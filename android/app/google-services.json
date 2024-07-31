@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "744851073999",
+    "project_id": "mesme2024",
+    "storage_bucket": "mesme2024.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744851073999:android:e9fe3b97248f0a399dc0ba",
+        "android_client_info": {
+          "package_name": "com.example.mesme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkHCBbWk4LmJBKAHqfUAVF3G1QdESdnQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744851073999:android:8433db5ca6b974a69dc0ba",
+        "android_client_info": {
+          "package_name": "in.mesme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkHCBbWk4LmJBKAHqfUAVF3G1QdESdnQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
