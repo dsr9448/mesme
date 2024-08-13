@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mesme/models/grocery_model.dart';
+import 'package:mesme/models/usermodel.dart';
 import 'package:mesme/provider/provider.dart';
+import 'package:mesme/screens/location.dart';
+import 'package:mesme/screens/search.dart';
 import 'package:mesme/screens/viewAll.dart';
 import 'package:mesme/widgets/HorizontalScrollGrocery.dart';
-import 'package:mesme/widgets/HorizontalScrollWidget.dart';
+import 'package:mesme/widgets/functionalities.dart';
 import 'package:provider/provider.dart';
 
 class GroceryScreen extends StatelessWidget {
@@ -13,51 +15,58 @@ class GroceryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final foodProvider = Provider.of<FoodProvider>(context);
+    UserModel? userData = foodProvider.userData;
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        forceMaterialTransparency: true,
         title: Row(
           children: [
+            Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                  color: Colors.black, borderRadius: BorderRadius.circular(50)),
+              child: GestureDetector(
+                child: const Icon(
+                  Icons.location_on_outlined,
+                  color: Colors.white,
+                ),
+              ),
+            ),
             GestureDetector(
-              onTap: () {},
-              child: Row(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MeLocation(
+                            uid: userData?.id ?? '-',
+                          )),
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Icon(
-                      Icons.location_on_outlined,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Your Location',
-                        style: GoogleFonts.poppins(
+                  Text('Your Location',
+                      style: GoogleFonts.poppins(
                           textStyle: const TextStyle(
-                              color: Colors.black, fontSize: 12),
+                              color: Colors.black, fontSize: 12))),
+                  Text(
+                      userData?.address != null
+                          ? userData!.address.split(' ').take(2).join(' ') +
+                              (userData.address.split(' ').length > 2
+                                  ? ''
+                                  : 'Enter location')
+                          : 'Enter location',
+                      style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      Text(
-                        'Enter location',
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                      ))
                 ],
               ),
             ),
@@ -65,21 +74,23 @@ class GroceryScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search, size: 36),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(50),
-            ),
-            child: IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/FoodProfile');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SearchPage()),
+                );
               },
-              icon: const Icon(Icons.person, color: Colors.white),
+              icon: const Icon(Icons.search, size: 36)),
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/FoodProfile');
+            },
+            icon: const Icon(
+              Icons.person,
+              color: Colors.white,
             ),
+            style: const ButtonStyle(
+                backgroundColor: MaterialStatePropertyAll(Colors.black)),
           ),
         ],
       ),
@@ -138,112 +149,55 @@ class GroceryScreen extends StatelessWidget {
                       ]),
                   HorizontalScrollGrocery(
                       items: grocery.groceryItem, rname: '', rlocation: ''),
-                  // HorizontalScrollWidget(items: grocery.groceryItem, rname: '',rlocation: '',)
                 ],
               )
           ],
         ),
       ),
-      // body: foodProvider.isLoading
-      //     ? const Center(child: CircularProgressIndicator())
-      //     : Container(
-      //         color: Colors.white,
-      //         padding: const EdgeInsets.all(8),
-      //         child: ListView(
-      //           children: foodProvider.groceries.map((category) {
-      //             List<GroceryItem>? items =
-      //                 foodProvider.groceryCategoriesMap[category.id];
-
-      //             return Column(
-      //               crossAxisAlignment: CrossAxisAlignment.start,
-      //               children: [
-      //                 Row(
-      //                   crossAxisAlignment: CrossAxisAlignment.center,
-      //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //                   children: [
-      //                     Text(
-      //                       category.name,
-      //                       style: TextStyle(
-      //                           fontWeight: FontWeight.bold, fontSize: 20),
-      //                     ),
-      //                     GestureDetector(
-      //                       onTap: (){
-      //                     //     Navigator.push(
-      //                     //   context,
-      //                     //   MaterialPageRoute(
-      //                     //     builder: (context) => FoodItemsApp(
-      //                     //       allFoodItems: items.Grcer
-      //                     //           .map((foodItem) => {
-      //                     //                 'name': foodItem.foodName,
-      //                     //                 'price': foodItem.price,
-      //                     //                 'image': foodItem.foodPhoto,
-      //                     //                 'vegOrNonVeg': foodItem.vegOrNonVeg,
-      //                     //                 'rating': foodItem.rating
-      //                     //               })
-      //                     //           .toList(),
-      //                     //       rname: 'restaurant.name',
-      //                     //       rlocation: 'restaurant.location',
-      //                     //     ),
-      //                     //   ),
-      //                     // );
-      //                       },
-      //                       child: Row(
-      //                         children: [
-      //                           Text('View all',
-      //                               style: GoogleFonts.poppins(
-      //                                   textStyle: const TextStyle(
-      //                                       fontWeight: FontWeight.w500))),
-      //                           const Icon(Icons.east)
-      //                         ],
-      //                       ),
-      //                     ),
-      //                   ],
-      //                 ),
-      //                 const SizedBox(height: 16),
-      //                 SizedBox(
-      //                   height: 120,
-      //                   child: ListView.builder(
-      //                     scrollDirection: Axis.horizontal,
-      //                     itemCount: items?.length ?? 0,
-      //                     itemBuilder: (context, index) {
-      //                       final item = items![index];
-      //                       return Container(
-      //                         margin: const EdgeInsets.only(right: 8),
-      //                         child: Column(
-      //                           crossAxisAlignment: CrossAxisAlignment.center,
-      //                           children: [
-      //                             ClipRRect(
-      //                               borderRadius: BorderRadius.circular(50),
-      //                               child: Image.network(
-      //                                 item.imageUrl,
-      //                                 fit: BoxFit.cover,
-      //                                 height:
-      //                                     100, // Set the height of the image
-      //                                 width: 100, // Set the width of the image
-      //                               ),
-      //                             ),
-      //                             Text(
-      //                               item.name,
-      //                             ),
-      //                           ],
-      //                         ),
-      //                       );
-      //                     },
-      //                   ),
-      //                 ),
-      //                 const SizedBox(height: 16),
-      //               ],
-      //             );
-      //           }).toList(),
-      //         ),
-      //       ),
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: Colors.black,
-      //   onPressed: () {
-      //     Navigator.pushNamed(context, '/FoodCart');
-      //   },
-      //   child: const Icon(Icons.shopping_cart, color: Colors.white),
-      // ),
+      floatingActionButton: ValueListenableBuilder<int>(
+        valueListenable: FoodFunction.cartItemCountNotifier,
+        builder: (context, itemCount, child) {
+          return FloatingActionButton(
+            backgroundColor: Colors.black,
+            onPressed: () {
+              Navigator.pushNamed(context, '/FoodCart');
+            },
+            child: Stack(
+              fit: StackFit.expand, // Make the stack fill the button area
+              children: [
+                const Icon(Icons.shopping_cart, color: Colors.white),
+                if (itemCount > 0)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding:
+                          const EdgeInsets.all(6), // Adjust padding as needed
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        maxWidth: 24, // Adjust size as needed
+                        maxHeight: 24, // Adjust size as needed
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$itemCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

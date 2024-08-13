@@ -57,13 +57,13 @@ class _MeIntroState extends State<MeIntro> {
                         'Fast delivery to your home, office or wherever you are.'),
               ],
             ),
-            Positioned(
-              top: kToolbarHeight,
-              child: Image.asset(
-                'images/logob.png',
-                width: 180,
-              ),
-            ),
+            // Positioned(
+            //   top: kToolbarHeight,
+            //   child: Image.asset(
+            //     'images/logob.png',
+            //     width: 180,
+            //   ),
+            // ),
             Positioned(
                 top: kToolbarHeight,
                 right: 18,

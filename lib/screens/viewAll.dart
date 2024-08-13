@@ -35,17 +35,20 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
-        leadingWidth: 24,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.arrow_back_ios)),
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          style: const ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(Colors.black)),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
+        centerTitle: true,
         title: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -150,121 +153,145 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
               itemCount: filteredFoodItems.length,
               itemBuilder: (context, index) {
                 final item = filteredFoodItems[index];
-                return Container(
-                  margin: const EdgeInsets.all(10),
-                  decoration: const BoxDecoration(
-                      border:
-                          Border(bottom: BorderSide(color: Colors.black45))),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            widget.food
-                                ? Container(
-                                    height: 30,
-                                    width: 30,
-                                    decoration: BoxDecoration(
-                                        color: item['vegOrNonVeg'] == 'Veg'
-                                            ? Colors.green.shade900
-                                            : Colors.red.shade900,
-                                        borderRadius: BorderRadius.circular(4)),
-                                    child: const Icon(
-                                      Icons.circle,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const SizedBox(),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            Text(
-                              item['name']!,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w900, fontSize: 16),
-                            ),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            Text(
-                              "₹ ${item['price']!}",
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w900),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                GestureDetector(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(18),
-                                        border:
-                                            Border.all(color: Colors.black45)),
-                                    child: const Text('View More'),
-                                  ),
-                                  onTap: () {
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                            builder: (context) => ViewItem(
-                                                  imageUrl: item['image']!,
-                                                  name: item['name']!,
-                                                  price: double.parse(
-                                                      item['price']!),
-                                                  location: widget.rlocation,
-                                                  restaurantName: widget.rname,
-                                                  description:
-                                                      item['description']!,
-                                                  isVeg: item['vegOrNonVeg'],
-                                                  rating: item['rating'],
-                                                  food: widget.food,
-                                                  quantity: item['quantity'],
-                                                  unit: item['unit'],
-                                                )));
-                                  },
-                                ),
-                                const SizedBox(
-                                  width: 28,
-                                ),
-                                IconButton(
-                                    style: const ButtonStyle(
-                                        backgroundColor: WidgetStatePropertyAll(
-                                            Colors.black)),
-                                    onPressed: () {
-                                      FoodFunction.addToCart(
-                                          item['name']!,
-                                          double.parse(item['price']!),
-                                          1,
-                                          item['image']!,
-                                          widget.rname,
-                                          widget.rlocation,
-                                          context);
-                                    },
-                                    color: Colors.white,
-                                    icon: const Icon(
-                                        Icons.local_grocery_store_rounded))
-                              ],
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                item['image']!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ViewItem(
+                              imageUrl: item['image']!,
+                              name: item['name']!,
+                              price: double.parse(item['price']!),
+                              location: widget.rlocation,
+                              restaurantName: widget.rname,
+                              description: item['description']!,
+                              isVeg: item['vegOrNonVeg'],
+                              rating: item['rating'],
+                              food: widget.food,
+                              quantity: item['quantity'],
+                              unit: item['unit'],
+                            )));
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                        border:
+                            Border(bottom: BorderSide(color: Colors.black45))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              widget.food
+                                  ? Container(
+                                      height: 30,
+                                      width: 30,
+                                      decoration: BoxDecoration(
+                                          color: item['vegOrNonVeg'] == 'Veg'
+                                              ? Colors.green.shade900
+                                              : Colors.red.shade900,
+                                          borderRadius:
+                                              BorderRadius.circular(4)),
+                                      child: const Icon(
+                                        Icons.circle,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                              const SizedBox(
+                                height: 6,
                               ),
-                            )
-                          ],
-                        )
-                      ],
+                              Text(
+                                item['name']!,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w900, fontSize: 16),
+                              ),
+                              const SizedBox(
+                                height: 6,
+                              ),
+                              Text(
+                                "₹ ${item['price']!}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w900),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          border: Border.all(
+                                              color: Colors.black45)),
+                                      child: const Text('View More'),
+                                    ),
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (context) => ViewItem(
+                                                    imageUrl: item['image']!,
+                                                    name: item['name']!,
+                                                    price: double.parse(
+                                                        item['price']!),
+                                                    location: widget.rlocation,
+                                                    restaurantName:
+                                                        widget.rname,
+                                                    description:
+                                                        item['description']!,
+                                                    isVeg: item['vegOrNonVeg'],
+                                                    rating: item['rating'],
+                                                    food: widget.food,
+                                                    quantity: item['quantity'],
+                                                    unit: item['unit'],
+                                                  )));
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    width: 28,
+                                  ),
+                                  IconButton(
+                                      style: const ButtonStyle(
+                                          backgroundColor:
+                                              WidgetStatePropertyAll(
+                                                  Colors.black)),
+                                      onPressed: () {
+                                        FoodFunction.addToCart(
+                                            item['name']!,
+                                            double.parse(item['price']!),
+                                            1,
+                                            item['image']!,
+                                            widget.rname,
+                                            widget.rlocation,
+                                            widget.food ? 'Food' : 'Grocery',
+                                            context);
+                                      },
+                                      color: Colors.white,
+                                      icon: const Icon(
+                                          Icons.local_grocery_store_rounded))
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  item['image']!,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -272,6 +299,50 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: ValueListenableBuilder<int>(
+        valueListenable: FoodFunction.cartItemCountNotifier,
+        builder: (context, itemCount, child) {
+          return FloatingActionButton(
+            backgroundColor: Colors.black,
+            onPressed: () {
+              Navigator.pushNamed(context, '/FoodCart');
+            },
+            child: Stack(
+              fit: StackFit.expand, // Make the stack fill the button area
+              children: [
+                const Icon(Icons.shopping_cart, color: Colors.white),
+                if (itemCount > 0)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding:
+                          const EdgeInsets.all(6), // Adjust padding as needed
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        maxWidth: 24, // Adjust size as needed
+                        maxHeight: 24, // Adjust size as needed
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$itemCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

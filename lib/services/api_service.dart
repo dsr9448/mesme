@@ -12,6 +12,90 @@ class ApiService with ChangeNotifier {
   ApiService() {
     fetchData();
   }
+  Future<void> createOrder(String userId, String status, String deliveryAddress,
+      double totalPrice, List<Map<String, dynamic>> items) async {
+    final url = 'https://mesme.in/admin/api/FoodOrders/create.php';
+
+    // Prepare the data
+    final requestData = {
+      'userId': userId,
+      'partnerId': '',
+      'status': status,
+      'deliveryAddress': deliveryAddress,
+      'totalPrice': totalPrice.toString(),
+      'items': items,
+    };
+
+    try {
+      // Make the POST request
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestData),
+      );
+
+      // Check the response status
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success']) {
+          print('Order created successfully: ${responseData['orderId']}');
+          // Handle success, e.g., navigate to a confirmation page or show a success message
+        } else {
+          print('Failed to create order: ${responseData['message']}');
+          // Handle failure, e.g., show an error message
+        }
+      } else {
+        print('Server error: ${response.statusCode}');
+        // Handle server error
+      }
+    } catch (error) {
+      print('Error: $error');
+      // Handle network or parsing error
+    }
+  }
+
+  Future<void> updateFoodOrder(String orderId, String status) async {
+    // API endpoint URL
+
+    // Data to be sent as JSON
+    Map<String, dynamic> requestData = {
+      'orderId': orderId,
+      'status': status,
+      'isActive': 1,
+    };
+
+    try {
+      // Sending the request to the server
+      final response = await http.post(
+        Uri.parse('https://mesme.in/admin/api/FoodOrders/update.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestData),
+      );
+
+      // Checking the response status code
+      if (response.statusCode == 200) {
+        // If the server returns a response with a 200 status code, parse the JSON
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        notifyListeners();
+        // Handle the response from the server
+        if (responseBody['error'] != null) {
+          // Handle error case
+          print('Error: ${responseBody['error']}');
+        } else {
+          // Success case
+          print('Success: ${responseBody['message']}');
+        }
+      } else {
+        // Handle non-200 responses
+        print('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle any errors that occur during the HTTP request
+      print('Request error: $e');
+    }
+  }
 
   Future<void> fetchData() async {
     final url = 'https://mesme.in/admin/api/Food/get.php';

@@ -35,8 +35,7 @@ class ViewItem extends StatefulWidget {
 }
 
 class _ViewItemState extends State<ViewItem> {
-
-int quantity=1;
+  int quantity = 1;
   void _incrementQuantity() {
     setState(() {
       quantity++;
@@ -96,7 +95,7 @@ int quantity=1;
                                   color: Colors.white,
                                 ),
                               )
-                            : SizedBox(),
+                            : const SizedBox(),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -235,7 +234,7 @@ int quantity=1;
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${widget.description}',
+                      widget.description,
                       textAlign: TextAlign.justify,
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
@@ -314,7 +313,10 @@ int quantity=1;
                           widget.imageUrl,
                           widget.restaurantName,
                           widget.location,
-                          context);
+                          widget.food ? 'Food' : 'Grocery',
+                          context).whenComplete((){
+                          Navigator.pop(context);
+                          });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,

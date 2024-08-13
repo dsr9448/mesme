@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mesme/provider/provider.dart';
 import 'package:mesme/services/firebase_authservices.dart';
 
 class MeLogin extends StatefulWidget {
@@ -26,7 +27,10 @@ class _MeLoginState extends State<MeLogin> {
           context,
           '/home',
           (route) => false,
-        );
+        ).then((value) async {
+          await FoodProvider().fetchSavedAddress();
+          await FoodProvider().fetchOrders();
+        });
       }
     });
   }

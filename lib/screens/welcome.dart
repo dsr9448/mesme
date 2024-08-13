@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mesme/provider/provider.dart';
 import 'package:mesme/screens/login.dart';
 import 'package:mesme/screens/signup.dart';
-import 'package:mesme/widgets/functionalities.dart';
 import 'package:provider/provider.dart';
 
 class MeWelcome extends StatelessWidget {
@@ -20,17 +19,6 @@ class MeWelcome extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
-                'Welcome to',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black87,
-                  // letterSpacing: 2,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              // const SizedBox(height: 20),
               Image.asset(
                 'images/logob.png',
                 width: 250,

@@ -6,10 +6,43 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class FoodFunction {
   static ValueNotifier<int> cartItemCountNotifier = ValueNotifier<int>(0);
-   static void addToCart(String name , double price , int quantity, String imageUrl, String restaurantName, String location,BuildContext context) async {
+
+  static Future<void> addToCart(
+      String name,
+      double price,
+      int quantity,
+      String imageUrl,
+      String restaurantName,
+      String location,
+      String category, // Add category parameter
+      BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> cartItems = prefs.getStringList('cartItems') ?? [];
-    int cartItemCount = cartItems.length;
+    Set<String> existingCategories = {}; // Set to track existing categories
+
+    // Check existing cart items for categories
+    for (String itemJson in cartItems) {
+      Map<String, dynamic> item = jsonDecode(itemJson);
+      existingCategories.add(item['category']);
+    }
+
+    // Prevent adding items from different categories
+    if (existingCategories.isNotEmpty &&
+        !existingCategories.contains(category)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'You cannot add items from different categories to the cart.'),
+          backgroundColor: Colors.red,
+          showCloseIcon: true,
+          closeIconColor: Colors.white,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    // Add new item to cart
     Map<String, dynamic> item = {
       'name': name,
       'price': price,
@@ -17,6 +50,7 @@ class FoodFunction {
       'imageUrl': imageUrl,
       'restaurantName': restaurantName,
       'location': location,
+      'category': category, // Add category to the item
     };
 
     cartItems.add(jsonEncode(item)); // Add JSON encoded string
@@ -25,10 +59,17 @@ class FoodFunction {
     await FoodFunction.updateCartItemCount(newCount);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Added $quantity $name to cart'),backgroundColor: Colors.black,closeIconColor: Colors.white,showCloseIcon: true,duration: const Duration(seconds: 3),),
+      SnackBar(
+        content: Text('Added $quantity $name to cart'),
+        backgroundColor: Colors.black,
+        closeIconColor: Colors.white,
+        duration: const Duration(seconds: 2),
+        showCloseIcon: true,
+        behavior: SnackBarBehavior.floating,
+      ),
     );
-
   }
+
   static Future<void> initialize() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int itemCount = prefs.getInt('cartItemCount') ?? 0;
@@ -40,10 +81,8 @@ class FoodFunction {
     await prefs.setInt('cartItemCount', newCount);
     cartItemCountNotifier.value = newCount;
   }
-   
-
-  
 }
+
 Widget caro2(List<String> bannerImages) {
   return Center(
     child: Builder(

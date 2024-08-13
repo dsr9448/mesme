@@ -1,30 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:mesme/models/usermodel.dart';
 import 'package:mesme/provider/provider.dart';
+import 'package:mesme/screens/location.dart';
 import 'package:mesme/screens/search.dart';
 import 'package:mesme/screens/viewAll.dart';
 import 'package:mesme/widgets/HorizontalScrollWidget.dart';
 import 'package:mesme/widgets/functionalities.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:mesme/food/screen/search.dart';
-// import 'package:mesme/food/screen/viewall.dart';
-// import 'package:mesme/food/widgets/text.dart';
-// import 'package:mesme/screens/location.dart';
-// import 'package:mesme/food/provider/food_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final foodProvider = Provider.of<FoodProvider>(context, listen: false);
+      foodProvider.fetchUserData();
+    });
+  }
+
   Widget build(BuildContext context) {
     final foodProvider = Provider.of<FoodProvider>(context);
+    UserModel? userData = foodProvider.userData;
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         forceMaterialTransparency: true,
-        // foregroundColor: Colors.white,
         title: Row(
           children: [
             Container(
@@ -41,13 +51,13 @@ class HomeScreen extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => MeLocation(
-                //             uid: userData?.id ?? '-',
-                //           )),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MeLocation(
+                            uid: userData?.id ?? '-',
+                          )),
+                );
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,12 +67,12 @@ class HomeScreen extends StatelessWidget {
                           textStyle: const TextStyle(
                               color: Colors.black, fontSize: 12))),
                   Text(
-                      // userData?.address != null
-                      //     ? userData!.address.split(' ').take(2).join(' ') +
-                      //         (userData!.address.split(' ').length > 2
-                      //             ? '.'
-                      //             : 'Enter location'):
-                      'Enter location',
+                      userData?.address != null
+                          ? userData!.address.split(' ').take(2).join(' ') +
+                              (userData.address.split(' ').length > 2
+                                  ? ''
+                                  : 'Enter location')
+                          : 'Enter location',
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           color: Colors.black,
@@ -80,8 +90,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) =>  SearchPage()),
+                  MaterialPageRoute(builder: (context) => SearchPage()),
                 );
               },
               icon: const Icon(Icons.search, size: 36)),
@@ -94,7 +103,7 @@ class HomeScreen extends StatelessWidget {
               color: Colors.white,
             ),
             style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.black)),
+                backgroundColor: WidgetStatePropertyAll(Colors.black)),
           ),
         ],
       ),
@@ -165,13 +174,6 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: Colors.black,
-      //   onPressed: () {
-      //     Navigator.pushNamed(context, '/FoodCart');
-      //   },
-      //   child: const Icon(Icons.shopping_cart, color: Colors.white),
-      // ),
       floatingActionButton: ValueListenableBuilder<int>(
         valueListenable: FoodFunction.cartItemCountNotifier,
         builder: (context, itemCount, child) {
@@ -181,6 +183,7 @@ class HomeScreen extends StatelessWidget {
               Navigator.pushNamed(context, '/FoodCart');
             },
             child: Stack(
+              fit: StackFit.expand, // Make the stack fill the button area
               children: [
                 const Icon(Icons.shopping_cart, color: Colors.white),
                 if (itemCount > 0)
@@ -188,14 +191,15 @@ class HomeScreen extends StatelessWidget {
                     right: 0,
                     top: 0,
                     child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
+                      padding:
+                          const EdgeInsets.all(6), // Adjust padding as needed
+                      decoration: const BoxDecoration(
                         color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
+                        shape: BoxShape.circle,
                       ),
                       constraints: const BoxConstraints(
-                        minWidth: 20,
-                        minHeight: 20,
+                        maxWidth: 24, // Adjust size as needed
+                        maxHeight: 24, // Adjust size as needed
                       ),
                       child: Center(
                         child: Text(
@@ -203,7 +207,7 @@ class HomeScreen extends StatelessWidget {
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: 10,
                           ),
                         ),
                       ),
@@ -217,5 +221,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
-

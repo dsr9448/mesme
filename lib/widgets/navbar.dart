@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mesme/models/usermodel.dart';
+import 'package:mesme/provider/provider.dart';
 import 'package:mesme/screens/grocery.dart';
 import 'package:mesme/screens/home.dart';
 import 'package:mesme/screens/orders.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FoodBottomNavBar extends StatefulWidget {
   const FoodBottomNavBar({super.key});
@@ -38,8 +42,8 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
             color: const Color.fromARGB(255, 255, 255, 255),
             shape: const CircularNotchedRectangle(),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 4.0), // Adjusted padding
+              padding:
+                  const EdgeInsets.symmetric(vertical: 4.0), // Adjusted padding
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -57,9 +61,8 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                         children: [
                           Icon(
                             Icons.dinner_dining,
-                            color: currentTab == 0
-                                ? Colors.black
-                                : Colors.black87,
+                            color:
+                                currentTab == 0 ? Colors.black : Colors.black87,
                           ),
                           Text(
                             'Food',
@@ -91,9 +94,8 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                         children: [
                           Icon(
                             Icons.local_grocery_store,
-                            color: currentTab == 1
-                                ? Colors.black
-                                : Colors.black45,
+                            color:
+                                currentTab == 1 ? Colors.black : Colors.black45,
                           ),
                           Text(
                             'Grocery',
@@ -126,9 +128,8 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                         children: [
                           Icon(
                             Icons.watch_later_outlined,
-                            color: currentTab == 2
-                                ? Colors.black
-                                : Colors.black45,
+                            color:
+                                currentTab == 2 ? Colors.black : Colors.black45,
                           ),
                           Text(
                             'Orders',
@@ -148,8 +149,14 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                   ),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () {
-                        Navigator.popAndPushNamed(context, '/home');
+                      onTap: () async {
+                        const url =
+                            'https://play.google.com/store/apps/details?id=in.mesme.mesme&pcampaignid=web_share';
+                        if (await canLaunch(url)) {
+                          await launch(url);
+                        } else {
+                          throw 'Could not launch $url';
+                        }
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
