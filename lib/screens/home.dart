@@ -18,10 +18,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      final foodProvider = Provider.of<FoodProvider>(context, listen: false);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if (FirebaseAuth.instance.currentUser != null) {
+        final foodProvider = Provider.of<FoodProvider>(context, listen: false);
       foodProvider.fetchUserData();
     });
   }
