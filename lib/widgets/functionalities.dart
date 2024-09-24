@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,6 +34,7 @@ class FoodFunction {
               'You cannot add items from different categories to the cart.'),
           backgroundColor: Colors.red,
           showCloseIcon: true,
+          behavior: SnackBarBehavior.floating,
           closeIconColor: Colors.white,
           duration: Duration(seconds: 3),
         ),
@@ -61,7 +61,7 @@ class FoodFunction {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Added $quantity $name to cart'),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.orange.shade700,
         closeIconColor: Colors.white,
         duration: const Duration(seconds: 2),
         showCloseIcon: true,
@@ -106,7 +106,7 @@ Widget caro2(List<String> bannerImages) {
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: Image.network(
-                          i,
+                          'https://mesme.in/ControlHub/includes/uploads/${i}',
                           fit: BoxFit.cover,
                           width: double.infinity,
                         )));

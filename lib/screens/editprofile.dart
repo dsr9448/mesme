@@ -177,7 +177,7 @@ class _MeEditprofileState extends State<MeEditprofile> {
         automaticallyImplyLeading: false,
         leading: IconButton(
           style: const ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll(Colors.black)),
+              backgroundColor: WidgetStatePropertyAll(Colors.orange)),
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Colors.white,
@@ -198,7 +198,7 @@ class _MeEditprofileState extends State<MeEditprofile> {
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(
-              color: Colors.black,
+              color: Colors.orange,
               backgroundColor: Colors.white, // Loading spinner color
             ))
           : Container(
@@ -216,13 +216,13 @@ class _MeEditprofileState extends State<MeEditprofile> {
                             width: 130,
                             height: 130,
                             decoration: BoxDecoration(
-                                border:
-                                    Border.all(width: 0.8, color: Colors.black),
+                                border: Border.all(
+                                    width: 0.8, color: Colors.orange),
                                 boxShadow: [
                                   BoxShadow(
                                       spreadRadius: 2,
                                       blurRadius: 10,
-                                      color: Colors.black.withOpacity(0.1)),
+                                      color: Colors.orange.withOpacity(0.1)),
                                 ],
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
@@ -241,8 +241,8 @@ class _MeEditprofileState extends State<MeEditprofile> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                      width: 0.8, color: Colors.black),
-                                  color: Colors.black,
+                                      width: 0.8, color: Colors.orange),
+                                  color: Colors.orange,
                                 ),
                                 child: IconButton(
                                   icon: const Icon(
@@ -308,8 +308,8 @@ class _MeEditprofileState extends State<MeEditprofile> {
                         IconButton(
                           color: Colors.black,
                           style: ButtonStyle(
-                            backgroundColor:
-                                WidgetStateProperty.all<Color>(Colors.black),
+                            backgroundColor: WidgetStateProperty.all<Color>(
+                                Colors.orange.shade700),
                           ),
                           icon: const Icon(
                             Icons.location_on,
@@ -350,7 +350,7 @@ class _MeEditprofileState extends State<MeEditprofile> {
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(horizontal: 50),
-                            backgroundColor: Colors.black,
+                            backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),

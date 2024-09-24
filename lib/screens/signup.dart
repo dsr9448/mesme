@@ -40,8 +40,8 @@ class _MeSignupState extends State<MeSignup> {
       backgroundColor: Colors.white,
       body: Center(
         child: isAuthInProgress
-            ? const CircularProgressIndicator(
-                color: Colors.black,
+            ? CircularProgressIndicator(
+                color: Colors.orange.shade700,
               )
             : ListView(
                 shrinkWrap: true,
@@ -68,11 +68,13 @@ class _MeSignupState extends State<MeSignup> {
                               autofocus: true,
                               controller: _usernameController,
                               decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.orange),
+                                ),
                                 fillColor: Colors.black,
                                 focusColor: Colors.black,
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.black87),
+                                  borderSide: BorderSide(color: Colors.orange),
                                 ),
                                 prefixIcon: Icon(
                                   Icons.person,
@@ -81,7 +83,7 @@ class _MeSignupState extends State<MeSignup> {
                                 labelText: 'Name',
                                 labelStyle: TextStyle(color: Colors.black87),
                               ),
-                              cursorColor: Colors.black,
+                              cursorColor: Colors.orange.shade700,
                               style: const TextStyle(color: Colors.black),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -95,11 +97,13 @@ class _MeSignupState extends State<MeSignup> {
                               autofocus: false,
                               controller: _emailController,
                               decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.orange),
+                                ),
                                 fillColor: Colors.black,
                                 focusColor: Colors.black,
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.black87),
+                                  borderSide: BorderSide(color: Colors.orange),
                                 ),
                                 prefixIcon: Icon(
                                   Icons.email,
@@ -108,7 +112,7 @@ class _MeSignupState extends State<MeSignup> {
                                 labelText: 'Email',
                                 labelStyle: TextStyle(color: Colors.black87),
                               ),
-                              cursorColor: Colors.black,
+                              cursorColor: Colors.orange.shade700,
                               style: const TextStyle(color: Colors.black),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -124,11 +128,13 @@ class _MeSignupState extends State<MeSignup> {
                               keyboardType: TextInputType.phone,
                               maxLength: 10,
                               decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                fillColor: Colors.black,
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.orange),
+                                ),
+                                fillColor: Colors.orange,
                                 focusColor: Colors.black,
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.black87),
+                                  borderSide: BorderSide(color: Colors.orange),
                                 ),
                                 prefixIcon: Icon(
                                   Icons.call,
@@ -137,10 +143,12 @@ class _MeSignupState extends State<MeSignup> {
                                 labelText: 'Phone Number',
                                 labelStyle: TextStyle(color: Colors.black87),
                               ),
-                              cursorColor: Colors.black,
+                              cursorColor: Colors.orange.shade700,
                               style: const TextStyle(color: Colors.black),
                               validator: (value) {
-                                if (value == null || value.isEmpty) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.length < 10) {
                                   return 'Please enter your phone number';
                                 }
                                 return null;
@@ -153,11 +161,13 @@ class _MeSignupState extends State<MeSignup> {
                               obscureText:
                                   !_passwordVisible, // Use _passwordVisible to toggle password visibility
                               decoration: InputDecoration(
-                                border: const OutlineInputBorder(),
+                                border: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.orange),
+                                ),
                                 fillColor: Colors.black,
                                 focusColor: Colors.black,
                                 focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.black87),
+                                  borderSide: BorderSide(color: Colors.orange),
                                 ),
                                 prefixIcon: const Icon(
                                   Icons.lock,
@@ -180,7 +190,7 @@ class _MeSignupState extends State<MeSignup> {
                                 labelStyle:
                                     const TextStyle(color: Colors.black87),
                               ),
-                              cursorColor: Colors.black,
+                              cursorColor: Colors.orange.shade700,
                               style: const TextStyle(color: Colors.black),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -195,8 +205,7 @@ class _MeSignupState extends State<MeSignup> {
                               child: ElevatedButton(
                                 onPressed: signUp,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color.fromRGBO(0, 0, 0, 1),
+                                  backgroundColor: Colors.orange.shade700,
                                 ),
                                 child: const Text(
                                   'Sign in',
@@ -221,7 +230,10 @@ class _MeSignupState extends State<MeSignup> {
     String email = _emailController.text;
     String phoneNumber = _phonenoController.text;
     String password = _passwordController.text;
-    if (name != "" || email != "" || phoneNumber != "" || password != "") {
+    if (name != "" ||
+        email != "" ||
+        (phoneNumber != "" || phoneNumber.length != 10) ||
+        password != "") {
       try {
         // Set isAuthInProgress to true when signup process starts
         setState(() {
@@ -232,8 +244,7 @@ class _MeSignupState extends State<MeSignup> {
 
         if (user != null) {
           var res = await http.post(
-            Uri.parse(
-                'https://mesme.in/admin/api/users/create.php'),
+            Uri.parse('https://mesme.in/admin/api/users/create.php'),
             body: {
               "id": user.uid,
               "name": name,
@@ -246,13 +257,14 @@ class _MeSignupState extends State<MeSignup> {
           );
           Navigator.pushNamedAndRemoveUntil(
             context,
-            '/home',
+            '/location',
+            arguments: true,
             (route) => false,
           );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Welcome $name'),
-              backgroundColor: Colors.black,
+              backgroundColor: Colors.orange.shade700,
               showCloseIcon: true,
               closeIconColor: Colors.white,
             ),
@@ -260,9 +272,9 @@ class _MeSignupState extends State<MeSignup> {
         } else {
           Navigator.pushNamed(context, '/welcome');
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: Colors.red,
-              content: Text('invalid access'),
+            SnackBar(
+              backgroundColor: Colors.red.shade700,
+              content: const Text('invalid Credentials'),
               showCloseIcon: true,
               closeIconColor: Colors.white,
             ),
@@ -285,9 +297,9 @@ class _MeSignupState extends State<MeSignup> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('please enter the data '),
+        SnackBar(
+          backgroundColor: Colors.red.shade700,
+          content: const Text('please enter the data '),
           showCloseIcon: true,
           closeIconColor: Colors.white,
         ),

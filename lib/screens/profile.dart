@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mesme/models/usermodel.dart';
 import 'package:http/http.dart' as http;
+import 'package:mesme/screens/customersupport.dart';
 import 'package:mesme/screens/editprofile.dart';
 import 'package:mesme/screens/privacy.dart';
 
@@ -65,7 +66,7 @@ class _FoodProfileState extends State<FoodProfile> {
         automaticallyImplyLeading: false,
         leading: IconButton(
           style: const ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll(Colors.black)),
+              backgroundColor: WidgetStatePropertyAll(Colors.orange)),
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Colors.white,
@@ -84,9 +85,9 @@ class _FoodProfileState extends State<FoodProfile> {
         ),
       ),
       body: isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(
-              color: Colors.black,
+              color: Colors.orange.shade700,
               backgroundColor: Colors.white, // Loading spinner color
             ))
           : Container(
@@ -138,9 +139,9 @@ class _FoodProfileState extends State<FoodProfile> {
                     },
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 12),
-                    leading: const Icon(
+                    leading: Icon(
                       Icons.settings,
-                      color: Colors.black, // Icon color
+                      color: Colors.orange.shade700, // Icon color
                     ),
                     title: Text(
                       'Account Settings',
@@ -149,21 +150,21 @@ class _FoodProfileState extends State<FoodProfile> {
                       ),
                     ),
                     titleAlignment: ListTileTitleAlignment.center,
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.arrow_forward_ios,
-                      color: Colors.black54, // Icon color
+                      color: Colors.orange.shade700, // Icon color
                     ),
                   ),
                   ListTile(
                     onTap: () {
-                      // Navigator.of(context).push(MaterialPageRoute(
-                      //     builder: (context) => const MeCustomer()));
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const MeCustomer()));
                     },
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 18, vertical: 12),
-                    leading: const Icon(
+                    leading: Icon(
                       Icons.support_agent_rounded,
-                      color: Colors.black, // Icon color
+                      color: Colors.orange.shade700, // Icon color
                     ),
                     title: Text(
                       'Customer Support',
@@ -172,21 +173,21 @@ class _FoodProfileState extends State<FoodProfile> {
                       ),
                     ),
                     titleAlignment: ListTileTitleAlignment.center,
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.arrow_forward_ios,
-                      color: Colors.black54, // Icon color
+                      color: Colors.orange.shade700, // Icon color
                     ),
                   ),
                   ListTile(
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const MePolicy()));
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => MePolicy()));
                     },
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 18, vertical: 12),
-                    leading: const Icon(
+                    leading: Icon(
                       Icons.privacy_tip,
-                      color: Colors.black, // Icon color
+                      color: Colors.orange.shade700, // Icon color
                     ),
                     title: Text(
                       'Privacy Policy',
@@ -195,9 +196,9 @@ class _FoodProfileState extends State<FoodProfile> {
                       ),
                     ),
                     titleAlignment: ListTileTitleAlignment.center,
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.arrow_forward_ios,
-                      color: Colors.black54, // Icon color
+                      color: Colors.orange.shade700, // Icon color
                     ),
                   ),
                   ListTile(
@@ -206,19 +207,18 @@ class _FoodProfileState extends State<FoodProfile> {
                         Navigator.pushNamedAndRemoveUntil(
                             context, '/welcome', (route) => false);
                       });
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Logout successful.'),
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: const Text('Logout successful.'),
                         showCloseIcon: true,
-                        backgroundColor: Colors.black,
+                        backgroundColor: Colors.orange.shade700,
                         closeIconColor: Colors.white,
                       ));
                     },
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 18, vertical: 12),
-                    leading: const Icon(
-                      Icons.logout,
-                      color: Colors.black, // Icon color
-                    ),
+                    leading: Icon(Icons.logout,
+                        color: Colors.orange.shade700 // Icon color
+                        ),
                     title: Text(
                       'Logout',
                       style: GoogleFonts.poppins(

@@ -20,7 +20,7 @@ class MeWelcome extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset(
-                'images/logob.png',
+                'images/mesmelogo.png',
                 width: 250,
               ),
               const SizedBox(height: 20),
@@ -29,34 +29,36 @@ class MeWelcome extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => const MeLogin()),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                    backgroundColor: Colors.white,
                   minimumSize: const Size(300, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.orange),
                   ),
-                  elevation: 5,
+                  elevation: 0,
                 ),
                 child: const Text(
                   'Log in',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
               ),
               const SizedBox(height: 15),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const MeSignup()),
+                  MaterialPageRoute(builder: (context) =>  MeSignup()),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: Colors.white,
                   minimumSize: const Size(300, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.orange),
                   ),
-                  elevation: 5,
+                  elevation: 0,
                 ),
                 child: const Text(
-                  'Sign up',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  'Sign In',
+                  style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
               ),
               const SizedBox(height: 20),

@@ -120,7 +120,7 @@ class _MePhotoState extends State<MePhoto> {
         automaticallyImplyLeading: false,
         leading: IconButton(
           style: const ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll(Colors.black)),
+              backgroundColor: WidgetStatePropertyAll(Colors.orange)),
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Colors.white,
@@ -153,9 +153,10 @@ class _MePhotoState extends State<MePhoto> {
               onTap: _pickImage,
               child: Container(
                 width: 180,
-                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: Colors.orange.shade700,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
@@ -176,7 +177,7 @@ class _MePhotoState extends State<MePhoto> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: Colors.orange.shade700,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(

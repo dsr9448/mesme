@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:mesme/models/ordermodel.dart';
 import 'package:mesme/provider/provider.dart';
 import 'package:mesme/services/api_service.dart';
-import 'package:mesme/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -20,13 +20,15 @@ class _OrderListPageState extends State<OrderListPage> {
   @override
   void initState() {
     super.initState();
+    _fetchOrders();
     _searchController.addListener(() {
       _filterOrders(_searchController.text);
     });
   }
 
-  void _fetchOrders() {
+  void _fetchOrders() async {
     final foodProvider = Provider.of<FoodProvider>(context, listen: false);
+    await foodProvider.fetchOrders();
     setState(() {
       filteredOrders = foodProvider.orders;
     });
@@ -46,8 +48,6 @@ class _OrderListPageState extends State<OrderListPage> {
         filteredOrders = foodProvider.orders; // Update filteredOrders list
       });
       Navigator.pop(context);
-      // Navigate or show a snackbar if necessary
-      // Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -70,6 +70,73 @@ class _OrderListPageState extends State<OrderListPage> {
           behavior: SnackBarBehavior.floating,
           closeIconColor: Colors.white,
         ),
+      );
+    }
+  }
+
+  void _updateRating(String orderId, double rating) async {
+    final foodProvider = Provider.of<FoodProvider>(context, listen: false);
+    try {
+      // Cancel the order via API
+      await ApiService().updateOrderRating(orderId, rating.toString());
+
+      // Refetch the orders from the server
+      await foodProvider.fetchOrders();
+
+      // Update the UI
+      setState(() {
+        filteredOrders = foodProvider.orders; // Update filteredOrders list
+      });
+      // Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Thank you for your rating!'),
+          backgroundColor: Colors.green.shade800,
+          duration: const Duration(seconds: 2),
+          showCloseIcon: true,
+          behavior: SnackBarBehavior.floating,
+          closeIconColor: Colors.white,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Failed to upate rating'),
+          backgroundColor: Colors.red.shade800,
+          duration: const Duration(seconds: 2),
+          showCloseIcon: true,
+          behavior: SnackBarBehavior.floating,
+          closeIconColor: Colors.white,
+        ),
+      );
+    }
+  }
+
+  void _updatePayment(String orderId, String status) async {
+    final foodProvider = Provider.of<FoodProvider>(context, listen: false);
+    try {
+      // Cancel the order via API
+      await ApiService().updatePayment(orderId, status);
+
+      // Refetch the orders from the server
+      await foodProvider.fetchOrders();
+
+      // Update the UI
+      setState(() {
+        filteredOrders = foodProvider.orders; // Update filteredOrders list
+      });
+      Navigator.pop(context);
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.success,
+        text: 'Transaction Completed Successfully!',
+      );
+    } catch (e) {
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.error,
+        title: 'Oops...',
+        text: 'Sorry, something went wrong',
       );
     }
   }
@@ -102,7 +169,7 @@ class _OrderListPageState extends State<OrderListPage> {
         title: TextField(
           controller: _searchController,
           onChanged: _filterOrders,
-          cursorColor: Colors.black,
+          cursorColor: Colors.orange.shade700,
           decoration: const InputDecoration(
             hintText: 'Search Orders...',
             prefixIcon: Icon(Icons.search),
@@ -119,7 +186,7 @@ class _OrderListPageState extends State<OrderListPage> {
               color: Colors.white,
             ),
             style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.black)),
+                backgroundColor: WidgetStatePropertyAll(Colors.orange)),
           ),
         ],
       ),
@@ -162,96 +229,154 @@ class _OrderListPageState extends State<OrderListPage> {
                     itemCount: filteredOrders.length,
                     itemBuilder: (context, index) {
                       final order = filteredOrders[index];
-                      return ListTile(
-                        title: Row(
-                          children: [
-                            const Text(
-                              'Order No:',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.circular(10), // Rounded corners
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  Colors.grey.withOpacity(0.5), // Shadow color
+                              spreadRadius: 2, // How much the shadow spreads
+                              blurRadius: 6, // Blur effect
+                              offset: const Offset(0, 3), // Shadow position
                             ),
-                            const SizedBox(width: 8),
-                            Text(order.orderId),
                           ],
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Text(
-                                  'Status:',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  order.status,
-                                  style: TextStyle(
-                                    color: _statusColor(order.status),
+                        child: ListTile(
+                          style: ListTileStyle.list,
+                          title: Row(
+                            children: [
+                              const Text(
+                                'Order No:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(order.orderId),
+                            ],
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Status:',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            if (order.status == 'Order Placed')
-                              GestureDetector(
-                                onTap: () {
-                                  QuickAlert.show(
-                                      context: context,
-                                      type: QuickAlertType.confirm,
-                                      text: 'Do you want to cancel your order?',
-                                      title: 'Confirm Cancelation',
-                                      backgroundColor: Colors.white,
-                                      confirmBtnText: 'Yes',
-                                      cancelBtnText: 'No',
-                                      confirmBtnColor: Colors.red.shade800,
-                                      onConfirmBtnTap: () async {
-                                        _cancelOrder(order.orderId);
-                                      });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red.shade800,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: const Text(
-                                    'Cancel Order',
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    order.status,
                                     style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
+                                      color: _statusColor(order.status),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              order.status == 'Delivered' && order.rating == '0'
+                                  ? Row(
+                                      children: [
+                                        RatingBar.builder(
+                                          initialRating:
+                                              double.parse(order.rating),
+                                          minRating: 1,
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: true,
+                                          itemSize: 28,
+                                          itemCount: 5,
+                                          itemPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 0.0),
+                                          itemBuilder: (context, _) =>
+                                              const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                          ),
+                                          updateOnDrag: true,
+                                          onRatingUpdate: (rating) {
+                                            // _updateRating(order.orderId, rating);
+                                            Future.delayed(Duration(seconds: 2),
+                                                () {
+                                              _updateRating(
+                                                  order.orderId, rating);
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    )
+                                  : const SizedBox(),
+                              if (order.status == 'Order Placed')
+                                GestureDetector(
+                                  onTap: () {
+                                    QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.confirm,
+                                        text:
+                                            'Do you want to cancel your order?',
+                                        title:
+                                            'Confirm Cancellation ${order.orderId}',
+                                        backgroundColor: Colors.white,
+                                        confirmBtnText: 'Yes',
+                                        cancelBtnText: 'No',
+                                        confirmBtnColor: Colors.red.shade800,
+                                        onConfirmBtnTap: () async {
+                                          _cancelOrder(order.orderId);
+                                        });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.shade800,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Text(
+                                      'Cancel Order',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                          ],
-                        ),
-                        trailing: IconButton(
-                          onPressed: () {
+                            ],
+                          ),
+                          trailing: IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      OrderDetailPage(order: order),
+                                ),
+                              ).whenComplete(() {
+                                _fetchOrders();
+                              });
+                            },
+                            style: const ButtonStyle(
+                                backgroundColor:
+                                    WidgetStatePropertyAll(Colors.orange)),
+                            icon: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Colors.white,
+                            ),
+                          ),
+                          onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     OrderDetailPage(order: order),
                               ),
-                            );
+                            ).whenComplete(() {
+                              _fetchOrders();
+                            });
                           },
-                          style: const ButtonStyle(
-                              backgroundColor:
-                                  MaterialStatePropertyAll(Colors.black)),
-                          icon: const Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            color: Colors.white,
-                          ),
                         ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  OrderDetailPage(order: order),
-                            ),
-                          );
-                        },
                       );
                     },
                   ),
@@ -264,19 +389,19 @@ class _OrderListPageState extends State<OrderListPage> {
   Color _statusColor(String status) {
     switch (status) {
       case 'Order Placed':
-        return Colors.lightBlue;
+        return Colors.blue.shade900;
       case 'Cancelled':
-        return Colors.red;
+        return Colors.red.shade800;
       case 'Accepted':
-        return Colors.blue;
+        return Colors.blueAccent.shade700;
       case 'Preparing':
-        return Colors.orange;
+        return Colors.orange.shade900;
       case 'Ready for Pickup':
-        return Colors.yellow;
+        return Colors.yellow.shade600;
       case 'On the Way':
-        return Colors.green;
+        return Colors.deepPurple.shade800;
       case 'Delivered':
-        return Colors.deepPurple;
+        return Colors.green.shade800;
       default:
         return Colors.black;
     }
@@ -298,7 +423,7 @@ class OrderDetailPage extends StatelessWidget {
         forceMaterialTransparency: true,
         leading: IconButton(
           style: const ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll(Colors.black)),
+              backgroundColor: WidgetStatePropertyAll(Colors.orange)),
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Colors.white,
@@ -322,8 +447,7 @@ class OrderContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final availableItemsTotal = _calculateAvailableItemsTotal(order.categories);
-
+    double price = 0.0;
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -376,7 +500,7 @@ class OrderContent extends StatelessWidget {
                                     fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                '₹${order.totalPrice}',
+                                '₹${(order.totalPrice).toString().replaceAll('.00', '')}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -407,7 +531,7 @@ class OrderContent extends StatelessWidget {
                                           ),
                                         ),
                                         Text(
-                                          '${order.rating}',
+                                          order.rating,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
@@ -424,6 +548,30 @@ class OrderContent extends StatelessWidget {
                         : const SizedBox(),
                   ],
                 ),
+                if (order.status == 'Accepted' &&
+                    order.deliveryPartnerName != null)
+                  Row(
+                    children: [
+                      const Icon(Icons.person),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${order.deliveryPartnerName}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () {
+                          launch('tel:${order.deliveryPartnerPhone}');
+                        },
+                        icon: const Icon(Icons.phone),
+                        color: Colors.white,
+                        style: const ButtonStyle(
+                          backgroundColor:
+                              WidgetStatePropertyAll(Colors.orange),
+                        ),
+                      ),
+                    ],
+                  ),
                 Divider(thickness: 1, color: Colors.grey[300]),
                 const Padding(
                   padding: EdgeInsets.all(16.0),
@@ -452,7 +600,7 @@ class OrderContent extends StatelessWidget {
                             const SizedBox(height: 8),
                             const Text(
                               'The order has been cancelled',
-                              style: const TextStyle(color: Colors.black87),
+                              style: TextStyle(color: Colors.black87),
                             ),
                           ],
                         ),
@@ -460,38 +608,93 @@ class OrderContent extends StatelessWidget {
                     : CreativeDeliveryStatus(status: order.status),
                 Divider(thickness: 1, color: Colors.grey[300]),
                 const SizedBox(height: 16),
-                if (order.status == 'Accepted' &&
-                    order.deliveryPartnerName != null)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Delivery Partner: ${order.deliveryPartnerName}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          launch('tel:${order.deliveryPartnerPhone}');
-                        },
-                        icon: const Icon(
-                          Icons.phone,
-                          color: Colors.white,
-                        ),
-                        style: const ButtonStyle(
-                            backgroundColor:
-                                MaterialStatePropertyAll(Colors.black)),
-                      ),
-                    ],
-                  ),
-                // const SizedBox(height: 16),
+                ...order.categories.entries.map((entry) {
+                  String category = entry.key;
+                  List<OrderCategory> items = entry.value;
 
-                ...order.categories.map((category) => OrderDetailsSection(
-                      orders: [category],
-                    )),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          category,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: items.asMap().entries.map((entry) {
+                            int index = entry.key;
+                            OrderCategory item = entry.value;
+                            price = price +
+                                double.parse(
+                                    (item.quantity * item.price).toString());
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          '${index + 1}. ${item.name} - ${item.quantity}',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      '₹ ${(item.quantity * item.price).toString().replaceAll('.0', '')}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                      ),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      order.status == 'Cancelled'
+                                          ? "Cancelled"
+                                          : item.isAvailable == 0
+                                              ? "Waiting"
+                                              : item.isAvailable == 1
+                                                  ? "Accepted"
+                                                  : "(Unavailable)",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: order.status == 'Cancelled'
+                                            ? Colors.red.shade800
+                                            : item.isAvailable == 1
+                                                ? Colors.green.shade900
+                                                : Colors.red.shade800,
+                                      ),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        )
+                      ],
+                    ),
+                  );
+                }).toList(),
                 const SizedBox(height: 16),
                 (order.status != 'Cancelled')
                     ? Container(
@@ -500,7 +703,7 @@ class OrderContent extends StatelessWidget {
                             vertical: 16, horizontal: 8),
                         width: double.infinity,
                         decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: Colors.orange.shade700,
                             // border: Border.all(color: Colors.black87, width: 1.0),
                             borderRadius: BorderRadius.circular(8)),
                         child: Padding(
@@ -530,7 +733,7 @@ class OrderContent extends StatelessWidget {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    '₹ ${double.parse(order.totalPrice) - _calculateGSTAndServiceCharge(double.parse(order.totalPrice))}',
+                                    '₹ ${price.toString().replaceAll('.0', '')}',
                                     style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
@@ -553,8 +756,8 @@ class OrderContent extends StatelessWidget {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    '₹ ${_calculateGSTAndServiceCharge(double.parse(order.totalPrice))}',
-                                    style: TextStyle(
+                                    '₹ ${(double.parse(order.totalPrice) - price).toString().replaceAll('.0', '')}',
+                                    style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold),
@@ -614,16 +817,37 @@ class OrderContent extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
-                                    'Amount Payable: ',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                  order.status == 'Delivered' &&
+                                              order.paymentStatus ==
+                                                  'Pending' ||
+                                          order.paymentStatus == 'Failed'
+                                      ? const Text(
+                                          'Amount Payable: ',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : order.paymentStatus == 'Pending'
+                                          ? const Text(
+                                              'Amount Payable: ',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Amount Paid: ',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                   Text(
-                                    '₹ ${double.parse(order.totalPrice)}',
+                                    '₹ ${double.parse(order.totalPrice).toString().replaceAll('.0', '')}',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -635,22 +859,53 @@ class OrderContent extends StatelessWidget {
                               const SizedBox(
                                 height: 8,
                               ),
-                              order.status == 'Delivered'
-                                  ? Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8),
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
-                                      child: const Text(
-                                        'Pay Now',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                              order.status == 'Delivered' &&
+                                          order.paymentStatus == 'Pending' ||
+                                      order.paymentStatus == 'Failed'
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        Provider.of<FoodProvider>(context,
+                                                listen: false)
+                                            .openCheckout(
+                                                double.parse(order.totalPrice),
+                                                '${order.orderId} ${order.orderDate}',
+                                                order.orderId)
+                                            .whenComplete(() {
+                                          QuickAlert.show(
+                                              context: context,
+                                              type: QuickAlertType.success,
+                                              title: 'Payment Successful',
+                                              confirmBtnColor:
+                                                  Colors.orange.shade700,
+                                              text:
+                                                  'Transaction Completed Successfully!',
+                                              onConfirmBtnTap: () {
+                                                Navigator
+                                                    .pushNamedAndRemoveUntil(
+                                                        context,
+                                                        '/home',
+                                                        (Route<dynamic>
+                                                                route) =>
+                                                            false);
+                                              });
+                                        });
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8),
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
+                                        child: const Text(
+                                          'Pay Now',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
                                         ),
                                       ),
                                     )
@@ -667,33 +922,6 @@ class OrderContent extends StatelessWidget {
       ),
     );
   }
-
-  double _calculateGSTAndServiceCharge(double totalAmount) {
-    if (totalAmount >= 0 && totalAmount <= 200) {
-      return 25;
-    } else if (totalAmount >= 301 && totalAmount <= 400) {
-      return 35;
-    } else if (totalAmount >= 401 && totalAmount <= 501) {
-      return 45;
-    } else {
-      // For amounts greater than 400, increase by 25 for every additional 100
-      int extraRange = ((totalAmount - 500) / 100).ceil();
-      return 45 + (extraRange * 10);
-    }
-  }
-  // double _calculateAvailableItemsTotal(List<OrderCategory> categories) {
-  //   double total = 0.0;
-
-  //   for (var category in categories) {
-  //     for (var item in category.items) {
-  //       if (item.isAvailable) {
-  //         total += item.price * item.quantity;
-  //       }
-  //     }
-  //   }
-
-  //   return total;
-  // }
 
   Color _statusColor(String status) {
     switch (status) {
@@ -719,12 +947,14 @@ class OrderContent extends StatelessWidget {
 
 class OrderDetailsSection extends StatelessWidget {
   final List<OrderCategory> orders;
-  OrderDetailsSection({required this.orders});
+  final String status;
+  double price = 0.0;
+  OrderDetailsSection({required this.orders, required this.status});
+
   @override
   Widget build(BuildContext context) {
-    Map<String, List<OrderCategory>> categorizedOrders = {};
-    print(' orders ${orders}');
     // Group orders by category
+    Map<String, List<OrderCategory>> categorizedOrders = {};
     for (var order in orders) {
       if (categorizedOrders.containsKey(order.category)) {
         categorizedOrders[order.category]!.add(order);
@@ -756,6 +986,7 @@ class OrderDetailsSection extends StatelessWidget {
                 children: items.asMap().entries.map((entry) {
                   int index = entry.key;
                   OrderCategory item = entry.value;
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Row(
@@ -778,7 +1009,7 @@ class OrderDetailsSection extends StatelessWidget {
                         Expanded(
                           flex: 1,
                           child: Text(
-                            '₹ ${item.quantity * item.price}',
+                            '₹ ${item.quantity * item.price.toDouble()}',
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black,
@@ -789,14 +1020,20 @@ class OrderDetailsSection extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: Text(
-                            item.isAvailable == 1
-                                ? "Accepted"
-                                : "(Unavailable)",
+                            status == 'Cancelled'
+                                ? "Cancelled"
+                                : item.isAvailable == 0
+                                    ? "Waiting"
+                                    : item.isAvailable == 1
+                                        ? "Accepted"
+                                        : "Unavailable",
                             style: TextStyle(
                               fontSize: 14,
-                              color: item.isAvailable == 1
-                                  ? Colors.green.shade900
-                                  : Colors.red.shade800,
+                              color: status == 'Cancelled'
+                                  ? Colors.red.shade800
+                                  : item.isAvailable == 1
+                                      ? Colors.green.shade900
+                                      : Colors.red.shade800,
                             ),
                             textAlign: TextAlign.right,
                           ),
@@ -891,17 +1128,17 @@ class CreativeDeliveryStatus extends StatelessWidget {
   String getEstimatedArrival(String status) {
     switch (status) {
       case 'Order Placed':
-        return 'Estimated Arrival: 2 hours';
+        return 'Order was placed Successfully';
       case 'Accepted':
-        return 'Estimated Arrival: 1.5 hours';
+        return 'Order was Accepted By the Delivery Partner';
       case 'Preparing':
-        return 'Estimated Arrival: 2 hours';
+        return 'Your order is being prepared';
       case 'Picked up':
-        return 'Estimated Arrival: 1.5 hours';
+        return 'Your order has been Picked up by the Delivery Partner';
       case 'On The Way':
-        return 'Estimated Arrival: 1 hour';
+        return 'Your order is on the way to your address';
       case 'Delivered':
-        return 'Delivered';
+        return 'Your order has been Delivered Successfully';
       default:
         return 'Status Unknown';
     }
@@ -931,15 +1168,21 @@ class StatusIndicator extends StatelessWidget {
               height: 12,
               decoration: BoxDecoration(
                 color: isActive
-                    ? (isCurrent ? Colors.blue : Colors.green)
-                    : Colors.grey,
+                    ? Colors.green.shade800
+                    : isCurrent
+                        ? Colors.green.shade800
+                        : Colors.blueGrey.shade300,
                 shape: BoxShape.circle,
               ),
             ),
             Container(
               width: 2,
               height: 40,
-              color: isActive ? Colors.green : Colors.grey,
+              color: isActive
+                  ? Colors.green
+                  : isCurrent
+                      ? Colors.green.shade800
+                      : Colors.blueGrey.shade300,
             ),
           ],
         ),
@@ -950,7 +1193,7 @@ class StatusIndicator extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-              color: isCurrent ? Colors.blue : Colors.black54,
+              color: isCurrent ? Colors.green.shade800 : Colors.black54,
             ),
           ),
         ),

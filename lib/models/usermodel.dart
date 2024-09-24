@@ -10,6 +10,7 @@ class UserModel {
   final String password;
   final bool isActive;
   final String address;
+  final String location;
   UserModel({
     required this.id,
     required this.name,
@@ -19,6 +20,7 @@ class UserModel {
     required this.password,
     required this.isActive,
     required this.address,
+    required this.location,
   });
 
   UserModel copyWith({
@@ -30,6 +32,7 @@ class UserModel {
     String? password,
     bool? isActive,
     String? address,
+    String? location,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -40,6 +43,7 @@ class UserModel {
       password: password ?? this.password,
       isActive: isActive ?? this.isActive,
       address: address ?? this.address,
+      location: location ?? this.location,
     );
   }
 
@@ -52,6 +56,7 @@ class UserModel {
       'profilePhoto': profilePhoto,
       'password': password,
       'address': address,
+      'location': location,
     };
   }
 
@@ -65,6 +70,7 @@ class UserModel {
       password: map['password'].toString(),
       isActive: map['isActive'] == 1,
       address: map['address'].toString(),
+      location: map['location'].toString(),
     );
   }
 
@@ -75,7 +81,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, profilePhoto: $profilePhoto, password: $password, address: $address)';
+    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, profilePhoto: $profilePhoto, password: $password, address: $address,location:$location )';
   }
 
   @override
@@ -89,7 +95,8 @@ class UserModel {
         other.profilePhoto == profilePhoto &&
         other.password == password &&
         other.isActive == isActive &&
-        other.address == address;
+        other.address == address &&
+        other.location == location;
   }
 
   @override
@@ -101,6 +108,7 @@ class UserModel {
         profilePhoto.hashCode ^
         password.hashCode ^
         isActive.hashCode ^
-        address.hashCode;
+        address.hashCode ^
+        location.hashCode;
   }
 }

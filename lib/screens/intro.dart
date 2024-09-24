@@ -41,35 +41,29 @@ class _MeIntroState extends State<MeIntro> {
               onPageChanged: controller.updatePageIndicator,
               children: const [
                 onBoard(
-                    image: 'images/mesme-01.png',
+                    image: 'images/1.jpeg',
                     title: 'Order your favorite food',
                     subtitle:
                         'Discover exclusive & delicious foods over 300+ restaurants.'),
                 onBoard(
-                    image: 'images/mesme-02.png',
+                    image: 'images/2.jpg',
                     title: 'Search for favorite Grocery',
                     subtitle:
                         'Find fresh and quality groceries from 300+ stores, easily.'),
                 onBoard(
-                    image: 'images/mesme-03.png',
+                    image: 'images/3.jpeg',
                     title: 'Fast delivery at your place',
                     subtitle:
                         'Fast delivery to your home, office or wherever you are.'),
               ],
             ),
-            // Positioned(
-            //   top: kToolbarHeight,
-            //   child: Image.asset(
-            //     'images/logob.png',
-            //     width: 180,
-            //   ),
-            // ),
-            Positioned(
+             Positioned(
                 top: kToolbarHeight,
                 right: 18,
                 child: TextButton(
                     style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.black)),
+                        backgroundColor:
+                            WidgetStatePropertyAll(Colors.orange.shade700)),
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => const MeWelcome()));
@@ -86,7 +80,7 @@ class _MeIntroState extends State<MeIntro> {
                   controller: controller.pageController,
                   count: 3,
                   effect: const ExpandingDotsEffect(
-                      activeDotColor: Colors.black, dotHeight: 6),
+                      activeDotColor: Colors.orange, dotHeight: 6),
                 )),
             Positioned(
                 bottom: kBottomNavigationBarHeight,
@@ -97,7 +91,7 @@ class _MeIntroState extends State<MeIntro> {
                     },
                     style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
-                        backgroundColor: Colors.black),
+                        backgroundColor: Colors.orange.shade700),
                     child: const Icon(
                       Icons.arrow_forward_ios_rounded,
                       color: Colors.white,

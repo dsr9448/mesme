@@ -5,6 +5,8 @@ class FoodItem {
   final String foodName;
   final String foodPhoto;
   final String foodDescription;
+  final String Quantity;
+  final String Unit;
   final String price;
   final String vegOrNonVeg;
   final String rating;
@@ -15,6 +17,8 @@ class FoodItem {
     required this.foodName,
     required this.foodPhoto,
     required this.foodDescription,
+    required this.Quantity,
+    required this.Unit,
     required this.price,
     required this.vegOrNonVeg,
     required this.rating,
@@ -27,6 +31,8 @@ class FoodItem {
       foodName: json['foodName'],
       foodPhoto: json['foodPhoto'],
       foodDescription: json['foodDescription'],
+      Quantity: json['Quantity'],
+      Unit: json['Unit'],
       price: json['price'],
       vegOrNonVeg: json['vegOrNonVeg'],
       rating: json['rating'],
@@ -40,6 +46,7 @@ class Restaurant {
   final String name;
   final String location;
   final String phoneNumber;
+  final String coordinates;
   final bool isOnline;
   final List<FoodItem> foodItems;
 
@@ -48,6 +55,7 @@ class Restaurant {
     required this.name,
     required this.location,
     required this.phoneNumber,
+    required this.coordinates,
     required this.isOnline,
     required this.foodItems,
   });
@@ -62,6 +70,7 @@ class Restaurant {
       name: json['name'],
       location: json['location'],
       phoneNumber: json['phoneNumber'],
+      coordinates: json['coordinates'],
       isOnline: json['isOnline'],
       foodItems: foodItems,
     );

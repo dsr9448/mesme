@@ -5,14 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:mesme/provider/provider.dart';
 import 'dart:convert';
-
-import 'package:mesme/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 
 class MeLocation extends StatefulWidget {
-  final String uid; // Define the parameter to be passed
+  final String uid;
+  final back; // Define the parameter to be passed
 
-  const MeLocation({Key? key, required this.uid}) : super(key: key);
+  const MeLocation({Key? key, required this.uid, this.back}) : super(key: key);
 
   @override
   State<MeLocation> createState() => _MeLocationState();
@@ -21,6 +20,8 @@ class MeLocation extends StatefulWidget {
 class _MeLocationState extends State<MeLocation> {
   TextEditingController _locationController = TextEditingController();
   Position? _currentPosition;
+  late double latitude;
+  late double longitude;
   late String savedAddress = '';
   bool _isLoading = false; // Add a bool to track loading state
 
@@ -43,17 +44,19 @@ class _MeLocationState extends State<MeLocation> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        leading: IconButton(
-          style: const ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll(Colors.black)),
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        leading: widget.back == true
+            ? SizedBox()
+            : IconButton(
+                style: const ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(Colors.orange)),
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
         centerTitle: true,
         title: Text(
           'Enter Your Location',
@@ -66,62 +69,25 @@ class _MeLocationState extends State<MeLocation> {
       body: _isLoading // Conditional rendering based on loading state
           ? const Center(
               child: CircularProgressIndicator(
-                backgroundColor: Colors.black,
+                backgroundColor: Colors.orange,
                 color: Colors.white,
-              ), // Show CircularProgressIndicator when loading
+              ),
             )
           : Container(
               padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _locationController,
-                            cursorColor: Colors.black,
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.location_on),
-                              prefixIconColor: Colors.black,
-                              filled: true,
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide.none),
-                              hintText: 'Enter Your Location',
-                              fillColor: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        IconButton(
-                            onPressed: () {
-                              updateLocation();
-                            },
-                            style: const ButtonStyle(
-                                backgroundColor:
-                                    WidgetStatePropertyAll(Colors.black)),
-                            icon: const Icon(
-                              Icons.search,
-                              color: Colors.white,
-                            ))
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: Colors.orange.shade700,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                       ),
                       onPressed: () {
                         _getLocation().whenComplete(() {
-                          updateLocation();
+                          updateLocation(latitude, longitude);
                         }); // Trigger location retrieval
                       },
                       icon: const Icon(
@@ -136,7 +102,7 @@ class _MeLocationState extends State<MeLocation> {
                     ),
                   ),
                   const SizedBox(
-                    height: 18,
+                    height: 50,
                   ),
                   const Text(
                     'Saved Address',
@@ -151,7 +117,7 @@ class _MeLocationState extends State<MeLocation> {
                     subtitle: Text(savedAddress.isNotEmpty
                         ? savedAddress
                         : 'No address saved'),
-                    tileColor: Colors.black,
+                    tileColor: Colors.orange.shade700,
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: _buildSnackBarContent(),
@@ -207,14 +173,15 @@ class _MeLocationState extends State<MeLocation> {
 
       setState(() {
         _currentPosition = position;
+        latitude = position.latitude;
+        longitude = position.longitude;
         _updateLocationTextField(placemarks.first);
-        _isLoading =
-            false; // Set loading state to false after fetching location
+        _isLoading = false;
       });
     } catch (e) {
       print(e.toString());
       setState(() {
-        _isLoading = false; // Set loading state to false if error occurs
+        _isLoading = false;
       });
     }
   }
@@ -242,6 +209,7 @@ class _MeLocationState extends State<MeLocation> {
         Map<String, dynamic> userData = jsonDecode(response.body);
         setState(() {
           savedAddress = userData['address'] ?? '';
+          // savedAddress = userData['address'] ?? '';
         });
       } else {
         throw Exception('Failed to load user data: ${response.statusCode}');
@@ -251,10 +219,14 @@ class _MeLocationState extends State<MeLocation> {
     }
   }
 
-  void updateLocation() async {
+  void updateLocation(double latitude, double longitude) async {
     try {
       var updateUrl = 'https://mesme.in/admin/api/location/location.php';
-      var body = {'id': widget.uid, 'address': _locationController.text};
+      var body = {
+        'id': widget.uid,
+        'address': _locationController.text,
+        'location': '$latitude,$longitude'
+      };
       var headers = {'Content-Type': 'application/x-www-form-urlencoded'};
       var response = await http.post(
         Uri.parse(updateUrl),
@@ -263,16 +235,17 @@ class _MeLocationState extends State<MeLocation> {
       );
       if (response.statusCode == 200) {
         Provider.of<FoodProvider>(context, listen: false).fetchSavedAddress();
-        Navigator.pop(context);
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
 
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text(
             'Location updated successfully',
             style: TextStyle(color: Colors.white),
           ),
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
           showCloseIcon: true,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ));
       } else {
         throw Exception('Failed to update location: ${response.statusCode}');

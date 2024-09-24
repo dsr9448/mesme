@@ -7,6 +7,7 @@ import 'dart:convert';
 
 import 'package:mesme/screens/ViewItem.dart';
 import 'package:mesme/screens/location.dart';
+import 'package:mesme/widgets/calculateLocation.dart';
 import 'package:mesme/widgets/functionalities.dart';
 import 'package:provider/provider.dart';
 
@@ -38,6 +39,7 @@ class _SearchPageState extends State<SearchPage> {
         Uri.parse('https://mesme.in/admin/api/Food/search.php?search=$query'));
 
     if (response.statusCode == 200) {
+      print('the respinsie is ${json.decode(response.body)}');
       setState(() {
         _searchResults = json.decode(response.body);
       });
@@ -62,7 +64,8 @@ class _SearchPageState extends State<SearchPage> {
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                  color: Colors.black, borderRadius: BorderRadius.circular(50)),
+                  color: Colors.orange.shade700,
+                  borderRadius: BorderRadius.circular(50)),
               child: GestureDetector(
                 child: const Icon(
                   Icons.location_on_outlined,
@@ -92,7 +95,7 @@ class _SearchPageState extends State<SearchPage> {
                           ? userData!.address.split(' ').take(3).join(' ') +
                               (userData!.address.split(' ').length > 2
                                   ? '.'
-                                  : 'Enter location')
+                                  : '')
                           : 'Enter location',
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
@@ -124,20 +127,28 @@ class _SearchPageState extends State<SearchPage> {
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Column(
           children: [
+            const SizedBox(height: 10),
             TextField(
-              controller: _controller,
-              cursorColor: Colors.black,
+              cursorColor: Colors.orange.shade700,
+              onChanged: (search) => _search(search),
               decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
+                focusColor: Colors.white,
+                isDense: true,
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
                 filled: true,
                 border: OutlineInputBorder(borderSide: BorderSide.none),
-                hintText: 'Search for Food or Grocery',
-                fillColor: Colors.white,
+                hintText: 'Are you Hungry!!!',
+                fillColor: Colors.orange,
+                hintStyle: TextStyle(color: Colors.white),
               ),
             ),
+            const SizedBox(height: 10),
             Expanded(
               child: ListView(
-                children: _buildResults(),
+                children: _buildResults(userData?.location ?? '0,0'),
               ),
             ),
           ],
@@ -147,7 +158,7 @@ class _SearchPageState extends State<SearchPage> {
         valueListenable: FoodFunction.cartItemCountNotifier,
         builder: (context, itemCount, child) {
           return FloatingActionButton(
-            backgroundColor: Colors.black,
+            backgroundColor: Colors.orange.shade700,
             onPressed: () {
               Navigator.pushNamed(context, '/FoodCart');
             },
@@ -190,7 +201,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  List<Widget> _buildResults() {
+  List<Widget> _buildResults(String userCoordinates) {
     List<Widget> widgets = [];
 
     if (_searchResults.isEmpty) {
@@ -202,86 +213,65 @@ class _SearchPageState extends State<SearchPage> {
       ];
     }
 
-    if (_searchResults['foodItems'] != null &&
-        _searchResults['foodItems'].isNotEmpty) {
+    // Check if 'restaurants' is a Map and not a List
+    if (_searchResults['restaurants'] is Map &&
+        _searchResults['restaurants'].isNotEmpty) {
       widgets.add(const Text('Food Items',
           style: TextStyle(fontWeight: FontWeight.bold)));
-      var restaurant = _searchResults['restaurants'][0];
 
-      for (var foodItem in _searchResults['foodItems']) {
-        widgets.add(ListTile(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ViewItem(
-                  imageUrl: foodItem['foodPhoto'],
-                  name: foodItem['foodName'],
-                  price: double.parse(foodItem['price']),
-                  restaurantName: restaurant['name'],
-                  location: restaurant['location'],
-                  description: foodItem['foodDescription'],
-                  rating: foodItem['rating'],
-                  isVeg: foodItem['vegOrNonVeg'],
-                  food: true,
-                ),
-              ),
-            );
-          },
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              foodItem['foodPhoto'],
-              width: 65,
-              height: 65,
-              fit: BoxFit.cover,
-            ),
-          ),
-          title: Text(foodItem['foodName']),
-          subtitle: Text(
-            'Description: ${foodItem['foodDescription']} - Price: ${foodItem['price']}',
-          ),
-        ));
-      }
-    }
+      // Iterate through each restaurant in the Map
+      var restaurants = _searchResults['restaurants'] as Map;
 
-    if (_searchResults['groceryItems'] != null &&
-        _searchResults['groceryItems'].isNotEmpty) {
-      widgets.add(const Text('Grocery Items Or Fruits & Vegetables',
-          style: TextStyle(fontWeight: FontWeight.bold)));
-      for (var item in _searchResults['groceryItems']) {
-        widgets.add(ListTile(
-          onTap: () {
-            Navigator.push(
+      // Use a loop to iterate over the Map entries (key-value pairs)
+      restaurants.forEach((key, restaurant) {
+        var restaurantDetails = restaurant['restaurantDetails'];
+        var foodItems = restaurant['foodItems'];
+
+        // Loop through food items in each restaurant
+        for (var foodItem in foodItems) {
+          widgets.add(ListTile(
+            onTap: () {
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ViewItem(
-                        imageUrl: item['ImageUrl'],
-                        name: item['ItemName'],
-                        price: double.parse(item['Price']),
-                        restaurantName: 'restaurantName',
-                        location: 'location',
-                        description: item['Description'],
-                        quantity: item['Quantity'],
-                        unit: item['Unit'],
-                        food: false,
-                        isVeg: '',
-                        rating: '')));
-          },
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              item['ImageUrl'],
-              width: 65,
-              height: 65,
-              fit: BoxFit.cover,
+                  builder: (context) => ViewItem(
+                    imageUrl: foodItem['foodPhoto'],
+                    name: foodItem['foodName'],
+                    price: double.parse(foodItem['price']),
+                    restaurantName: restaurantDetails['name'],
+                    location: restaurantDetails['location'],
+                    description: foodItem['foodDescription'],
+                    quantity: foodItem['Quantity'],
+                    unit: foodItem['Unit'],
+                    rating: foodItem['rating'],
+                    isVeg: foodItem['vegOrNonVeg'],
+                    food: true,
+                    canAdd: isWithin6Km(userCoordinates,
+                            restaurantDetails['coordinates'])['distance'] <=
+                        6,
+                    distance: isWithin6Km(userCoordinates,
+                            restaurantDetails['coordinates'])['distance'] ??
+                        0.0,
+                  ),
+                ),
+              );
+            },
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                "https://mesme.in/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
+                width: 65,
+                height: 65,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          title: Text(item['ItemName']),
-          subtitle: Text('Description: ${item['Description']}'),
-          // 'Price: ${item['Price']} - Quantity: ${item['Quantity']} ${item['Unit']}'),
-        ));
-      }
+            title: Text(foodItem['foodName']),
+            subtitle: Text(
+              'Description: ${foodItem['foodDescription']} - Price: ${foodItem['price'].toString().replaceAll('.00', '')}',
+            ),
+          ));
+        }
+      });
     }
 
     return widgets;

@@ -4,6 +4,7 @@ import 'package:mesme/models/usermodel.dart';
 import 'package:mesme/provider/provider.dart';
 import 'package:mesme/screens/location.dart';
 import 'package:mesme/screens/search.dart';
+import 'package:mesme/screens/searchGrocery.dart';
 import 'package:mesme/screens/viewAll.dart';
 import 'package:mesme/widgets/HorizontalScrollGrocery.dart';
 import 'package:mesme/widgets/functionalities.dart';
@@ -22,31 +23,32 @@ class GroceryScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         forceMaterialTransparency: true,
-        title: Row(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                  color: Colors.black, borderRadius: BorderRadius.circular(50)),
-              child: GestureDetector(
-                child: const Icon(
-                  Icons.location_on_outlined,
-                  color: Colors.white,
+        title: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MeLocation(
+                        uid: userData?.id ?? '-',
+                      )),
+            );
+          },
+          child: Row(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                    color: Colors.orange.shade700,
+                    borderRadius: BorderRadius.circular(50)),
+                child: GestureDetector(
+                  child: const Icon(
+                    Icons.location_on_outlined,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MeLocation(
-                            uid: userData?.id ?? '-',
-                          )),
-                );
-              },
-              child: Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Your Location',
@@ -56,9 +58,7 @@ class GroceryScreen extends StatelessWidget {
                   Text(
                       userData?.address != null
                           ? userData!.address.split(' ').take(2).join(' ') +
-                              (userData.address.split(' ').length > 2
-                                  ? ''
-                                  : 'Enter location')
+                              (userData.address.split(' ').length > 2 ? '' : '')
                           : 'Enter location',
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
@@ -69,18 +69,21 @@ class GroceryScreen extends StatelessWidget {
                       ))
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           IconButton(
+              style: const ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Colors.orange),
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchPage()),
+                  MaterialPageRoute(builder: (context) => Search()),
                 );
               },
-              icon: const Icon(Icons.search, size: 36)),
+              icon: const Icon(Icons.search_rounded, color: Colors.white)),
           IconButton(
             onPressed: () {
               Navigator.pushNamed(context, '/FoodProfile');
@@ -90,7 +93,7 @@ class GroceryScreen extends StatelessWidget {
               color: Colors.white,
             ),
             style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.black)),
+                backgroundColor: WidgetStatePropertyAll(Colors.orange)),
           ),
         ],
       ),
@@ -100,56 +103,70 @@ class GroceryScreen extends StatelessWidget {
         child: ListView(
           children: [
             for (var grocery in foodProvider.groceries)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          grocery.name,
-                          style: const TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w900),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => FoodItemsApp(
-                                  allFoodItems: grocery.groceryItem
-                                      .map((foodItem) => {
-                                            'name': foodItem.name,
-                                            'price': foodItem.price,
-                                            'image': foodItem.imageUrl,
-                                            'description': foodItem.description,
-                                            'vegOrNonVeg': '',
-                                            'quantity': foodItem.quantity,
-                                            'unit': foodItem.unit,
-                                            'rating': ''
-                                          })
-                                      .toList(),
-                                  rname: grocery.name,
-                                  rlocation: '',
-                                  food: false,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              Text('View all',
-                                  style: GoogleFonts.poppins(
-                                      textStyle: const TextStyle(
-                                          fontWeight: FontWeight.w500))),
-                              const Icon(Icons.east)
-                            ],
+              Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            grocery.name,
+                            style: const TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.w900),
                           ),
-                        ),
-                      ]),
-                  HorizontalScrollGrocery(
-                      items: grocery.groceryItem, rname: '', rlocation: ''),
-                ],
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => FoodItemsApp(
+                                    allFoodItems: grocery.groceryItem
+                                        .map((foodItem) => {
+                                              'name': foodItem.name,
+                                              'price': foodItem.price,
+                                              'image': foodItem.imageUrl,
+                                              'description':
+                                                  foodItem.description,
+                                              'vegOrNonVeg': '',
+                                              'quantity': foodItem.quantity,
+                                              'unit': foodItem.unit,
+                                              'rating': ''
+                                            })
+                                        .toList(),
+                                    rname: grocery.ShopName,
+                                    rlocation: grocery.location,
+                                    food: false,
+                                    isOnline: grocery.isOnline ? 1 : 0,
+                                    userCoordinate: userData!.location ,
+                                    restrauntCoordinate: grocery.coordinates,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Text('View all',
+                                    style: GoogleFonts.poppins(
+                                        textStyle: const TextStyle(
+                                            fontWeight: FontWeight.w500))),
+                                const Icon(Icons.east)
+                              ],
+                            ),
+                          ),
+                        ]),
+                    HorizontalScrollGrocery(
+                      items: grocery.groceryItem,
+                      rname: grocery.ShopName,
+                      rlocation: grocery.location,
+                      isOnline: grocery.isOnline,
+                      userCoordinate: userData!.location ,
+                      groceryCoordinate: grocery.coordinates,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
               )
           ],
         ),
@@ -158,7 +175,7 @@ class GroceryScreen extends StatelessWidget {
         valueListenable: FoodFunction.cartItemCountNotifier,
         builder: (context, itemCount, child) {
           return FloatingActionButton(
-            backgroundColor: Colors.black,
+            backgroundColor: Colors.orange.shade700,
             onPressed: () {
               Navigator.pushNamed(context, '/FoodCart');
             },

@@ -1,159 +1,265 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class MePolicy extends StatefulWidget {
-  const MePolicy({Key? key}) : super(key: key);
-
+class MePolicy extends StatelessWidget {
   @override
-  _MePolicyState createState() => _MePolicyState();
-}
+  // Function to launch email
+  void _launchEmail(String email) async {
+    final Uri params = Uri(
+      scheme: 'mailto',
+      path: email,
+    );
+    if (await canLaunchUrl(params)) {
+      await launchUrl(params);
+    } else {
+      throw 'Could not launch $email';
+    }
+  }
 
-class _MePolicyState extends State<MePolicy> {
-  String selectedContent = 'Terms and Conditions';
+  // Function to launch phone call
+  void _launchPhone(String phoneNumber) async {
+    final Uri params = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    if (await canLaunchUrl(params)) {
+      await launchUrl(params);
+    } else {
+      throw 'Could not launch $phoneNumber';
+    }
+  }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        automaticallyImplyLeading: true,
+        automaticallyImplyLeading: false,
+        forceMaterialTransparency: true,
         leading: IconButton(
           style: const ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll(Colors.black)),
+              backgroundColor: WidgetStatePropertyAll(Colors.orange)),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(Icons.arrow_back_ios_new),
-          color: Colors.white,
         ),
         centerTitle: true,
-        title: const Text(
-          'Privacy and Policy',
-          style: TextStyle(color: Colors.black),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              ListView.separated(
-                shrinkWrap: true,
-                separatorBuilder: (BuildContext context, int index) =>
-                    const SizedBox(height: 8),
-                itemCount: 2,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedContent = index == 0
-                            ? 'Terms and Conditions'
-                            : 'Cancellation and Refund';
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: selectedContent ==
-                                (index == 0
-                                    ? 'Terms and Conditions'
-                                    : 'Cancellation and Refund')
-                            ? Colors.black
-                            : Colors.black87,
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          index == 0
-                              ? 'Terms and Conditions'
-                              : 'Cancellation and Refund',
-                          style: TextStyle(
-                            color: selectedContent ==
-                                    (index == 0
-                                        ? 'Terms and Conditions'
-                                        : 'Cancellation and Refund')
-                                ? Colors.white
-                                : Colors.white60,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 18),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: SingleChildScrollView(
-                  child: selectedContent == 'Terms and Conditions'
-                      ? PrivacyContent()
-                      : PolicyContent(),
-                ),
-              ),
-            ],
+        title: Text(
+          'Terms and Conditions',
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
-    );
-  }
-}
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Welcome to “MESME online Food and Grocery delivery”',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'These Terms and Conditions (“Terms”) govern your use of the MESME application (“App”). By accessing or using the MESME app, you agree to comply with and be bound by these terms and conditions. If you do not agree, then do not use the MESME app.',
+            ),
+            const SizedBox(height: 16),
+            _sectionTitle('I. Account Registration:'),
+            _bulletPoint(
+                'You must be at least 18 years old to create an account and use the MESME app.'),
+            _bulletPoint(
+                'You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.'),
+            const SizedBox(height: 16),
+            _sectionTitle('II. Order and Delivery:'),
+            _bulletPoint(
+                'By placing an order through the MESME app, you agree to purchase the items selected.'),
+            _bulletPoint(
+                'Delivery times provided are estimates and not guaranteed, delays may occur due to traffic, weather, or other factors.'),
+            _bulletPoint(
+                'You are responsible for providing accurate delivery instructions and ensuring someone is available to receive the order.'),
+            const SizedBox(height: 16),
+            _sectionTitle('III. Pricing and Payments:'),
+            _bulletPoint(
+                'Prices for menu items and delivery fees are displayed in the app and are subject to change without notice.'),
+            _bulletPoint(
+                'Payment must be made at the time of ordering. MESME accepts various payment methods, including credit/debit cards, mobile wallets, and cash on delivery.'),
+            _bulletPoint(
+                'All transactions are processed securely. MESME does not store your payment information.'),
+            const SizedBox(height: 16),
+            _sectionTitle('IV. Cancellation and Refunds:'),
+            _bulletPoint(
+                'Orders can be cancelled within a specified time frame before the scheduled delivery time. Refer to our cancellation policy for more details.'),
+            _bulletPoint(
+                'Refunds will be issued in accordance with our refund policy. Refund amounts will be credited within 3 working days.'),
+            const SizedBox(height: 16),
+            _sectionTitle('V. User Responsibilities:'),
+            _bulletPoint(
+                'You agree not to use the MESME app for any unlawful or unauthorized purpose.'),
+            _bulletPoint(
+                'You are responsible for providing accurate and up-to-date information, including your contact details and delivery address.'),
+            const SizedBox(height: 16),
+            _sectionTitle('VI. Intellectual Property:'),
+            _bulletPoint(
+                'All content, logos, and graphics in the app are the property of MESME or its licensors and are protected by copyright, trademark, and other intellectual property laws.'),
+            _bulletPoint(
+                'You may not reproduce, distribute, or use any content from the MESME app without permission.'),
+            const SizedBox(height: 16),
+            _sectionTitle('VII. Limitation of Liability:'),
+            _bulletPoint(
+                'MESME shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of the app or any products or services ordered through the app.'),
+            _bulletPoint(
+                'Our total liability for any claims arising out of or related to these terms and conditions shall not exceed the total amount paid by you for the specific orders giving rise to the claim.'),
+            const SizedBox(height: 16),
+            _sectionTitle('VIII. Changes to Terms:'),
+            _bulletPoint(
+                'MESME reserves the right to modify or update these terms at any time without prior notice. Changes will be posted in the app with a revised “Last Updated” date.'),
+            _bulletPoint(
+                'Your continued use of the app after the posting of revised terms and conditions constitutes your acceptance of the changes.'),
+            const SizedBox(height: 16),
+            _sectionTitle('IX. Termination:'),
+            _bulletPoint(
+                'MESME may terminate or suspend your account and access to the app without prior notice for violations of these terms and conditions or for any other reasons.'),
+            _bulletPoint(
+                'Upon termination, your right to use the app will cease immediately.'),
+            const SizedBox(height: 16),
+            _sectionTitle('X. Governing Law:'),
+            _bulletPoint(
+                'These terms and conditions shall be governed by and construed in accordance with the laws of (“Jurisdiction”) without regard to its conflict of law principles.'),
+            const SizedBox(height: 16),
+            _sectionTitle('Contact Us:'),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                    'If you have any questions or concerns about these terms and conditions, please contact us at:\n\n'
+                    'MESME ONLINE PRIVATE LIMITED\n'),
+                // Other sections here...
 
-class PrivacyContent extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10), color: Colors.black),
-      child: const SingleChildScrollView(
-        child: Text(
-          'Last updated on Feb 29 2024\n'
-          'For the purpose of these Terms and Conditions, "we", "us", "our" refer to MESME ONLINE PRIVATE LIMITED, located at 1,120 Tavarekere Hobli Kethohalli/Chunchanakuppe Post Bengaluru KARNATAKA 562130. "You", "your", "user", and "visitor" refer to any natural or legal person visiting our website and/or agreeing to purchase from us.\n'
-          'Your use of the website and/or purchase from us is governed by the following Terms and Conditions:\n'
-          'The content of the pages of this website is subject to change without notice.\n'
-          'We do not provide any warranty or guarantee as to the accuracy, timeliness, performance, completeness, or suitability of the information and materials found or offered on this website.\n'
-          'Your use of any information or materials on our website and/or product pages is entirely at your own risk.\n'
-          'Our website contains material owned by or licensed to us, and reproduction is prohibited without our prior consent.\n'
-          'All trademarks not owned by us are acknowledged on the website.\n'
-          'Unauthorized use of information provided by us may result in a claim for damages or be a criminal offense.\n'
-          'Links to other websites may be provided for your convenience, but we do not endorse those websites.\n'
-          'You may not create a link to our website without our prior written consent.\n'
-          'Any dispute arising from the use of our website, purchase, or engagement with us is subject to Indian laws.\n'
-          'We are not liable for any loss or damage arising directly or indirectly from the decline of authorization for any transaction.\n',
-          style: TextStyle(color: Colors.white),
+                GestureDetector(
+                  onTap: () => _launchEmail('mesmegroup@gmail.com'),
+                  child: Row(
+                    children: [
+                      Icon(Icons.email_rounded, color: Colors.orange.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'mesmegroup@gmail.com',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                GestureDetector(
+                  onTap: () => _launchEmail('mesmeinfo@gmail.com'),
+                  child: Row(
+                    children: [
+                      Icon(Icons.email_rounded, color: Colors.orange.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'mesmeinfo@gmail.com',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () => _launchPhone('+918680888124'),
+                  child: Row(
+                    children: [
+                      Icon(Icons.phone_android_rounded,
+                          color: Colors.orange.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Phone: +91 8680888124',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () => _launchPhone('+918660629972'),
+                  child: Row(
+                    children: [
+                      Icon(Icons.phone_android_rounded,
+                          color: Colors.orange.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Phone: +91 8660629972',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Thank you for choosing MESME. We hope you enjoy using our Food and Grocery delivery app.',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );
   }
-}
 
-class PolicyContent extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.black,
+  // Helper function to display section titles
+  Widget _sectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Colors.orange.shade700,
       ),
-      child: const SingleChildScrollView(
-        child: Text(
-          'Last updated on Feb 29 2024\n'
-          'MESME ONLINE PRIVATE LIMITED believes in helping its customers as far as possible and has therefore a liberal cancellation policy. Under this policy:\n'
-          'Cancellations will be considered only if the request is made within the same day of placing the order. However, the cancellation request may not be entertained if the orders have been communicated to the vendors/merchants and they have initiated the process of shipping them.\n'
-          'MESME ONLINE PRIVATE LIMITED does not accept cancellation requests for perishable items like flowers, eatables etc. However, refund/replacement can be made if the customer establishes that the quality of product delivered is not good.\n'
-          'In case of receipt of damaged or defective items please report the same to our Customer Service team. The request will, however, be entertained once the merchant has checked and determined the same at his own end. This should be reported within the same day of receipt of the products.\n'
-          'If you feel that the product received is not as shown on the site or as per your expectations, you must bring it to the notice of our customer service within the same day of receiving the product. The Customer Service Team after looking into your complaint will take an appropriate decision.\n'
-          'For complaints regarding products that come with a warranty from manufacturers, please refer the issue to them.\n'
-          'In case of any refunds approved by MESME ONLINE PRIVATE LIMITED, it will take 1-2 days for the refund to be processed to the end customer.',
-          style: TextStyle(color: Colors.white),
-        ),
+    );
+  }
+
+  // Helper function to display bullet points
+  Widget _bulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(fontSize: 16)),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -63,13 +63,90 @@ class ApiService with ChangeNotifier {
     Map<String, dynamic> requestData = {
       'orderId': orderId,
       'status': status,
-      'isActive': 1,
+      'isActive': 0,
     };
+
 
     try {
       // Sending the request to the server
       final response = await http.post(
         Uri.parse('https://mesme.in/admin/api/FoodOrders/update.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestData),
+      );
+
+      // Checking the response status code
+      if (response.statusCode == 200) {
+        // If the server returns a response with a 200 status code, parse the JSON
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        notifyListeners();
+        // Handle the response from the server
+        if (responseBody['error'] != null) {
+          // Handle error case
+          print('Error: ${responseBody['error']}');
+        } else {
+          // Success case
+          print('Success: ${responseBody['message']}');
+        }
+      } else {
+        // Handle non-200 responses
+        print('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle any errors that occur during the HTTP request
+      print('Request error: $e');
+    }
+  }
+
+ Future<void> updateOrderRating(String orderId, String rating) async {
+  // Data to be sent as JSON
+  Map<String, dynamic> requestData = {
+    'orderId': orderId.toString(),  // Ensure orderId is a string
+    'rating': rating.toString(),    // Ensure rating is a string
+  };
+
+  try {
+    // Sending the request to the server
+    final response = await http.post(
+      Uri.parse('https://mesme.in/admin/api/FoodOrders/rating.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(requestData),
+    );
+
+     if (response.statusCode == 200) {
+        // If the server returns a response with a 200 status code, parse the JSON
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        notifyListeners();
+        // Handle the response from the server
+        if (responseBody['error'] != null) {
+          // Handle error case
+          print('Error: ${responseBody['error']}');
+        } else {
+          // Success case
+          print('Success: ${responseBody['message']}');
+        }
+      } else {
+        // Handle non-200 responses
+        print('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle any errors that occur during the HTTP request
+      print('Request error: $e');
+    }
+  }
+
+
+  Future<void> updatePayment(String orderId, String status) async {
+    // Data to be sent as JSON
+    Map<String, dynamic> requestData = {
+      'orderId': orderId,
+      'rating': status, // Change 'status' to 'rating'
+    };
+
+    try {
+      // Sending the request to the server
+      final response = await http.post(
+        Uri.parse('https://mesme.in/admin/api/FoodPayments/update.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -119,7 +196,6 @@ class ApiService with ChangeNotifier {
       }
     } catch (e) {
       print('Exception occurred: $e');
-      throw Exception('Failed to load data: $e');
     }
   }
 }

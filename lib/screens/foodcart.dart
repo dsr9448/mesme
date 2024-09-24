@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class FoodCart extends StatefulWidget {
   const FoodCart({super.key});
@@ -82,14 +81,27 @@ class _FoodCartState extends State<FoodCart> {
   double _calculateGSTAndServiceCharge(double totalAmount) {
     if (totalAmount >= 0 && totalAmount <= 200) {
       return 25;
-    } else if (totalAmount <= 300) {
+    } else if (totalAmount >= 201 && totalAmount <= 300) {
       return 35;
-    } else if (totalAmount <= 400) {
+    } else if (totalAmount >= 301 && totalAmount <= 400) {
       return 45;
+    } else if (totalAmount >= 401 && totalAmount <= 500) {
+      return 55;
+    } else if (totalAmount >= 501 && totalAmount <= 600) {
+      return 65;
+    } else if (totalAmount >= 601 && totalAmount <= 700) {
+      return 75;
+    } else if (totalAmount >= 701 && totalAmount <= 800) {
+      return 85;
+    } else if (totalAmount >= 801 && totalAmount <= 900) {
+      return 95;
+    } else if (totalAmount >= 901 && totalAmount <= 1000) {
+      return 105;
+    } else if (totalAmount >= 1001 && totalAmount <= 1100) {
+      return 115;
     } else {
-      // For amounts greater than 400, increase by 25 for every additional 100
-      int extraRange = ((totalAmount - 400) / 100).ceil();
-      return 45 + (extraRange * 10);
+      int extraRange = ((totalAmount - 1100) / 100).ceil();
+      return 115 + (extraRange * 10);
     }
   }
 
@@ -107,7 +119,8 @@ class _FoodCartState extends State<FoodCart> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          backgroundColor: Colors.black,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.orange,
           showCloseIcon: true,
           closeIconColor: Colors.white,
         ),
@@ -152,7 +165,7 @@ class _FoodCartState extends State<FoodCart> {
                   margin: const EdgeInsets.only(right: 8),
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.orange.shade700,
                       borderRadius: BorderRadius.circular(50)),
                   child: GestureDetector(
                     child: const Icon(
@@ -181,9 +194,9 @@ class _FoodCartState extends State<FoodCart> {
                       Text(
                           userData?.address != null
                               ? userData!.address.split(' ').take(1).join(' ') +
-                                  (userData!.address.split(' ').length > 2
+                                  (userData.address.split(' ').length > 2
                                       ? '.'
-                                      : 'Enter location')
+                                      : '')
                               : 'Enter location',
                           style: GoogleFonts.poppins(
                             textStyle: const TextStyle(
@@ -306,7 +319,7 @@ class _FoodCartState extends State<FoodCart> {
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(8),
                                         child: Image.network(
-                                          item['imageUrl'],
+                                          "https://mesme.in/ControlHub/includes/uploads/${item['imageUrl']}",
                                           width: 100,
                                           height: 100,
                                           fit: BoxFit.cover,
@@ -324,13 +337,13 @@ class _FoodCartState extends State<FoodCart> {
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold),
                                             ),
+                                            // Text(
+                                            //   ' ${item['restaurantName']}',
+                                            //   style: GoogleFonts.poppins(
+                                            //       fontSize: 14),
+                                            // ),
                                             Text(
-                                              'Location: ${item['location']}',
-                                              style: GoogleFonts.poppins(
-                                                  fontSize: 14),
-                                            ),
-                                            Text(
-                                              '₹${item['price'].toStringAsFixed(2)}',
+                                              '₹${item['price'].toString().replaceAll('.0', '')}',
                                               style: GoogleFonts.poppins(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold),
@@ -346,7 +359,7 @@ class _FoodCartState extends State<FoodCart> {
                                                 style: const ButtonStyle(
                                                     backgroundColor:
                                                         WidgetStatePropertyAll(
-                                                            Colors.black)),
+                                                            Colors.orange)),
                                                 onPressed: () =>
                                                     _decreaseQuantity(
                                                         itemIndex),
@@ -369,7 +382,7 @@ class _FoodCartState extends State<FoodCart> {
                                                 style: const ButtonStyle(
                                                     backgroundColor:
                                                         WidgetStatePropertyAll(
-                                                            Colors.black)),
+                                                            Colors.orange)),
                                                 onPressed: () =>
                                                     _increaseQuantity(
                                                         itemIndex),
@@ -432,7 +445,7 @@ class _FoodCartState extends State<FoodCart> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    '₹ ${totalAmount.toStringAsFixed(2)}',
+                                    '₹ ${totalAmount.toString().replaceAll('.0', '')}',
                                     style: const TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold),
@@ -453,7 +466,7 @@ class _FoodCartState extends State<FoodCart> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    '₹  ${gstAndServiceCharge.toStringAsFixed(2)}',
+                                    '₹  ${gstAndServiceCharge.toString().replaceAll('.0', '')}',
                                     style: const TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold),
@@ -518,7 +531,7 @@ class _FoodCartState extends State<FoodCart> {
                                     ),
                                   ),
                                   Text(
-                                    '₹${amountPayable.toStringAsFixed(2)}',
+                                    '₹${amountPayable.toString().replaceAll('.0', '')}',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -583,7 +596,7 @@ class _FoodCartState extends State<FoodCart> {
                                     type: QuickAlertType.success,
                                     text: 'Order placed successfully',
                                     title: 'Thank you for your order!',
-                                    confirmBtnColor: Colors.black,
+                                    confirmBtnColor: Colors.orange.shade700,
                                     onConfirmBtnTap: () async {
                                       await Provider.of<FoodProvider>(context,
                                               listen: false)
@@ -595,12 +608,12 @@ class _FoodCartState extends State<FoodCart> {
                                 });
                               },
                             );
-                          },  
+                          },
                           child: Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(8.0),
                             decoration: const BoxDecoration(
-                                color: Colors.black,
+                                color: Colors.orange,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(8.0))),
                             child: Text(

@@ -6,6 +6,8 @@ import 'package:mesme/screens/grocery.dart';
 import 'package:mesme/screens/home.dart';
 import 'package:mesme/screens/orders.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FoodBottomNavBar extends StatefulWidget {
@@ -16,6 +18,18 @@ class FoodBottomNavBar extends StatefulWidget {
 }
 
 class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
+  void initState() {
+    super.initState();
+    final foodProvider = Provider.of<FoodProvider>(context, listen: false);
+    _fetchData(foodProvider);
+  }
+
+  Future<void> _fetchData(FoodProvider foodProvider) async {
+    await foodProvider.fetchUserData();
+    await foodProvider.fetchSavedAddress();
+    await foodProvider.fetchOrders();
+  }
+
   int currentTab = 0;
   final List<Widget> screens = [
     const HomeScreen(),
@@ -61,8 +75,9 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                         children: [
                           Icon(
                             Icons.dinner_dining,
-                            color:
-                                currentTab == 0 ? Colors.black : Colors.black87,
+                            color: currentTab == 0
+                                ? Colors.orange.shade700
+                                : Colors.black45,
                           ),
                           Text(
                             'Food',
@@ -71,8 +86,8 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12, // Adjusted font size
                                 color: currentTab == 0
-                                    ? Colors.black
-                                    : Colors.black87,
+                                    ? Colors.orange.shade700
+                                    : Colors.black45,
                               ),
                             ),
                           ),
@@ -94,8 +109,9 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                         children: [
                           Icon(
                             Icons.local_grocery_store,
-                            color:
-                                currentTab == 1 ? Colors.black : Colors.black45,
+                            color: currentTab == 1
+                                ? Colors.orange.shade700
+                                : Colors.black45,
                           ),
                           Text(
                             'Grocery',
@@ -104,7 +120,7 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12, // Adjusted font size
                                 color: currentTab == 1
-                                    ? Colors.black
+                                    ? Colors.orange.shade700
                                     : Colors.black45,
                               ),
                             ),
@@ -128,8 +144,9 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                         children: [
                           Icon(
                             Icons.watch_later_outlined,
-                            color:
-                                currentTab == 2 ? Colors.black : Colors.black45,
+                            color: currentTab == 2
+                                ? Colors.orange.shade700
+                                : Colors.black45,
                           ),
                           Text(
                             'Orders',
@@ -138,7 +155,7 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12, // Adjusted font size
                                 color: currentTab == 2
-                                    ? Colors.black
+                                    ? Colors.orange.shade700
                                     : Colors.black45,
                               ),
                             ),
@@ -149,20 +166,14 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                   ),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () async {
-                        const url =
-                            'https://play.google.com/store/apps/details?id=in.mesme.mesme&pcampaignid=web_share';
-                        if (await canLaunch(url)) {
-                          await launch(url);
-                        } else {
-                          throw 'Could not launch $url';
-                        }
+                      onTap: () {
+                        _showComingSoonDialog(context);
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 4, vertical: 2), // Adjusted padding
                         decoration: BoxDecoration(
-                          color: Colors.black,
+                          color: Colors.orange.shade700,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
@@ -193,6 +204,50 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showComingSoonDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0)),
+          ),
+          backgroundColor: Colors.white,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    style: ButtonStyle(
+                        backgroundColor:
+                            WidgetStatePropertyAll(Colors.orange.shade700)),
+                    color: Colors.white,
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              Image.asset(
+                'images/iron.jpg', // Replace with your image URL
+                width: 500,
+                // height: 450,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Coming Soon!',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

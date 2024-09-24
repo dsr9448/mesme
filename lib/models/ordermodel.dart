@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 
 class Order {
   final String orderId;
@@ -9,8 +8,10 @@ class Order {
   final String status;
   final String? deliveryPartnerName;
   final String? deliveryPartnerPhone;
-  final List<OrderCategory>
-      categories; // Updated to categories to match your JSON
+  final String deliveryAddress;
+  final String paymentMethod;
+  final String paymentStatus;
+  final Map<String, List<OrderCategory>> categories;
 
   Order({
     required this.orderId,
@@ -20,32 +21,45 @@ class Order {
     required this.status,
     this.deliveryPartnerName,
     this.deliveryPartnerPhone,
+    required this.deliveryAddress,
+    required this.paymentMethod,
+    required this.paymentStatus,
     required this.categories,
   });
 
-  Order copyWith({
-    String? orderId,
-    String? orderDate,
-    String? totalPrice,
-    String? rating,
-    String? status,
-    String? deliveryPartnerName,
-    String? deliveryPartnerPhone,
-    List<OrderCategory>? categories,
-  }) {
+  factory Order.fromMap(Map<String, dynamic> json) {
+    var itemsMap = json['items'] as Map<String, dynamic>;
+    Map<String, List<OrderCategory>> categories = {};
+
+    itemsMap.forEach((categoryName, items) {
+      categories[categoryName] = (items as List)
+          .map((i) => OrderCategory.fromMap(i, categoryName))
+          .toList();
+    });
+
     return Order(
-      orderId: orderId ?? this.orderId,
-      orderDate: orderDate ?? this.orderDate,
-      totalPrice: totalPrice ?? this.totalPrice,
-      rating: rating ?? this.rating,
-      status: status ?? this.status,
-      deliveryPartnerName: deliveryPartnerName ?? this.deliveryPartnerName,
-      deliveryPartnerPhone: deliveryPartnerPhone ?? this.deliveryPartnerPhone,
-      categories: categories ?? this.categories,
+      orderId: json['orderId'] as String,
+      orderDate: json['orderDate'] as String,
+      totalPrice: json['totalPrice'] as String,
+      rating: json['rating'] as String,
+      status: json['status'] as String,
+      deliveryPartnerName: json['deliveryPartnerName'] as String?,
+      deliveryPartnerPhone: json['deliveryPartnerPhone'] as String?,
+      deliveryAddress: json['deliveryAddress'] as String,
+      paymentMethod: json['paymentMethod'] as String,
+      paymentStatus: json['paymentStatus'] as String,
+      categories: categories,
     );
   }
 
   Map<String, dynamic> toMap() {
+    Map<String, dynamic> itemsMap = {};
+
+    categories.forEach((categoryName, categoryList) {
+      itemsMap[categoryName] =
+          categoryList.map((category) => category.toMap()).toList();
+    });
+
     return <String, dynamic>{
       'orderId': orderId,
       'orderDate': orderDate,
@@ -54,27 +68,11 @@ class Order {
       'status': status,
       'deliveryPartnerName': deliveryPartnerName,
       'deliveryPartnerPhone': deliveryPartnerPhone,
-      'items': categories
-          .map((x) => x.toMap())
-          .toList(), // Use 'items' instead of 'categories'
+      'deliveryAddress': deliveryAddress,
+      'paymentMethod': paymentMethod,
+      'paymentStatus': paymentStatus,
+      'items': itemsMap,
     };
-  }
-
-  factory Order.fromMap(Map<String, dynamic> map) {
-    return Order(
-      orderId: map['orderId'] as String,
-      orderDate: map['orderDate'] as String,
-      totalPrice: map['totalPrice'] as String,
-      rating: map['rating'] as String,
-      status: map['status'] as String,
-      deliveryPartnerName: map['deliveryPartnerName'] as String?,
-      deliveryPartnerPhone: map['deliveryPartnerPhone'] as String?,
-      categories: List<OrderCategory>.from(
-        (map['items'] as List<dynamic>).map(
-          (x) => OrderCategory.fromMap(x as Map<String, dynamic>),
-        ),
-      ),
-    );
   }
 
   String toJson() => json.encode(toMap());
@@ -84,7 +82,7 @@ class Order {
 
   @override
   String toString() {
-    return 'Order(orderId: $orderId, orderDate: $orderDate, totalPrice: $totalPrice, rating: $rating, status: $status, deliveryPartnerName: $deliveryPartnerName, deliveryPartnerPhone: $deliveryPartnerPhone, categories: $categories)';
+    return 'Order(orderId: $orderId, orderDate: $orderDate, totalPrice: $totalPrice, rating: $rating, status: $status, deliveryPartnerName: $deliveryPartnerName, deliveryPartnerPhone: $deliveryPartnerPhone, deliveryAddress: $deliveryAddress,paymentMethod: $paymentMethod,paymentStatus: $paymentStatus, categories: $categories)';
   }
 
   @override
@@ -98,7 +96,10 @@ class Order {
         other.status == status &&
         other.deliveryPartnerName == deliveryPartnerName &&
         other.deliveryPartnerPhone == deliveryPartnerPhone &&
-        listEquals(other.categories, categories);
+        other.deliveryAddress == deliveryAddress &&
+        other.paymentMethod == paymentMethod &&
+        other.paymentStatus == paymentStatus &&
+        mapEquals(other.categories, categories);
   }
 
   @override
@@ -110,153 +111,80 @@ class Order {
         status.hashCode ^
         deliveryPartnerName.hashCode ^
         deliveryPartnerPhone.hashCode ^
+        deliveryAddress.hashCode ^
+        paymentMethod.hashCode ^
+        paymentStatus.hashCode ^
         categories.hashCode;
   }
 }
 
+bool mapEquals(Map<dynamic, dynamic> map1, Map<dynamic, dynamic> map2) {
+  if (map1.length != map2.length) return false;
+  for (var key in map1.keys) {
+    if (map2[key] != map1[key]) return false;
+  }
+  return true;
+}
+
 class OrderCategory {
   final String category;
-   final String name;
+  final String name;
   final int quantity;
   final double price;
   final int isAvailable;
 
-  // final List<OrderItem> items;
-
   OrderCategory({
     required this.category,
-     required this.name,
+    required this.name,
     required this.quantity,
     required this.price,
     required this.isAvailable,
-    // required this.items,
   });
 
-  OrderCategory copyWith({
-    String? category,
-    String? name,
-    int? quantity,
-    double? price,
-    int? isAvailable,
-    // List<OrderItem>? items,
-  }) {
+  factory OrderCategory.fromMap(Map<String, dynamic> map, String category) {
     return OrderCategory(
-      category: category ?? this.category,
-       name: name ?? this.name,
-      quantity: quantity ?? this.quantity,
-      price: price ?? this.price,
-      isAvailable: isAvailable ?? this.isAvailable,
+      category: category,
+      name: map['name'] as String,
+      quantity: map['quantity'] as int,
+      price: double.parse(map['price'] as String),
+      isAvailable: map['isAvailable'] as int,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'category': category, // Field name should match your JSON field name
-      'itemName':name ,
-      'qty': quantity,
+      'name': name,
+      'quantity': quantity,
       'price': price,
       'isAvailable': isAvailable,
     };
   }
 
-  factory OrderCategory.fromMap(Map<String, dynamic> map) {
-    return OrderCategory(
-      category: map['category'] as String, // Field name should match your JSON field name
-     name: map['itemName'] as String, // Corrected to match JSON field
-      quantity: map['qty'] as int, // Corrected to match JSON field
-      price: double.parse(map['price'] as String), // Convert string to double
-      isAvailable: map['isAvailable'] as int, // Provide an empty list if 'items' is null
-    );
-  }
-
   String toJson() => json.encode(toMap());
 
   factory OrderCategory.fromJson(String source) =>
-      OrderCategory.fromMap(json.decode(source) as Map<String, dynamic>);
+      OrderCategory.fromMap(json.decode(source) as Map<String, dynamic>, '');
 
   @override
-  String toString() => 'OrderCategory(category: $category, itemName: $name, qty: $quantity, price: $price, isAvailable: $isAvailable)';
+  String toString() =>
+      'OrderCategory(category: $category, name: $name, quantity: $quantity, price: $price, isAvailable: $isAvailable)';
 
   @override
   bool operator ==(covariant OrderCategory other) {
     if (identical(this, other)) return true;
 
-    return other.category == category && other.name == name &&
+    return other.category == category &&
+        other.name == name &&
         other.quantity == quantity &&
         other.price == price &&
         other.isAvailable == isAvailable;
   }
 
   @override
-  int get hashCode => category.hashCode ^  name.hashCode ^ quantity.hashCode ^ price.hashCode ^ isAvailable.hashCode;
+  int get hashCode =>
+      category.hashCode ^
+      name.hashCode ^
+      quantity.hashCode ^
+      price.hashCode ^
+      isAvailable.hashCode;
 }
-
-
-// class OrderItem {
-//   final String name;
-//   final int quantity;
-//   final double price;
-//   final bool isAvailable;
-
-//   OrderItem({
-//     required this.name,
-//     required this.quantity,
-//     required this.price,
-//     required this.isAvailable,
-//   });
-
-//   OrderItem copyWith({
-//     String? name,
-//     int? quantity,
-//     double? price,
-//     bool? isAvailable,
-//   }) {
-//     return OrderItem(
-//       name: name ?? this.name,
-//       quantity: quantity ?? this.quantity,
-//       price: price ?? this.price,
-//       isAvailable: isAvailable ?? this.isAvailable,
-//     );
-//   }
-
-//   Map<String, dynamic> toMap() {
-//     return <String, dynamic>{
-//       'itemName': name,
-//       'quantity': quantity,
-//       'price': price,
-//       'isAvailable': isAvailable,
-//     };
-//   }
-
-//   factory OrderItem.fromMap(Map<String, dynamic> map) {
-//     return OrderItem(
-//       name: map['itemName'] as String, // Corrected to match JSON field
-//       quantity: map['qty'] as int, // Corrected to match JSON field
-//       price: double.parse(map['price'] as String), // Convert string to double
-//       isAvailable: map['isAvailable'] as bool,
-//     );
-//   }
-
-//   String toJson() => json.encode(toMap());
-
-//   factory OrderItem.fromJson(String source) =>
-//       OrderItem.fromMap(json.decode(source) as Map<String, dynamic>);
-
-//   @override
-//   String toString() =>
-//       'OrderItem(name: $name, quantity: $quantity, price: $price, isAvailable: $isAvailable)';
-
-//   @override
-//   bool operator ==(covariant OrderItem other) {
-//     if (identical(this, other)) return true;
-
-//     return other.name == name &&
-//         other.quantity == quantity &&
-//         other.price == price &&
-//         other.isAvailable == isAvailable;
-//   }
-
-//   @override
-//   int get hashCode =>
-//       name.hashCode ^ quantity.hashCode ^ price.hashCode ^ isAvailable.hashCode;
-// }

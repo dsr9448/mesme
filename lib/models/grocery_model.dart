@@ -32,16 +32,25 @@ class GroceryItem {
     );
   }
 }
+
 class Grocery {
   final int id;
   final String name;
+  final String ShopName;
   final String location;
+  final String phoneNumber;
+  final String coordinates;
+  final bool isOnline;
   final List<GroceryItem> groceryItem;
 
   Grocery({
     required this.id,
     required this.name,
+    required this.ShopName,
     required this.location,
+    required this.phoneNumber,
+    required this.coordinates,
+    required this.isOnline,
     required this.groceryItem,
   });
 
@@ -50,10 +59,14 @@ class Grocery {
     List<GroceryItem> groceryItem =
         gitems.map((i) => GroceryItem.fromJson(i)).toList();
     return Grocery(
-        id: json['id'],
-        name: json['name'],
-        location: json['location'],
-        groceryItem: groceryItem,
-        );
+      id: json['id'],
+      name: json['name'],
+      ShopName: json['ShopName'],
+      location: json['location'],
+      phoneNumber: json['phoneNumber'],
+      coordinates: json['coordinates'],
+      isOnline: json['isOnline'],
+      groceryItem: groceryItem,
+    );
   }
 }

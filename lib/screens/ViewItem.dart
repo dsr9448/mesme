@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mesme/widgets/functionalities.dart';
@@ -14,6 +15,8 @@ class ViewItem extends StatefulWidget {
   final unit;
   final isVeg;
   final rating;
+  final canAdd;
+  final distance;
 
   const ViewItem({
     super.key,
@@ -26,8 +29,10 @@ class ViewItem extends StatefulWidget {
     required this.food,
     this.isVeg,
     this.rating,
-    this.quantity,
-    this.unit,
+    required this.quantity,
+    required this.unit,
+    this.canAdd,
+    this.distance,
   });
 
   @override
@@ -58,7 +63,28 @@ class _ViewItemState extends State<ViewItem> {
         children: [
           ListView(
             children: [
-              Image.network(widget.imageUrl, fit: BoxFit.cover),
+              CachedNetworkImage(
+                imageUrl:
+                    'https://mesme.in/ControlHub/includes/uploads/${widget.imageUrl}',
+                fit: BoxFit.cover,
+                placeholder: (context, url) => const SizedBox(
+                  height: 100,
+                  width: double.infinity,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => const SizedBox(
+                  height: 100,
+                  width: double.infinity,
+                  child: Center(
+                    child: Icon(Icons.error, color: Colors.red),
+                  ),
+                ),
+              ),
+              // Image.network(widget.imageUrl, fit: BoxFit.cover),
               const SizedBox(height: 8),
               Container(
                 padding:
@@ -121,49 +147,94 @@ class _ViewItemState extends State<ViewItem> {
                                 ],
                               ),
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Icon(
                                     Icons.location_on,
                                     color: Colors.black54,
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    widget.location,
-                                    style: GoogleFonts.poppins(
-                                      textStyle: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w600,
+                                  Expanded(
+                                    child: Text(
+                                      widget.location,
+                                      maxLines: 3,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  )
                                 ],
                               ),
+                              widget.distance != ''
+                                  ? Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.bike_scooter,
+                                          color: Colors.black54,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          '${widget.distance} km away',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: const TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : SizedBox(),
                             ],
                           )
                         : Column(
                             children: [
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Qty: ',
-                                    style: GoogleFonts.poppins(
-                                      textStyle: const TextStyle(
-                                        color: Colors.black54,
-                                        fontWeight: FontWeight.w600,
+                                  const Icon(
+                                    Icons.location_on,
+                                    color: Colors.black54,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      widget.location,
+                                      maxLines: 3,
+                                      style: GoogleFonts.poppins(
+                                        textStyle: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Text(
-                                    "${widget.quantity} ${widget.unit}",
-                                    style: GoogleFonts.poppins(
-                                      textStyle: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
+                                  )
                                 ],
                               ),
+                              const SizedBox(height: 12),
+                              widget.distance != ''
+                                  ? Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.bike_scooter,
+                                          color: Colors.black54,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          '${widget.distance} km away',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: const TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : SizedBox(),
                             ],
                           ),
                     const SizedBox(height: 12),
@@ -202,15 +273,37 @@ class _ViewItemState extends State<ViewItem> {
                                 ],
                               )
                             : const SizedBox(),
+                        Row(
+                          children: [
+                            Text(
+                              'Qty: ',
+                              style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              "${(double.parse(widget.quantity) * quantity).toString().replaceAll('.0', '')} ${widget.unit}",
+                              style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 18, vertical: 12),
                           decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: Colors.orange.shade700,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            '₹ ${widget.price}',
+                            '₹ ${widget.price.toString().replaceAll('.0', '')}',
                             style: GoogleFonts.poppins(
                               textStyle: const TextStyle(
                                 color: Colors.white,
@@ -254,7 +347,7 @@ class _ViewItemState extends State<ViewItem> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              backgroundColor: Colors.black,
+              backgroundColor: Colors.orange.shade700,
               shape: const CircleBorder(),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -278,62 +371,133 @@ class _ViewItemState extends State<ViewItem> {
                         icon: const Icon(Icons.remove, color: Colors.white),
                         style: const ButtonStyle(
                             backgroundColor:
-                                WidgetStatePropertyAll(Colors.black)),
+                                WidgetStatePropertyAll(Colors.orange)),
                         onPressed: _decrementQuantity,
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        '$quantity ${widget.food == false ? widget.unit : ''}',
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                      const SizedBox(width: 4),
+                      Row(
+                        children: [
+                          Text(
+                            (double.parse(widget.quantity) * quantity)
+                                .toString()
+                                .replaceAll('.0', ''),
+                            style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${widget.unit}  ',
+                            style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 4),
                       IconButton(
                         icon: const Icon(Icons.add, color: Colors.white),
                         style: const ButtonStyle(
                             backgroundColor:
-                                WidgetStatePropertyAll(Colors.black)),
+                                WidgetStatePropertyAll(Colors.orange)),
                         onPressed: _incrementQuantity,
                       ),
                     ],
                   ),
                   const Spacer(),
                   // Add to Cart Button
-                  ElevatedButton(
-                    onPressed: () {
-                      FoodFunction.addToCart(
-                          widget.name,
-                          widget.price,
-                          quantity,
-                          widget.imageUrl,
-                          widget.restaurantName,
-                          widget.location,
-                          widget.food ? 'Food' : 'Grocery',
-                          context).whenComplete((){
-                          Navigator.pop(context);
-                          });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 12),
-                    ),
-                    child: Text(
-                      'Add to Cart ₹ ${widget.price * quantity}',
-                      style: GoogleFonts.poppins(
-                        textStyle: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
+                  widget.canAdd == true
+                      ? ElevatedButton(
+                          onPressed: () {
+                            FoodFunction.addToCart(
+                                    widget.name,
+                                    widget.price,
+                                    quantity,
+                                    widget.imageUrl,
+                                    widget.restaurantName,
+                                    widget.location,
+                                    widget.food ? 'Food' : 'Grocery',
+                                    context)
+                                .whenComplete(() {
+                              Navigator.pop(context);
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange.shade700,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 12),
+                          ),
+                          child: Text(
+                            'Add to Cart ₹ ${(widget.price * quantity).toString().replaceAll('.0', '')}',
+                            style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        )
+                      : widget.canAdd == false
+                          ? ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red.shade800,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 12),
+                              ),
+                              child: Text(
+                                'Service Not Available',
+                                style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  FoodFunction.addToCart(
+                                          widget.name,
+                                          widget.price,
+                                          quantity,
+                                          widget.imageUrl,
+                                          widget.restaurantName,
+                                          widget.location,
+                                          widget.food ? 'Food' : 'Grocery',
+                                          context)
+                                      .whenComplete(() {
+                                    Navigator.pop(context);
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange.shade700,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 12),
+                                ),
+                                child: Text(
+                                  'Add to Cart ₹ ${(widget.price * quantity).toString()}',
+                                  style: GoogleFonts.poppins(
+                                    textStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
                 ],
               ),
             ),
