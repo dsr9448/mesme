@@ -39,7 +39,6 @@ class _SearchPageState extends State<SearchPage> {
         Uri.parse('https://mesme.in/admin/api/Food/search.php?search=$query'));
 
     if (response.statusCode == 200) {
-      print('the respinsie is ${json.decode(response.body)}');
       setState(() {
         _searchResults = json.decode(response.body);
       });

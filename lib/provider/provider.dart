@@ -178,7 +178,7 @@ class FoodProvider with ChangeNotifier {
   }
 
   Future<void> fetchGrocery() async {
-    if (_dataFetched) return;
+    // if (_dataFetched) return;
     if (groceries.isNotEmpty) return;
     await fetchUserData();
     String? address = await fetchSavedCoordinates();
@@ -192,7 +192,8 @@ class FoodProvider with ChangeNotifier {
       final Map<int, List<GroceryItem>> loadedCategoriesMap = {};
 
       // User location (assumed to be in 'lat,long' format)
-      String userCoordinate =  userData?.location ?? '0,0' ;
+      String userCoordinate = userData!.location ?? address ?? '0,0';
+
 
 
       // Parse categories and calculate distance
@@ -233,7 +234,7 @@ class FoodProvider with ChangeNotifier {
       // Assign the loaded categories map
       groceryCategoriesMap = loadedCategoriesMap;
       _dataFetched = true;
-      notifyListeners(); // Notify listeners to update UI
+      notifyListeners(); 
     } else {
       throw Exception('Failed to load groceries');
     }
@@ -252,7 +253,7 @@ class FoodProvider with ChangeNotifier {
         final data = jsonDecode(response.body);
         userData = UserModel.fromMap(data);
         fetchSavedAddress();
-        notifyListeners(); // Notify listeners to update UI
+        notifyListeners(); 
       } else {
         throw Exception('Failed to load user data: ${response.statusCode}');
       }
@@ -260,7 +261,7 @@ class FoodProvider with ChangeNotifier {
       throw Exception('Error fetching user data: $e');
     } finally {
       isLoading = false;
-      notifyListeners(); // Notify listeners to update UI
+      notifyListeners(); 
     }
   }
 
@@ -324,7 +325,7 @@ class FoodProvider with ChangeNotifier {
         orders = orderList.map((orderData) {
           return Order.fromMap(orderData);
         }).toList();
-        notifyListeners(); // Notify listeners to update UI
+        notifyListeners(); 
         print('fetching');
       } else {
         throw Exception('Failed to load orders: ${data['message']}');

@@ -270,6 +270,7 @@ class _FoodCartState extends State<FoodCart> {
                 children: [
                   Expanded(
                     child: ListView.builder(
+                      shrinkWrap: true,
                       itemCount: groupedItems.keys.length,
                       itemBuilder: (context, groupIndex) {
                         String restaurantName =
@@ -292,7 +293,7 @@ class _FoodCartState extends State<FoodCart> {
                             ...items.map((item) {
                               int itemIndex = cartItems.indexOf(item);
                               return Dismissible(
-                                key: Key(item['name']),
+                                key: Key('$groupIndex-${item['name']}'),
                                 direction: DismissDirection.endToStart,
                                 onDismissed: (direction) {
                                   _removeItem(itemIndex);

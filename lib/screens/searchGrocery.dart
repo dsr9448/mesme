@@ -39,7 +39,6 @@ class _SearchState extends State<Search> {
         Uri.parse('https://mesme.in/admin/api/Food/search.php?search=$query'));
 
     if (response.statusCode == 200) {
-      print('the respinsie is ${json.decode(response.body)}');
       setState(() {
         _searchResults = json.decode(response.body);
       });
@@ -183,15 +182,14 @@ class _SearchState extends State<Search> {
                     right: 0,
                     top: 0,
                     child: Container(
-                      padding:
-                          const EdgeInsets.all(6), // Adjust padding as needed
+                      padding: const EdgeInsets.all(6),
                       decoration: const BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
                       ),
                       constraints: const BoxConstraints(
-                        maxWidth: 24, // Adjust size as needed
-                        maxHeight: 24, // Adjust size as needed
+                        maxWidth: 24,
+                        maxHeight: 24,
                       ),
                       child: Center(
                         child: Text(
@@ -231,7 +229,8 @@ class _SearchState extends State<Search> {
           style: TextStyle(fontWeight: FontWeight.bold)));
       for (var item in _searchResults['groceryItems']) {
         var groceryCategories = _searchResults['groceryCategories'];
-
+        print(
+            'this is something new item: $item ,groceryCategories: $groceryCategories');
         widgets.add(ListTile(
           onTap: () {
             Navigator.push(
@@ -241,28 +240,22 @@ class _SearchState extends State<Search> {
                           imageUrl: item['ImageUrl'],
                           name: item['ItemName'],
                           price: double.parse(item['Price']),
-                          restaurantName: 'restaurantName',
-                          location: 'location',
+                          restaurantName: item['ShopName'],
+                          location: item['Location'],
                           description: item['Description'],
                           quantity: item['Quantity'],
                           unit: item['Unit'],
                           food: false,
                           canAdd: _searchResults['groceryCategories'].isNotEmpty
                               ? isWithin6Km(
-                                      userCoordinates,
-                                      groceryCategories[0]
-                                          ['coordinates'])['distance'] ??
-                                  0
+                                  userCoordinates, item['coordinates'])
                               : 0 >= 6
                                   ? true
                                   : false,
                           distance:
                               _searchResults['groceryCategories'].isNotEmpty
                                   ? isWithin6Km(
-                                          userCoordinates,
-                                          groceryCategories[0]
-                                              ['coordinates'])['distance'] ??
-                                      0
+                                      userCoordinates, item['coordinates'])
                                   : 0,
                           isVeg: '',
                           rating: '',
