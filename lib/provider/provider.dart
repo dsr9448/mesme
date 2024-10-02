@@ -194,8 +194,6 @@ class FoodProvider with ChangeNotifier {
       // User location (assumed to be in 'lat,long' format)
       String userCoordinate = userData!.location ?? address ?? '0,0';
 
-
-
       // Parse categories and calculate distance
       for (var categoryJson in data['categories']) {
         final category = Grocery.fromJson(categoryJson);
@@ -234,7 +232,7 @@ class FoodProvider with ChangeNotifier {
       // Assign the loaded categories map
       groceryCategoriesMap = loadedCategoriesMap;
       _dataFetched = true;
-      notifyListeners(); 
+      notifyListeners();
     } else {
       throw Exception('Failed to load groceries');
     }
@@ -253,7 +251,7 @@ class FoodProvider with ChangeNotifier {
         final data = jsonDecode(response.body);
         userData = UserModel.fromMap(data);
         fetchSavedAddress();
-        notifyListeners(); 
+        notifyListeners();
       } else {
         throw Exception('Failed to load user data: ${response.statusCode}');
       }
@@ -261,7 +259,7 @@ class FoodProvider with ChangeNotifier {
       throw Exception('Error fetching user data: $e');
     } finally {
       isLoading = false;
-      notifyListeners(); 
+      notifyListeners();
     }
   }
 
@@ -325,7 +323,7 @@ class FoodProvider with ChangeNotifier {
         orders = orderList.map((orderData) {
           return Order.fromMap(orderData);
         }).toList();
-        notifyListeners(); 
+        notifyListeners();
         print('fetching');
       } else {
         throw Exception('Failed to load orders: ${data['message']}');

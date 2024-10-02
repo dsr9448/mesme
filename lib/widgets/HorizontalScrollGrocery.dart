@@ -99,12 +99,12 @@ class HorizontalScrollGrocery extends StatelessWidget {
                     child: CachedNetworkImage(
                       imageUrl:
                           'https://mesme.in/ControlHub/includes/uploads/${item.imageUrl}',
-                      height: 100, // Adjust the height as needed
-                      width: 100,
+                      height: 80, // Adjust the height as needed
+                      width: 80,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => const SizedBox(
-                        height: 100,
-                        width: 100,
+                        height: 80,
+                        width: 80,
                         child: Center(
                           child: CircularProgressIndicator(
                             color: Colors.black,

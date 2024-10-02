@@ -100,12 +100,12 @@ class HorizontalScrollWidget extends StatelessWidget {
                     child: CachedNetworkImage(
                       imageUrl:
                           "https://mesme.in/ControlHub/includes/uploads/${item.foodPhoto}",
-                      height: 100, // Adjust the height as needed
-                      width: 100,
+                      height: 80, // Adjust the height as needed
+                      width: 80,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => const SizedBox(
-                        height: 100,
-                        width: 100,
+                        height: 80,
+                        width: 80,
                         child: Center(
                           child: CircularProgressIndicator(
                             color: Colors.black,
@@ -113,8 +113,8 @@ class HorizontalScrollWidget extends StatelessWidget {
                         ),
                       ),
                       errorWidget: (context, url, error) => const SizedBox(
-                        height: 100,
-                        width: 100,
+                        height: 80,
+                        width: 80,
                         child: Center(
                           child: Icon(Icons.error, color: Colors.red),
                         ),

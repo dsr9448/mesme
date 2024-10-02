@@ -126,18 +126,7 @@ class _SearchState extends State<Search> {
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Column(
           children: [
-            // TextField(
-            //   controller: _controller,
-            //   cursorColor: Colors.orange.shade700,
-            //   onChanged: (search) => _search(search),
-            //   decoration: const InputDecoration(
-            //     prefixIcon: Icon(Icons.search),
-            //     filled: true,
-            //     border: OutlineInputBorder(borderSide: BorderSide.none),
-            //     hintText: 'Search for groceries',
-            //     fillColor: Colors.white,
-            //   ),
-            // ),
+           
             const SizedBox(height: 10),
             TextField(
               cursorColor: Colors.orange.shade700,

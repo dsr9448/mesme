@@ -636,56 +636,65 @@ class OrderContent extends StatelessWidget {
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 4.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    flex: 3,
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          '${index + 1}. ${item.name} - ${item.quantity}',
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        flex: 3,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              '${index + 1}. ${item.name} - ${item.quantity}',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Text(
+                                          '₹ ${(item.quantity * item.price).toString().replaceAll('.0', '')}',
                                           style: const TextStyle(
                                             fontSize: 14,
                                             color: Colors.black,
                                           ),
+                                          textAlign: TextAlign.right,
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Text(
-                                      '₹ ${(item.quantity * item.price).toString().replaceAll('.0', '')}',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
                                       ),
-                                      textAlign: TextAlign.right,
-                                    ),
+                                    ],
                                   ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text(
-                                      order.status == 'Cancelled'
-                                          ? "Cancelled"
-                                          : item.isAvailable == 0
-                                              ? "Waiting"
-                                              : item.isAvailable == 1
-                                                  ? "Accepted"
-                                                  : "(Unavailable)",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: order.status == 'Cancelled'
-                                            ? Colors.red.shade800
-                                            : item.isAvailable == 1
-                                                ? Colors.green.shade900
-                                                : Colors.red.shade800,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          order.status == 'Cancelled'
+                                              ? "Cancelled"
+                                              : item.isAvailable == 0
+                                                  ? "Waiting"
+                                                  : item.isAvailable == 1
+                                                      ? "Accepted"
+                                                      : "(Unavailable)",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: order.status == 'Cancelled'
+                                                ? Colors.red.shade800
+                                                : item.isAvailable == 1
+                                                    ? Colors.green.shade900
+                                                    : Colors.red.shade800,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
                                       ),
-                                      textAlign: TextAlign.right,
-                                    ),
-                                  ),
+                                    ],
+                                  )
                                 ],
                               ),
                             );
