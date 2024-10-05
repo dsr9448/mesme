@@ -218,8 +218,7 @@ class _SearchState extends State<Search> {
           style: TextStyle(fontWeight: FontWeight.bold)));
       for (var item in _searchResults['groceryItems']) {
         var groceryCategories = _searchResults['groceryCategories'];
-        print(
-            'this is something new item: $item ,groceryCategories: $groceryCategories');
+    
         widgets.add(ListTile(
           onTap: () {
             Navigator.push(
@@ -229,23 +228,19 @@ class _SearchState extends State<Search> {
                           imageUrl: item['ImageUrl'],
                           name: item['ItemName'],
                           price: double.parse(item['Price']),
-                          restaurantName: item['ShopName'],
+                          restaurantName: item['ShopName']??'',
                           location: item['Location'],
                           description: item['Description'],
                           quantity: item['Quantity'],
                           unit: item['Unit'],
                           food: false,
-                          canAdd: _searchResults['groceryCategories'].isNotEmpty
-                              ? isWithin6Km(
-                                  userCoordinates, item['coordinates'])
-                              : 0 >= 6
-                                  ? true
-                                  : false,
+                          canAdd:  isWithin6Km(userCoordinates,
+                            item['coordinates'])['distance'] <=
+                        6,
                           distance:
-                              _searchResults['groceryCategories'].isNotEmpty
-                                  ? isWithin6Km(
-                                      userCoordinates, item['coordinates'])
-                                  : 0,
+                           isWithin6Km(
+                                      userCoordinates, item['coordinates'])['distance']??0,
+                               
                           isVeg: '',
                           rating: '',
                         )));

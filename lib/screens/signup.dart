@@ -1,11 +1,13 @@
-// ignore_for_file: use_build_context_synchronously
+// // ignore_for_file: use_build_context_synchronously
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:mesme/models/usermodel.dart';
+import 'package:mesme/provider/provider.dart';
 import 'package:mesme/services/firebase_authservices.dart';
+import 'package:provider/provider.dart';
 
 class MeSignup extends StatefulWidget {
   const MeSignup({Key? key}) : super(key: key);
@@ -16,7 +18,7 @@ class MeSignup extends StatefulWidget {
 
 class _MeSignupState extends State<MeSignup> {
   final FirebaseAuthServices _auth = FirebaseAuthServices();
-  bool isAuthInProgress = false;
+  // bool isAuthInProgress = false;
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _phonenoController = TextEditingController();
@@ -39,11 +41,11 @@ class _MeSignupState extends State<MeSignup> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: isAuthInProgress
-            ? CircularProgressIndicator(
-                color: Colors.orange.shade700,
-              )
-            : ListView(
+        child: Consumer<FoodProvider>(
+          builder: (context, foodProvider, child) {
+            return foodProvider.isAuthInProgress
+                ? const CircularProgressIndicator(color: Colors.orange)
+                : ListView(
                 shrinkWrap: true,
                 padding: const EdgeInsets.all(8),
                 children: [
@@ -203,7 +205,9 @@ class _MeSignupState extends State<MeSignup> {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: signUp,
+                                onPressed:  () async {
+                                     signUp(foodProvider);
+                                  },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.orange.shade700,
                                 ),
@@ -220,90 +224,121 @@ class _MeSignupState extends State<MeSignup> {
                     ),
                   ),
                 ],
-              ),
+              );
+          }
       ),
+    )
     );
   }
-
-  void signUp() async {
-    String name = _usernameController.text;
+  Future<void> signUp(FoodProvider provider) async {
+       String name = _usernameController.text;
     String email = _emailController.text;
     String phoneNumber = _phonenoController.text;
     String password = _passwordController.text;
-    if (name != "" ||
-        email != "" ||
-        (phoneNumber != "" || phoneNumber.length != 10) ||
-        password != "") {
-      try {
-        // Set isAuthInProgress to true when signup process starts
-        setState(() {
-          isAuthInProgress = true;
-        });
 
-        User? user = await _auth.signupWithEmailandPassword(email, password);
+    User? user = await provider.signUpWithEmailAndPassword(
+        name, email, phoneNumber, password);
 
-        if (user != null) {
-          var res = await http.post(
-            Uri.parse('https://mesme.in/admin/api/users/create.php'),
-            body: {
-              "id": user.uid,
-              "name": name,
-              "email": email,
-              "phoneNumber": phoneNumber,
-              "profilePhoto": '',
-              "password": password,
-              "address": '',
-            },
-          );
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/location',
-            arguments: true,
-            (route) => false,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Welcome $name'),
-              backgroundColor: Colors.orange.shade700,
-              showCloseIcon: true,
-              closeIconColor: Colors.white,
-            ),
-          );
-        } else {
-          Navigator.pushNamed(context, '/welcome');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.red.shade700,
-              content: const Text('invalid Credentials'),
-              showCloseIcon: true,
-              closeIconColor: Colors.white,
-            ),
-          );
-        }
-      } catch (e) {
-        Navigator.pushNamed(context, '/welcome');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.red,
-            content: Text('Something went wrong'),
-            showCloseIcon: true,
-            closeIconColor: Colors.white,
-          ),
-        );
-      } finally {
-        setState(() {
-          isAuthInProgress = false;
-        });
-      }
+    if (user != null) {
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text('Welcome '),
+        showCloseIcon: true,
+        backgroundColor: Colors.orange.shade700,
+        closeIconColor: Colors.white,
+      ));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red.shade700,
-          content: const Text('please enter the data '),
-          showCloseIcon: true,
-          closeIconColor: Colors.white,
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red.shade800,
+        content: const Text('Something went wrong. Please try again'),
+        showCloseIcon: true,
+        closeIconColor: Colors.white,
+      ));
     }
   }
 }
+
+  // void signUp() async {
+  //   String name = _usernameController.text;
+  //   String email = _emailController.text;
+  //   String phoneNumber = _phonenoController.text;
+  //   String password = _passwordController.text;
+  //   if (name != "" ||
+  //       email != "" ||
+  //       (phoneNumber != "" || phoneNumber.length != 10) ||
+  //       password != "") {
+  //     try {
+    
+  //       setState(() {
+  //         isAuthInProgress = true;
+  //       });
+
+  //       User? user = await _auth.signupWithEmailandPassword(email, password);
+
+  //       if (user != null) {
+  //         var res = await http.post(
+  //           Uri.parse('https://mesme.in/admin/api/users/create.php'),
+  //           body: {
+  //             "id": user.uid,
+  //             "name": name,
+  //             "email": email,
+  //             "phoneNumber": phoneNumber,
+  //             "profilePhoto": '',
+  //             "password": password,
+  //             "address": '',
+  //           },
+  //         );
+  //         Navigator.pushNamedAndRemoveUntil(
+  //           context,
+  //           '/location',
+  //           arguments: true,
+  //           (route) => false,
+  //         );
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text('Welcome $name'),
+  //             backgroundColor: Colors.orange.shade700,
+  //             showCloseIcon: true,
+  //             closeIconColor: Colors.white,
+  //           ),
+  //         );
+  //       } else {
+  //         Navigator.pushNamed(context, '/welcome');
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             backgroundColor: Colors.red.shade700,
+  //             content: const Text('invalid Credentials'),
+  //             showCloseIcon: true,
+  //             closeIconColor: Colors.white,
+  //           ),
+  //         );
+  //       }
+  //     } catch (e) {
+  //       Navigator.pushNamed(context, '/welcome');
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           backgroundColor: Colors.red,
+  //           content: Text('Something went wrong'),
+  //           showCloseIcon: true,
+  //           closeIconColor: Colors.white,
+  //         ),
+  //       );
+  //     } finally {
+  //       setState(() {
+  //         isAuthInProgress = false;
+  //       });
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         backgroundColor: Colors.red.shade700,
+  //         content: const Text('please enter the data '),
+  //         showCloseIcon: true,
+  //         closeIconColor: Colors.white,
+  //       ),
+  //     );
+  //   }
+  // }
+  
+
+// }

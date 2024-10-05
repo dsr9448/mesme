@@ -32,7 +32,7 @@ class HorizontalScrollGrocery extends StatelessWidget {
 
     bool canAdd = result['distance'] <= 6 ? true : false;
     double distance = result['distance'] ?? 0.0;
-    print('this is test: $result, this is test1: $canAdd');
+    // print('this is test: $result, this is test1: $canAdd');
     return SizedBox(
       height: 150, // Adjust the height as needed
       child: ListView.builder(

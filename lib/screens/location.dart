@@ -39,6 +39,7 @@ class _MeLocationState extends State<MeLocation> {
 
   @override
   Widget build(BuildContext context) {
+     final foodProvider = Provider.of<FoodProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -234,7 +235,11 @@ class _MeLocationState extends State<MeLocation> {
         body: body,
       );
       if (response.statusCode == 200) {
+        Provider.of<FoodProvider>(context, listen: false).fetchUserData();
+        Provider.of<FoodProvider>(context, listen: false).fetchSavedCoordinates();
         Provider.of<FoodProvider>(context, listen: false).fetchSavedAddress();
+        
+        
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

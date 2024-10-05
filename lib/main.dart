@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
             primaryColor: Colors.white),
         color: Colors.white,
         initialRoute: '/introPage',
+
         routes: {
           '/introPage': (context) => const MeIntro(),
           '/home': (context) => const FoodBottomNavBar(),

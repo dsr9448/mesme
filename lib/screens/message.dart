@@ -35,14 +35,15 @@ class _MeMessageState extends State<MeMessage> {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         setState(() {
-          _messages =
-              data.map((messageJson) => Message.fromJson(messageJson)).toList();
-        });
+          _messages = data
+              .map((messageJson) => Message.fromJson(messageJson))
+              .toList();
+                });
       } else {
         throw Exception('Failed to load messages');
       }
     } catch (e) {
-      // const   print('Error fetching messages: $e');
+      print('Error fetching messages: $e');
     }
   }
 
@@ -71,7 +72,7 @@ class _MeMessageState extends State<MeMessage> {
   void _addMessage(String message) {
     setState(() {
       _messages.insert(
-        0,
+        0,  // Insert at the top
         Message(
           userId: _user!.uid,
           message: message,
@@ -79,6 +80,9 @@ class _MeMessageState extends State<MeMessage> {
           isReply: false,
         ),
       );
+
+      // Sort messages by createdAt to keep the newest ones at the top
+      _messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     });
   }
 
@@ -90,11 +94,9 @@ class _MeMessageState extends State<MeMessage> {
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         leading: IconButton(
-          style: const ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll(Colors.orange)),
           icon: const Icon(
             Icons.arrow_back_ios,
-            color: Colors.white,
+            color: Colors.orange,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -114,7 +116,6 @@ class _MeMessageState extends State<MeMessage> {
           if (_messages.isNotEmpty) _buildDateHeader(_messages[0].createdAt),
           Expanded(
             child: ListView.builder(
-              reverse: true,
               itemCount: _messages.length,
               itemBuilder: (BuildContext context, int index) {
                 final message = _messages[index];
@@ -183,12 +184,9 @@ class _MeMessageState extends State<MeMessage> {
                     ),
                   ),
                   IconButton(
-                    style: const ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.orange),
-                    ),
                     icon: const Icon(
                       Icons.send,
-                      color: Colors.white,
+                      color: Colors.orange,
                     ),
                     onPressed: () {
                       if (_controller.text.isNotEmpty) {
@@ -238,10 +236,6 @@ class _MeMessageState extends State<MeMessage> {
         ),
       );
     }
-  }
-
-  String _formatTime(DateTime date) {
-    return '${date.hour}:${date.minute}';
   }
 }
 

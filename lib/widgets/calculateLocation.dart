@@ -36,7 +36,7 @@ Map<String, dynamic> isWithin6Km(String coord1, String coord2) {
   double roundedDistance =
       double.parse(distance.toStringAsFixed(2)); // Round to 2 decimal places
   bool isWithinRange = roundedDistance <= 6.0;
-  print('this is test, $isWithinRange, $roundedDistance');
+  // print('this is test, $isWithinRange, $roundedDistance');
 
   return {'isWithinRange': isWithinRange, 'distance': roundedDistance};
 }

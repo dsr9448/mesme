@@ -121,6 +121,63 @@ class FoodProvider with ChangeNotifier {
       return null;
     }
   }
+Future<User?> signUpWithEmailAndPassword(
+    String name, String email, String phoneNumber, String password) async {
+  try {
+    isAuthInProgress = true;
+    notifyListeners(); // Notify UI to show a loading indicator
+
+    // Firebase sign-up process
+    
+    UserCredential userCredential = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email:email,password: password);
+    User? user = userCredential.user;
+
+
+    if (user != null) {
+      // Store user information in your backend server
+      var res = await http.post(
+        Uri.parse('https://mesme.in/admin/api/users/create.php'),
+        body: {
+          "id": user.uid,
+          "name": name,
+          "email": email,
+          "phoneNumber": phoneNumber,
+          "profilePhoto": '',
+          "password": password,
+          "address": '',
+        },
+      );
+
+      if (res.statusCode == 200) {
+        // Fetch user data and relevant information
+       
+        await fetchRestaurants();
+        await fetchGrocery();
+
+        isAuthInProgress = false;
+        notifyListeners();
+        return user; // Return the signed-up user
+      } else {
+        throw Exception('Failed to create user: ${res.statusCode}');
+      }
+    } else {
+      isAuthInProgress = false;
+      notifyListeners();
+      return null; // Sign-up failed
+    }
+  } on FirebaseAuthException catch (e) {
+    isAuthInProgress = false;
+    notifyListeners();
+    print('Sign-up failed: $e');
+    return null;
+  } catch (e) {
+    isAuthInProgress = false;
+    notifyListeners();
+    print('Error during sign-up: $e');
+    return null;
+  }
+}
 
   Future<void> fetchRestaurants() async {
     await fetchUserData();
