@@ -7,6 +7,7 @@ import 'package:mesme/models/grocery_model.dart';
 import 'package:mesme/models/ordermodel.dart';
 import 'package:mesme/models/usermodel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mesme/services/firebase_authservices.dart';
 import 'package:mesme/widgets/calculateLocation.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class FoodProvider with ChangeNotifier {
   bool _dataFetched = false;
   late Razorpay _razorpay;
   String? _currentOrderId;
-
+final FirebaseAuthServices auth = FirebaseAuthServices();
   FoodProvider() {
     fetchUserData();
     fetchSavedCoordinates();
@@ -129,9 +130,10 @@ Future<User?> signUpWithEmailAndPassword(
 
     // Firebase sign-up process
     
-    UserCredential userCredential = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email:email,password: password);
-    User? user = userCredential.user;
+    // UserCredential userCredential = await FirebaseAuth.instance
+    //     .signInWithEmailAndPassword(email:email,password: password);
+    // User? user = userCredential.user;
+    User? user = await auth.signupWithEmailandPassword(email, password);
 
 
     if (user != null) {
@@ -152,8 +154,8 @@ Future<User?> signUpWithEmailAndPassword(
       if (res.statusCode == 200) {
         // Fetch user data and relevant information
        
-        await fetchRestaurants();
-        await fetchGrocery();
+        // await fetchRestaurants();
+        // await fetchGrocery();
 
         isAuthInProgress = false;
         notifyListeners();
@@ -297,6 +299,7 @@ Future<User?> signUpWithEmailAndPassword(
 
   Future<void> fetchUserData() async {
     try {
+      user=_auth.currentUser;
       if (user == null) {
         throw Exception('User is not authenticated');
       }

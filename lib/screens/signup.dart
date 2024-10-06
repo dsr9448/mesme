@@ -17,7 +17,7 @@ class MeSignup extends StatefulWidget {
 }
 
 class _MeSignupState extends State<MeSignup> {
-  final FirebaseAuthServices _auth = FirebaseAuthServices();
+  // final FirebaseAuthServices _auth = FirebaseAuthServices();
   // bool isAuthInProgress = false;
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
@@ -240,7 +240,7 @@ class _MeSignupState extends State<MeSignup> {
         name, email, phoneNumber, password);
 
     if (user != null) {
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      Navigator.pushNamedAndRemoveUntil(context, '/location', (route) => false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text('Welcome '),
         showCloseIcon: true,

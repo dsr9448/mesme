@@ -238,6 +238,8 @@ class _MeLocationState extends State<MeLocation> {
         Provider.of<FoodProvider>(context, listen: false).fetchUserData();
         Provider.of<FoodProvider>(context, listen: false).fetchSavedCoordinates();
         Provider.of<FoodProvider>(context, listen: false).fetchSavedAddress();
+        Provider.of<FoodProvider>(context, listen: false).fetchRestaurants();
+        Provider.of<FoodProvider>(context, listen: false).fetchGrocery();
         
         
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
