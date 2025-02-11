@@ -89,13 +89,13 @@ Widget caro2(List<String> bannerImages) {
       builder: (context) {
         return FlutterCarousel(
           options: CarouselOptions(
-            height: 200,
+            height: 140,
             viewportFraction: 1.0,
             enlargeCenterPage: false,
             autoPlay: true,
             enableInfiniteScroll: true,
+            showIndicator: false,
             autoPlayInterval: const Duration(seconds: 2),
-            slideIndicator: CircularWaveSlideIndicator(),
           ),
           items: bannerImages.map((i) {
             return Builder(

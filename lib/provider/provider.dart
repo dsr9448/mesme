@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:mesme/models/food_item.dart';
 import 'package:mesme/models/grocery_model.dart';
@@ -17,6 +16,8 @@ import 'package:flutter/material.dart';
 
 class FoodProvider with ChangeNotifier {
   List<Restaurant> restaurants = [];
+  List<Restaurant> restaurant = [];
+  List<Restaurant> restaurantsAbove4 = [];
   List<String> bannerImages = [];
   List<Grocery> groceries = [];
   List<Order> orders = [];
@@ -30,7 +31,7 @@ class FoodProvider with ChangeNotifier {
   late Razorpay _razorpay;
   String? _currentOrderId;
   BuildContext? _tempContext;
-final FirebaseAuthServices auth = FirebaseAuthServices();
+  final FirebaseAuthServices auth = FirebaseAuthServices();
   FoodProvider() {
     fetchUserData();
     fetchSavedCoordinates();
@@ -38,6 +39,7 @@ final FirebaseAuthServices auth = FirebaseAuthServices();
     fetchRestaurants();
     fetchGrocery();
     fetchOrders();
+    fetchWishlist();
     _startPeriodicFetch();
     _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
@@ -103,6 +105,7 @@ final FirebaseAuthServices auth = FirebaseAuthServices();
         await fetchSavedCoordinates();
         await fetchSavedAddress();
         await fetchRestaurants();
+        await fetchWishlist();
         await fetchGrocery();
         await fetchOrders();
 
@@ -127,66 +130,63 @@ final FirebaseAuthServices auth = FirebaseAuthServices();
     }
   }
 
+  Future<User?> signUpWithEmailAndPassword(
+      String name, String email, String phoneNumber, String password) async {
+    try {
+      isAuthInProgress = true;
+      notifyListeners(); // Notify UI to show a loading indicator
 
-Future<User?> signUpWithEmailAndPassword(
-    String name, String email, String phoneNumber, String password) async {
-  try {
-    isAuthInProgress = true;
-    notifyListeners(); // Notify UI to show a loading indicator
+      // Firebase sign-up process
 
-    // Firebase sign-up process
-    
-    // UserCredential userCredential = await FirebaseAuth.instance
-    //     .signInWithEmailAndPassword(email:email,password: password);
-    // User? user = userCredential.user;
-    User? user = await auth.signupWithEmailandPassword(email, password);
+      // UserCredential userCredential = await FirebaseAuth.instance
+      //     .signInWithEmailAndPassword(email:email,password: password);
+      // User? user = userCredential.user;
+      User? user = await auth.signupWithEmailandPassword(email, password);
 
+      if (user != null) {
+        // Store user information in your backend server
+        var res = await http.post(
+          Uri.parse('https://mesme.in/admin/api/users/create.php'),
+          body: {
+            "id": user.uid,
+            "name": name,
+            "email": email,
+            "phoneNumber": phoneNumber,
+            "profilePhoto": '',
+            "password": password,
+            "address": '',
+          },
+        );
 
-    if (user != null) {
-      // Store user information in your backend server
-      var res = await http.post(
-        Uri.parse('https://mesme.in/admin/api/users/create.php'),
-        body: {
-          "id": user.uid,
-          "name": name,
-          "email": email,
-          "phoneNumber": phoneNumber,
-          "profilePhoto": '',
-          "password": password,
-          "address": '',
-          // "token":,
-        },
-      );
+        if (res.statusCode == 200) {
+          // Fetch user data and relevant information
 
-      if (res.statusCode == 200) {
-        // Fetch user data and relevant information
-       
-        // await fetchRestaurants();
-        // await fetchGrocery();
+          // await fetchRestaurants();
+          // await fetchGrocery();
 
+          isAuthInProgress = false;
+          notifyListeners();
+          return user; // Return the signed-up user
+        } else {
+          throw Exception('Failed to create user: ${res.statusCode}');
+        }
+      } else {
         isAuthInProgress = false;
         notifyListeners();
-        return user; // Return the signed-up user
-      } else {
-        throw Exception('Failed to create user: ${res.statusCode}');
+        return null; // Sign-up failed
       }
-    } else {
+    } on FirebaseAuthException catch (e) {
       isAuthInProgress = false;
       notifyListeners();
-      return null; // Sign-up failed
+      print('Sign-up failed: $e');
+      return null;
+    } catch (e) {
+      isAuthInProgress = false;
+      notifyListeners();
+      print('Error during sign-up: $e');
+      return null;
     }
-  } on FirebaseAuthException catch (e) {
-    isAuthInProgress = false;
-    notifyListeners();
-    print('Sign-up failed: $e');
-    return null;
-  } catch (e) {
-    isAuthInProgress = false;
-    notifyListeners();
-    print('Error during sign-up: $e');
-    return null;
   }
-}
 
   Future<void> fetchRestaurants() async {
     await fetchUserData();
@@ -196,6 +196,84 @@ Future<User?> signUpWithEmailAndPassword(
     String? address = await fetchSavedCoordinates();
     final response =
         await http.get(Uri.parse('https://mesme.in/admin/api/Food/get.php'));
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonData = json.decode(response.body);
+
+      // Parse restaurant data
+      List<Restaurant> fetchedRestaurants = (jsonData['restaurants'] as List)
+          .map((json) => Restaurant.fromJson(json))
+          .toList();
+
+      // Filter only restaurants with rating > 4
+      List<Restaurant> fetchedRestaurantsAbove4 = fetchedRestaurants
+          .where((restaurant) => (restaurant.rating ?? 0) > 4)
+          .toList();
+
+      String userCoordinate = userData!.location ?? address ?? '0,0';
+
+      // Function to calculate distances
+      List<Map<String, dynamic>> calculateDistances(
+          List<Restaurant> restaurantList) {
+        return restaurantList.map((restaurant) {
+          String restaurantCoordinate = restaurant.coordinates;
+          double rating = restaurant.rating ?? 0.0;
+
+          // Calculate the distance
+          Map<String, dynamic> result =
+              isWithin6Km(userCoordinate, restaurantCoordinate);
+          double distance = result['distance'];
+
+          return {
+            'restaurant': restaurant,
+            'distance': distance,
+            'rating': rating,
+          };
+        }).toList();
+      }
+
+      // Calculate distances
+      List<Map<String, dynamic>> restaurantWithDistances =
+          calculateDistances(fetchedRestaurants);
+      List<Map<String, dynamic>> restaurantAbove4WithDistances =
+          calculateDistances(fetchedRestaurantsAbove4);
+
+      // Sort `restaurants` by distance (ASC - closest first)
+      restaurantWithDistances
+          .sort((a, b) => a['distance'].compareTo(b['distance']));
+
+      // Sort `restaurantsAbove4` by rating (DESC - highest rated first)
+      restaurantAbove4WithDistances
+          .sort((a, b) => b['rating'].compareTo(a['rating']));
+
+      // Extract sorted restaurants
+      restaurants = restaurantWithDistances
+          .map<Restaurant>((item) => item['restaurant'] as Restaurant)
+          .toList();
+
+      restaurantsAbove4 = restaurantAbove4WithDistances
+          .map<Restaurant>((item) => item['restaurant'] as Restaurant)
+          .toList();
+
+      // Banner images
+      bannerImages = List<String>.from(jsonData['bannerImages']);
+      await fetchWishlist();
+
+      _dataFetched = true;
+      notifyListeners();
+    } else {
+      throw Exception('Failed to load restaurants');
+    }
+  }
+
+  Future<void> fetchWishlist() async {
+    await fetchUserData();
+    if (_dataFetched) return;
+    if (restaurant.isNotEmpty) return;
+
+    String? address = await fetchSavedCoordinates();
+    final response = await http.get(Uri.parse(
+        'https://mesme.in/admin/api/Wishlist/get.php?userid=${user!.uid}'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);
@@ -230,17 +308,53 @@ Future<User?> signUpWithEmailAndPassword(
           .sort((a, b) => a['distance'].compareTo(b['distance']));
 
       // Extract the sorted restaurants and cast them as List<Restaurant>
-      restaurants = restaurantWithDistances
+      restaurant = restaurantWithDistances
           .map<Restaurant>((item) => item['restaurant'] as Restaurant)
           .toList();
-
-      // Banner images (if needed)
-      bannerImages = List<String>.from(jsonData['bannerImages']);
       _dataFetched = true;
       notifyListeners();
     } else {
       throw Exception('Failed to load restaurants');
     }
+  }
+
+  Future<void> addToWishlist(int foodId) async {
+    final url = 'https://mesme.in/admin/api/Wishlist/create.php';
+
+    // Prepare the data
+    final requestData = {
+      'userid': FirebaseAuth.instance.currentUser!.uid,
+      'foodid': foodId,
+    };
+
+    try {
+      // Make the POST request
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestData),
+      );
+
+      // Check the response status
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData.containsKey('message')) {
+          await fetchWishlist();
+          notifyListeners();
+        } else if (responseData.containsKey('error')) {
+          await fetchWishlist();
+          notifyListeners();
+        }
+      } else {
+        await fetchWishlist();
+        notifyListeners();
+      }
+    } catch (error) {
+      print('Network error: $error');
+    }
+    notifyListeners();
   }
 
   Future<void> fetchGrocery() async {
@@ -306,7 +420,7 @@ Future<User?> signUpWithEmailAndPassword(
 
   Future<void> fetchUserData() async {
     try {
-      user=_auth.currentUser;
+      user = _auth.currentUser;
       if (user == null) {
         throw Exception('User is not authenticated');
       }
@@ -377,6 +491,7 @@ Future<User?> signUpWithEmailAndPassword(
       return null; // Return null in case of error
     }
   }
+
   Future<void> updateToken() async {
     try {
       // Get the current authenticated user
@@ -402,8 +517,8 @@ Future<User?> signUpWithEmailAndPassword(
       var response = await http.post(
         url,
         body: {
-          'id': user.uid,      // Pass the user ID as 'id'
-          'token': token,      // Pass the Firebase token as 'token'
+          'id': user.uid, // Pass the user ID as 'id'
+          'token': token, // Pass the Firebase token as 'token'
         },
       );
 
@@ -445,9 +560,9 @@ Future<User?> signUpWithEmailAndPassword(
     double totalAmount,
     String Description,
     String orderId,
-     BuildContext context,
+    BuildContext context,
   ) async {
-     _tempContext = context;
+    _tempContext = context;
     _currentOrderId = orderId;
     print(
         'this is razorpay: $totalAmount, $Description, ${userData!.email}, ${userData!.phoneNumber}');
@@ -484,83 +599,78 @@ Future<User?> signUpWithEmailAndPassword(
   //   }
   //   notifyListeners();
   // }
-void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-  if (_currentOrderId != null) {
-    await updatePayment(_currentOrderId!, "Paid").whenComplete(() {
-      
-     if (_tempContext != null && _tempContext!.mounted) {
-        // Safe navigation after checking if the context is still valid
-        Navigator.pushNamedAndRemoveUntil(
-          _tempContext!,
-          '/home',
-          (Route<dynamic> route) => false,
-        );
-    
-      QuickAlert.show(
-        context: _tempContext!,
-        type: QuickAlertType.success,
-        title: 'Payment Successful',
-        confirmBtnColor: Colors.orange.shade700,
-        text: 'Transaction Completed Successfully!',
-        autoCloseDuration: Duration(seconds: 3),
-        showConfirmBtn: false
-      );
-         Future.delayed(Duration(seconds: 3), () {
-          if (_tempContext != null && Navigator.canPop(_tempContext!)) {
-            Navigator.pop(_tempContext!);
-          }
-        });
-      }
-    });
-    
-    // Show success message after successful payment
-  } else {
-    print('Error: orderId is null');
-  }
-  _tempContext = null; // Clear context after use
-  notifyListeners();
-}
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    if (_currentOrderId != null) {
+      await updatePayment(_currentOrderId!, "Paid").whenComplete(() {
+        if (_tempContext != null && _tempContext!.mounted) {
+          // Safe navigation after checking if the context is still valid
+          Navigator.pushNamedAndRemoveUntil(
+            _tempContext!,
+            '/home',
+            (Route<dynamic> route) => false,
+          );
 
-void _handlePaymentError(PaymentFailureResponse response) async {
-  if (_currentOrderId != null) {
-    await updatePayment(_currentOrderId!, "Failed").whenComplete(() {
-      if (_tempContext != null && _tempContext!.mounted) {
-        // Safe navigation after checking if the context is still valid
-        Navigator.pushNamedAndRemoveUntil(
-          _tempContext!,
-          '/home',
-          (Route<dynamic> route) => false,
-        );
+          QuickAlert.show(
+              context: _tempContext!,
+              type: QuickAlertType.success,
+              title: 'Payment Successful',
+              confirmBtnColor: Colors.orange.shade700,
+              text: 'Transaction Completed Successfully!',
+              autoCloseDuration: Duration(seconds: 3),
+              showConfirmBtn: false);
+          Future.delayed(Duration(seconds: 3), () {
+            if (_tempContext != null && Navigator.canPop(_tempContext!)) {
+              Navigator.pop(_tempContext!);
+            }
+          });
+        }
+      });
 
-        // Show the QuickAlert in a safe context
-        QuickAlert.show(
-          context: _tempContext!,
-          type: QuickAlertType.error,
-          title: 'Payment Failed',
-          confirmBtnColor: Colors.red,
-          text: 'Transaction Failed. Please try again.',
-          autoCloseDuration: Duration(seconds: 1),
-          showConfirmBtn: false,
-      
-        );
-
-        // Close the QuickAlert dialog after 3 seconds if the context is still valid
-        Future.delayed(Duration(seconds: 3), () {
-          if (_tempContext != null && Navigator.canPop(_tempContext!)) {
-            Navigator.pop(_tempContext!);
-          }
-        });
-      }
-    });
-  } else {
-    print('Error: orderId is null');
+      // Show success message after successful payment
+    } else {
+      print('Error: orderId is null');
+    }
+    _tempContext = null; // Clear context after use
+    notifyListeners();
   }
 
-  _tempContext = null;
-  notifyListeners();
-}
+  void _handlePaymentError(PaymentFailureResponse response) async {
+    if (_currentOrderId != null) {
+      await updatePayment(_currentOrderId!, "Failed").whenComplete(() {
+        if (_tempContext != null && _tempContext!.mounted) {
+          // Safe navigation after checking if the context is still valid
+          Navigator.pushNamedAndRemoveUntil(
+            _tempContext!,
+            '/home',
+            (Route<dynamic> route) => false,
+          );
 
+          // Show the QuickAlert in a safe context
+          QuickAlert.show(
+            context: _tempContext!,
+            type: QuickAlertType.error,
+            title: 'Payment Failed',
+            confirmBtnColor: Colors.red,
+            text: 'Transaction Failed. Please try again.',
+            autoCloseDuration: Duration(seconds: 1),
+            showConfirmBtn: false,
+          );
 
+          // Close the QuickAlert dialog after 3 seconds if the context is still valid
+          Future.delayed(Duration(seconds: 3), () {
+            if (_tempContext != null && Navigator.canPop(_tempContext!)) {
+              Navigator.pop(_tempContext!);
+            }
+          });
+        }
+      });
+    } else {
+      print('Error: orderId is null');
+    }
+
+    _tempContext = null;
+    notifyListeners();
+  }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
     print("External Wallet Selected: ${response.walletName}");

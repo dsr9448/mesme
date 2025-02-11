@@ -10,7 +10,9 @@ class FoodItem {
   final String price;
   final String vegOrNonVeg;
   final String rating;
+  final String category;
   final int restaurantId;
+  final int totalCount;
 
   FoodItem({
     required this.id,
@@ -22,21 +24,25 @@ class FoodItem {
     required this.price,
     required this.vegOrNonVeg,
     required this.rating,
+    required this.category,
     required this.restaurantId,
+    required this.totalCount,
   });
 
   factory FoodItem.fromJson(Map<String, dynamic> json) {
     return FoodItem(
       id: json['id'],
       foodName: json['foodName'],
-      foodPhoto: json['foodPhoto'],
+      foodPhoto: json['foodPhoto'], 
       foodDescription: json['foodDescription'],
       Quantity: json['Quantity'],
       Unit: json['Unit'],
       price: json['price'],
       vegOrNonVeg: json['vegOrNonVeg'],
       rating: json['rating'],
+      category: json['category'],
       restaurantId: json['restaurantId'],
+      totalCount: json['totalCount']
     );
   }
 }
@@ -48,16 +54,30 @@ class Restaurant {
   final String phoneNumber;
   final String coordinates;
   final bool isOnline;
-  final List<FoodItem> foodItems;
+  final String time;
+  final String description;
+  final String area;
+  final String style;
+  final String rphoto;
+  final double rating;
+  final int totalOrders;
+    final List<FoodItem> foodItems;
 
-  Restaurant({
+  Restaurant( {
     required this.id,
     required this.name,
     required this.location,
     required this.phoneNumber,
     required this.coordinates,
     required this.isOnline,
+    required this.time,
+    required this.description,
+    required this.area,
+    required this.style,
+    required this.rphoto,
+    required this.rating,
     required this.foodItems,
+    required this.totalOrders
   });
 
   factory Restaurant.fromJson(Map<String, dynamic> json) {
@@ -72,6 +92,13 @@ class Restaurant {
       phoneNumber: json['phoneNumber'],
       coordinates: json['coordinates'],
       isOnline: json['isOnline'],
+      time: json['time'],
+      description: json['description'],
+      area: json['area'],
+      style: json['style'],
+      rphoto: json['rphoto'],
+      rating: json['rating'],
+      totalOrders: json['totalOrders'],
       foodItems: foodItems,
     );
   }

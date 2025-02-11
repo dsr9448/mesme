@@ -5,9 +5,11 @@ import 'package:mesme/provider/provider.dart';
 import 'package:mesme/screens/location.dart';
 import 'package:mesme/screens/searchGrocery.dart';
 import 'package:mesme/screens/viewAll.dart';
-import 'package:mesme/widgets/HorizontalScrollGrocery.dart';
+import 'package:mesme/widgets/calculateLocation.dart';
+import 'package:mesme/widgets/customSwitch.dart';
 import 'package:mesme/widgets/functionalities.dart';
 import 'package:provider/provider.dart';
+import 'package:mesme/widgets/preloder.dart';
 
 class GroceryScreen extends StatelessWidget {
   const GroceryScreen({super.key});
@@ -17,7 +19,9 @@ class GroceryScreen extends StatelessWidget {
     final foodProvider = Provider.of<FoodProvider>(context);
     UserModel? userData = foodProvider.userData;
 
-    return Scaffold(
+    return foodProvider.groceries.isEmpty
+                    ? buildShimmerLoader(false)
+                    : Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -101,21 +105,15 @@ class GroceryScreen extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         child: ListView(
           children: [
+                 Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: customHeading( 'Top (${foodProvider.groceries.length}) Groceries to explore'), 
+              ),
+                            const SizedBox(height: 12),
+
             for (var grocery in foodProvider.groceries)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            grocery.name,
-                            style: const TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.w900),
-                          ),
-                          GestureDetector(
+            
+               GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -144,29 +142,117 @@ class GroceryScreen extends StatelessWidget {
                                 ),
                               );
                             },
-                            child: Row(
-                              children: [
-                                Text('View all',
-                                    style: GoogleFonts.poppins(
-                                        textStyle: const TextStyle(
-                                            fontWeight: FontWeight.w500))),
-                                const Icon(Icons.east)
-                              ],
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  // Restaurant Image
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?q=80&w=2020&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                                          height: 130,
+                                          width: 130,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Image.asset(
+                                              'assets/images/placeholder.png',
+                                              height: 130,
+                                              width: 120,
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                        
+                                  const SizedBox(width: 12),
+
+                                  // Restaurant Info
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Restaurant Name
+                                        Text(
+                                          grocery.name,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+
+                                        const SizedBox(height: 2),
+
+                                        // Rating and Time
+                                        Row(
+                                          children: [
+                                            Icon(Icons.star,
+                                                color: Colors.orange, size: 16),
+                                            Text(
+                                              " ${'4.5 (20k)'} • ${'20-30 min'}",
+                                              // " ${'restaurant.rating'} • ${'restaurant.time'}",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(height: 2),
+
+                                        // Description
+                                        Text(
+                                          'restaurant.description',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+
+                                        const SizedBox(height: 2),
+
+                                        // Location
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Vijaipur, Guna',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey.shade600,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(" • "),
+                                            Expanded(
+                                              child:  Text(
+                          '${( isWithin6Km(userData!.location, grocery.coordinates)['distance']).toStringAsFixed(2)} Km ',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey.shade600,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ]),
-                    HorizontalScrollGrocery(
-                      items: grocery.groceryItem,
-                      rname: grocery.ShopName,
-                      rlocation: grocery.location,
-                      isOnline: grocery.isOnline,
-                      userCoordinate: userData!.location ,
-                      groceryCoordinate: grocery.coordinates,
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              )
           ],
         ),
       ),
@@ -217,3 +303,5 @@ class GroceryScreen extends StatelessWidget {
     );
   }
 }
+
+                

@@ -12,6 +12,7 @@ class ApiService with ChangeNotifier {
   ApiService() {
     fetchData();
   }
+
   Future<void> createOrder(String userId, String status, String deliveryAddress,
       double totalPrice, List<Map<String, dynamic>> items) async {
     final url = 'https://mesme.in/admin/api/FoodOrders/create.php';
@@ -66,7 +67,6 @@ class ApiService with ChangeNotifier {
       'isActive': 0,
     };
 
-
     try {
       // Sending the request to the server
       final response = await http.post(
@@ -98,22 +98,22 @@ class ApiService with ChangeNotifier {
     }
   }
 
- Future<void> updateOrderRating(String orderId, String rating) async {
-  // Data to be sent as JSON
-  Map<String, dynamic> requestData = {
-    'orderId': orderId.toString(),  // Ensure orderId is a string
-    'rating': rating.toString(),    // Ensure rating is a string
-  };
+  Future<void> updateOrderRating(String orderId, String rating) async {
+    // Data to be sent as JSON
+    Map<String, dynamic> requestData = {
+      'orderId': orderId.toString(), // Ensure orderId is a string
+      'rating': rating.toString(), // Ensure rating is a string
+    };
 
-  try {
-    // Sending the request to the server
-    final response = await http.post(
-      Uri.parse('https://mesme.in/admin/api/FoodOrders/rating.php'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(requestData),
-    );
+    try {
+      // Sending the request to the server
+      final response = await http.post(
+        Uri.parse('https://mesme.in/admin/api/FoodOrders/rating.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestData),
+      );
 
-     if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         // If the server returns a response with a 200 status code, parse the JSON
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
         notifyListeners();
@@ -135,6 +135,7 @@ class ApiService with ChangeNotifier {
     }
   }
 
+  
 
   Future<void> updatePayment(String orderId, String status) async {
     // Data to be sent as JSON
