@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mesme/models/usermodel.dart';
 import 'package:mesme/provider/provider.dart';
 import 'package:mesme/screens/location.dart';
-import 'package:mesme/screens/search.dart';
 import 'package:mesme/screens/searchGrocery.dart';
 import 'package:mesme/screens/viewAll.dart';
 import 'package:mesme/widgets/HorizontalScrollGrocery.dart';

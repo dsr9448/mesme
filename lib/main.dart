@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mesme/provider/provider.dart';
@@ -11,14 +12,17 @@ import 'package:mesme/screens/profile.dart';
 import 'package:mesme/screens/search.dart';
 import 'package:mesme/screens/signup.dart';
 import 'package:mesme/screens/welcome.dart';
+import 'package:mesme/services/firebase_api.dart';
 import 'package:mesme/services/firebase_options.dart';
 import 'package:mesme/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Firebase.initializeApp();
+  await FirebaseApi().initNotifications();
   runApp(
     ChangeNotifierProvider(
       create: (context) => FoodProvider(),
@@ -26,7 +30,10 @@ Future<void> main() async {
     ),
   );
 }
-
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Handling a background message: ${message.messageId}");
+}
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   // This widget is the root of your application.

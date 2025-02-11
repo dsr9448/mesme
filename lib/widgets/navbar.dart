@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mesme/models/usermodel.dart';
 import 'package:mesme/provider/provider.dart';
 import 'package:mesme/screens/grocery.dart';
 import 'package:mesme/screens/home.dart';
 import 'package:mesme/screens/orders.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class FoodBottomNavBar extends StatefulWidget {
   const FoodBottomNavBar({super.key});

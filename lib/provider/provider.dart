@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:mesme/models/food_item.dart';
@@ -9,6 +10,8 @@ import 'package:mesme/models/usermodel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mesme/services/firebase_authservices.dart';
 import 'package:mesme/widgets/calculateLocation.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +29,7 @@ class FoodProvider with ChangeNotifier {
   bool _dataFetched = false;
   late Razorpay _razorpay;
   String? _currentOrderId;
+  BuildContext? _tempContext;
 final FirebaseAuthServices auth = FirebaseAuthServices();
   FoodProvider() {
     fetchUserData();
@@ -122,6 +126,8 @@ final FirebaseAuthServices auth = FirebaseAuthServices();
       return null;
     }
   }
+
+
 Future<User?> signUpWithEmailAndPassword(
     String name, String email, String phoneNumber, String password) async {
   try {
@@ -148,6 +154,7 @@ Future<User?> signUpWithEmailAndPassword(
           "profilePhoto": '',
           "password": password,
           "address": '',
+          // "token":,
         },
       );
 
@@ -370,6 +377,47 @@ Future<User?> signUpWithEmailAndPassword(
       return null; // Return null in case of error
     }
   }
+  Future<void> updateToken() async {
+    try {
+      // Get the current authenticated user
+      User? user = FirebaseAuth.instance.currentUser;
+
+      // Check if user is authenticated
+      if (user == null) {
+        throw Exception('User is not authenticated');
+      }
+
+      // Retrieve the Firebase token
+      String? token = await FirebaseMessaging.instance.getToken();
+
+      // Check if token is retrieved successfully
+      if (token == null) {
+        throw Exception('Unable to retrieve Firebase token');
+      }
+
+      // Define the API URL for updating the token
+      var url = Uri.parse('https://mesme.in/admin/api/users/updateToken.php');
+
+      // Send POST request to the API
+      var response = await http.post(
+        url,
+        body: {
+          'id': user.uid,      // Pass the user ID as 'id'
+          'token': token,      // Pass the Firebase token as 'token'
+        },
+      );
+
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        print('Token updated successfully');
+      } else {
+        throw Exception('Failed to update token: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Print error if updating token fails
+      print("Error updating token: $e");
+    }
+  }
 
   Future<void> fetchOrders() async {
     final response = await http.get(Uri.parse(
@@ -397,13 +445,15 @@ Future<User?> signUpWithEmailAndPassword(
     double totalAmount,
     String Description,
     String orderId,
+     BuildContext context,
   ) async {
+     _tempContext = context;
     _currentOrderId = orderId;
     print(
         'this is razorpay: $totalAmount, $Description, ${userData!.email}, ${userData!.phoneNumber}');
     var options = {
       // 'key': 'rzp_live_XUVo3h4lBdfxh0',
-      'key': 'rzp_test_4dYa1o2CgjiMJ1',
+      'key': 'rzp_live_XUVo3h4lBdfxh0',
       'amount': totalAmount * 100,
       'name': userData!.name,
       'description': Description,
@@ -425,25 +475,92 @@ Future<User?> signUpWithEmailAndPassword(
     }
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    if (_currentOrderId != null) {
-      await updatePayment(_currentOrderId!, "Paid");
-      // Use the stored orderId
-    } else {
-      print('Error: orderId is null');
-    }
-    notifyListeners();
+  // void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+  //   if (_currentOrderId != null) {
+  //     await updatePayment(_currentOrderId!, "Paid");
+  //     // Use the stored orderId
+  //   } else {
+  //     print('Error: orderId is null');
+  //   }
+  //   notifyListeners();
+  // }
+void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+  if (_currentOrderId != null) {
+    await updatePayment(_currentOrderId!, "Paid").whenComplete(() {
+      
+     if (_tempContext != null && _tempContext!.mounted) {
+        // Safe navigation after checking if the context is still valid
+        Navigator.pushNamedAndRemoveUntil(
+          _tempContext!,
+          '/home',
+          (Route<dynamic> route) => false,
+        );
+    
+      QuickAlert.show(
+        context: _tempContext!,
+        type: QuickAlertType.success,
+        title: 'Payment Successful',
+        confirmBtnColor: Colors.orange.shade700,
+        text: 'Transaction Completed Successfully!',
+        autoCloseDuration: Duration(seconds: 3),
+        showConfirmBtn: false
+      );
+         Future.delayed(Duration(seconds: 3), () {
+          if (_tempContext != null && Navigator.canPop(_tempContext!)) {
+            Navigator.pop(_tempContext!);
+          }
+        });
+      }
+    });
+    
+    // Show success message after successful payment
+  } else {
+    print('Error: orderId is null');
+  }
+  _tempContext = null; // Clear context after use
+  notifyListeners();
+}
+
+void _handlePaymentError(PaymentFailureResponse response) async {
+  if (_currentOrderId != null) {
+    await updatePayment(_currentOrderId!, "Failed").whenComplete(() {
+      if (_tempContext != null && _tempContext!.mounted) {
+        // Safe navigation after checking if the context is still valid
+        Navigator.pushNamedAndRemoveUntil(
+          _tempContext!,
+          '/home',
+          (Route<dynamic> route) => false,
+        );
+
+        // Show the QuickAlert in a safe context
+        QuickAlert.show(
+          context: _tempContext!,
+          type: QuickAlertType.error,
+          title: 'Payment Failed',
+          confirmBtnColor: Colors.red,
+          text: 'Transaction Failed. Please try again.',
+          autoCloseDuration: Duration(seconds: 1),
+          showConfirmBtn: false,
+      
+        );
+
+        // Close the QuickAlert dialog after 3 seconds if the context is still valid
+        Future.delayed(Duration(seconds: 3), () {
+          if (_tempContext != null && Navigator.canPop(_tempContext!)) {
+            Navigator.pop(_tempContext!);
+          }
+        });
+      }
+    });
+  } else {
+    print('Error: orderId is null');
   }
 
-  void _handlePaymentError(PaymentFailureResponse response) async {
-    print("Payment Failed: ${response.code} - ${response.message}");
-    if (_currentOrderId != null) {
-      await updatePayment(_currentOrderId!, "Failed"); // Use the stored orderId
-    } else {
-      print('Error: orderId is null');
-    }
-    notifyListeners();
-  }
+  _tempContext = null;
+  notifyListeners();
+}
+
+
 
   void _handleExternalWallet(ExternalWalletResponse response) {
     print("External Wallet Selected: ${response.walletName}");

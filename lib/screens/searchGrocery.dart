@@ -126,9 +126,10 @@ class _SearchState extends State<Search> {
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Column(
           children: [
-           
             const SizedBox(height: 10),
             TextField(
+              style: const TextStyle(
+                  color: Colors.white, decoration: TextDecoration.none),
               cursorColor: Colors.orange.shade700,
               onChanged: (search) => _search(search),
               decoration: const InputDecoration(
@@ -217,8 +218,6 @@ class _SearchState extends State<Search> {
       widgets.add(const Text('Grocery Items Or Fruits & Vegetables',
           style: TextStyle(fontWeight: FontWeight.bold)));
       for (var item in _searchResults['groceryItems']) {
-        var groceryCategories = _searchResults['groceryCategories'];
-    
         widgets.add(ListTile(
           onTap: () {
             Navigator.push(
@@ -226,21 +225,20 @@ class _SearchState extends State<Search> {
                 MaterialPageRoute(
                     builder: (context) => ViewItem(
                           imageUrl: item['ImageUrl'],
-                          name: item['ItemName'],
+                          name: item['ItemName'] ?? '',
                           price: double.parse(item['Price']),
-                          restaurantName: item['ShopName']??'',
+                          restaurantName: item['ShopName'] ?? '',
                           location: item['Location'],
                           description: item['Description'],
                           quantity: item['Quantity'],
                           unit: item['Unit'],
                           food: false,
-                          canAdd:  isWithin6Km(userCoordinates,
-                            item['coordinates'])['distance'] <=
-                        6,
-                          distance:
-                           isWithin6Km(
-                                      userCoordinates, item['coordinates'])['distance']??0,
-                               
+                          canAdd: isWithin6Km(userCoordinates,
+                                  item['coordinates'])['distance'] <=
+                              6,
+                          distance: isWithin6Km(userCoordinates,
+                                  item['coordinates'])['distance'] ??
+                              0,
                           isVeg: '',
                           rating: '',
                         )));

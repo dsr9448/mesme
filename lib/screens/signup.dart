@@ -231,13 +231,15 @@ class _MeSignupState extends State<MeSignup> {
     );
   }
   Future<void> signUp(FoodProvider provider) async {
-       String name = _usernameController.text;
-    String email = _emailController.text;
-    String phoneNumber = _phonenoController.text;
-    String password = _passwordController.text;
+       String name = _usernameController.text.trim();
+    String email = _emailController.text.trim();
+    String phoneNumber = _phonenoController.text.trim();
+    String password = _passwordController.text.trim();
 
     User? user = await provider.signUpWithEmailAndPassword(
-        name, email, phoneNumber, password);
+        name, email, phoneNumber, password).whenComplete(() {
+          provider.updateToken(); 
+        });
 
     if (user != null) {
       Navigator.pushNamedAndRemoveUntil(context, '/location', (route) => false);
@@ -258,87 +260,4 @@ class _MeSignupState extends State<MeSignup> {
   }
 }
 
-  // void signUp() async {
-  //   String name = _usernameController.text;
-  //   String email = _emailController.text;
-  //   String phoneNumber = _phonenoController.text;
-  //   String password = _passwordController.text;
-  //   if (name != "" ||
-  //       email != "" ||
-  //       (phoneNumber != "" || phoneNumber.length != 10) ||
-  //       password != "") {
-  //     try {
-    
-  //       setState(() {
-  //         isAuthInProgress = true;
-  //       });
-
-  //       User? user = await _auth.signupWithEmailandPassword(email, password);
-
-  //       if (user != null) {
-  //         var res = await http.post(
-  //           Uri.parse('https://mesme.in/admin/api/users/create.php'),
-  //           body: {
-  //             "id": user.uid,
-  //             "name": name,
-  //             "email": email,
-  //             "phoneNumber": phoneNumber,
-  //             "profilePhoto": '',
-  //             "password": password,
-  //             "address": '',
-  //           },
-  //         );
-  //         Navigator.pushNamedAndRemoveUntil(
-  //           context,
-  //           '/location',
-  //           arguments: true,
-  //           (route) => false,
-  //         );
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(
-  //             content: Text('Welcome $name'),
-  //             backgroundColor: Colors.orange.shade700,
-  //             showCloseIcon: true,
-  //             closeIconColor: Colors.white,
-  //           ),
-  //         );
-  //       } else {
-  //         Navigator.pushNamed(context, '/welcome');
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(
-  //             backgroundColor: Colors.red.shade700,
-  //             content: const Text('invalid Credentials'),
-  //             showCloseIcon: true,
-  //             closeIconColor: Colors.white,
-  //           ),
-  //         );
-  //       }
-  //     } catch (e) {
-  //       Navigator.pushNamed(context, '/welcome');
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           backgroundColor: Colors.red,
-  //           content: Text('Something went wrong'),
-  //           showCloseIcon: true,
-  //           closeIconColor: Colors.white,
-  //         ),
-  //       );
-  //     } finally {
-  //       setState(() {
-  //         isAuthInProgress = false;
-  //       });
-  //     }
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         backgroundColor: Colors.red.shade700,
-  //         content: const Text('please enter the data '),
-  //         showCloseIcon: true,
-  //         closeIconColor: Colors.white,
-  //       ),
-  //     );
-  //   }
-  // }
   
-
-// }

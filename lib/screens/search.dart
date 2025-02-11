@@ -128,10 +128,14 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             const SizedBox(height: 10),
             TextField(
+              style: const TextStyle(color: Colors.white,decoration: TextDecoration.none),
+              
               cursorColor: Colors.orange.shade700,
               onChanged: (search) => _search(search),
+            
               decoration: const InputDecoration(
                 focusColor: Colors.white,
+                             
                 isDense: true,
                 prefixIcon: Icon(
                   Icons.search,
@@ -141,6 +145,7 @@ class _SearchPageState extends State<SearchPage> {
                 border: OutlineInputBorder(borderSide: BorderSide.none),
                 hintText: 'Are you Hungry!!!',
                 fillColor: Colors.orange,
+                
                 hintStyle: TextStyle(color: Colors.white),
               ),
             ),

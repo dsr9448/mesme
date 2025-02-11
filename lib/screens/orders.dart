@@ -3,6 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:mesme/models/ordermodel.dart';
 import 'package:mesme/provider/provider.dart';
 import 'package:mesme/services/api_service.dart';
+import 'package:mesme/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -630,9 +631,9 @@ class OrderContent extends StatelessWidget {
                           children: items.asMap().entries.map((entry) {
                             int index = entry.key;
                             OrderCategory item = entry.value;
-                            price = price +
+                            price = ((item.isAvailable == 0) ||  (item.isAvailable == 1)) ? price +
                                 double.parse(
-                                    (item.quantity * item.price).toString());
+                                    (item.quantity * item.price).toString()): price;
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 4.0),
@@ -647,7 +648,7 @@ class OrderContent extends StatelessWidget {
                                         child: Row(
                                           children: [
                                             Text(
-                                              '${index + 1}. ${item.name} - ${item.quantity}',
+                                              '${index + 1}. ${item.name} - ${(item.quantity * double.parse(item.itemQuantity)).toString().replaceAll('.0', '')} ${item.unit}',
                                               style: const TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.black,
@@ -765,7 +766,7 @@ class OrderContent extends StatelessWidget {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    '₹ ${(double.parse(order.totalPrice) - price).toString().replaceAll('.0', '')}',
+                                    '₹ ${_calculateGSTAndServiceCharge(price).toString().replaceAll('.0', '')}',
                                     style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
@@ -856,7 +857,7 @@ class OrderContent extends StatelessWidget {
                                               ),
                                             ),
                                   Text(
-                                    '₹ ${double.parse(order.totalPrice).toString().replaceAll('.0', '')}',
+                                    '₹ ${(_calculateGSTAndServiceCharge(price)+price).toString().replaceAll('.0', '')}',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -871,34 +872,18 @@ class OrderContent extends StatelessWidget {
                               order.status == 'Delivered' &&
                                           order.paymentStatus == 'Pending' ||
                                       order.paymentStatus == 'Failed'
-                                  ? GestureDetector(
-                                      onTap: () {
-                                        Provider.of<FoodProvider>(context,
-                                                listen: false)
-                                            .openCheckout(
-                                                double.parse(order.totalPrice),
-                                                '${order.orderId} ${order.orderDate}',
-                                                order.orderId)
-                                            .whenComplete(() {
-                                          QuickAlert.show(
-                                              context: context,
-                                              type: QuickAlertType.success,
-                                              title: 'Payment Successful',
-                                              confirmBtnColor:
-                                                  Colors.orange.shade700,
-                                              text:
-                                                  'Transaction Completed Successfully!',
-                                              onConfirmBtnTap: () {
-                                                Navigator
-                                                    .pushNamedAndRemoveUntil(
-                                                        context,
-                                                        '/home',
-                                                        (Route<dynamic>
-                                                                route) =>
-                                                            false);
-                                              });
-                                        });
-                                      },
+                                  ? 
+                                  GestureDetector(
+                                   
+                                      onTap: () async {
+  await Provider.of<FoodProvider>(context, listen: false).openCheckout(
+    (_calculateGSTAndServiceCharge(price) + price),
+    '${order.orderId} ${order.orderDate}',
+    order.orderId,
+    context, 
+  );
+},
+
                                       child: Container(
                                         width: double.infinity,
                                         padding: const EdgeInsets.symmetric(
@@ -931,7 +916,32 @@ class OrderContent extends StatelessWidget {
       ),
     );
   }
-
+double _calculateGSTAndServiceCharge(double totalAmount) {
+    if (totalAmount >= 0 && totalAmount <= 200) {
+      return 25;
+    } else if (totalAmount >= 201 && totalAmount <= 300) {
+      return 35;
+    } else if (totalAmount >= 301 && totalAmount <= 400) {
+      return 45;
+    } else if (totalAmount >= 401 && totalAmount <= 500) {
+      return 55;
+    } else if (totalAmount >= 501 && totalAmount <= 600) {
+      return 65;
+    } else if (totalAmount >= 601 && totalAmount <= 700) {
+      return 75;
+    } else if (totalAmount >= 701 && totalAmount <= 800) {
+      return 85;
+    } else if (totalAmount >= 801 && totalAmount <= 900) {
+      return 95;
+    } else if (totalAmount >= 901 && totalAmount <= 1000) {
+      return 105;
+    } else if (totalAmount >= 1001 && totalAmount <= 1100) {
+      return 115;
+    } else {
+      int extraRange = ((totalAmount - 1100) / 100).ceil();
+      return 115 + (extraRange * 10);
+    }
+  }
   Color _statusColor(String status) {
     switch (status) {
       case 'Order Placed':

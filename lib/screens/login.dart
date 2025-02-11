@@ -157,7 +157,9 @@ class _MeLoginState extends State<MeLogin> {
     String email = emailController.text;
     String password = passwordController.text;
 
-    User? user = await provider.loginWithEmailAndPassword(email, password);
+    User? user = await provider.loginWithEmailAndPassword(email, password).whenComplete(() {
+      provider.updateToken();
+    });
 
     if (user != null) {
       // User logged in successfully, navigate to home screen
