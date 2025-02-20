@@ -7,6 +7,7 @@ class GroceryItem {
   final String imageUrl;
   final String description;
   final int categoryId;
+  final String category;
 
   GroceryItem({
     required this.id,
@@ -17,6 +18,7 @@ class GroceryItem {
     required this.imageUrl,
     required this.description,
     required this.categoryId,
+    required this.category,
   });
 
   factory GroceryItem.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class GroceryItem {
       imageUrl: json['imageUrl'],
       description: json['description'],
       categoryId: json['categoryId'],
+      category: json['category'],
     );
   }
 }
@@ -41,7 +44,11 @@ class Grocery {
   final String phoneNumber;
   final String coordinates;
   final bool isOnline;
+  final String time;
+  final String description;
+  final String area;
   final List<GroceryItem> groceryItem;
+
 
   Grocery({
     required this.id,
@@ -52,6 +59,9 @@ class Grocery {
     required this.coordinates,
     required this.isOnline,
     required this.groceryItem,
+    required this.time,
+    required this.description,
+    required this.area,
   });
 
   factory Grocery.fromJson(Map<String, dynamic> json) {
@@ -66,6 +76,9 @@ class Grocery {
       phoneNumber: json['phoneNumber'],
       coordinates: json['coordinates'],
       isOnline: json['isOnline'],
+      time: json['time'],
+      description: json['description'],
+      area: json['area'],
       groceryItem: groceryItem,
     );
   }

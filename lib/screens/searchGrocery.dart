@@ -228,6 +228,7 @@ class _SearchState extends State<Search> {
                           name: item['ItemName'] ?? '',
                           price: double.parse(item['Price']),
                           restaurantName: item['ShopName'] ?? '',
+                          restrauntCoordinate: item['coordinates'],
                           location: item['Location'],
                           description: item['Description'],
                           quantity: item['Quantity'],

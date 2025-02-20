@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mesme/models/usermodel.dart';
 import 'package:mesme/provider/provider.dart';
+import 'package:provider/provider.dart';
+import 'package:mesme/models/usermodel.dart';
 import 'package:mesme/screens/location.dart';
 import 'package:mesme/screens/viewAll.dart';
 import 'package:mesme/screens/ViewItem.dart';
@@ -9,7 +10,6 @@ import 'package:mesme/widgets/functionalities.dart';
 import 'package:mesme/widgets/preloder.dart';
 import 'package:mesme/widgets/wishlist.dart';
 import 'package:mesme/widgets/calculateLocation.dart';
-import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   OverlayEntry? _overlayEntry;
 
   final GlobalKey _searchKey = GlobalKey();
+  String selectedFilter = 'All';
 
   @override
   void initState() {
@@ -138,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           unit: foodItem['Unit'],
                           rating: foodItem['rating'],
                           isVeg: foodItem['vegOrNonVeg'],
+                          restrauntCoordinate: restaurantDetails['coordinates'],
                           food: true,
                           canAdd: isWithin6Km(
                                       Provider.of<FoodProvider>(context,
@@ -203,7 +205,6 @@ class _HomeScreenState extends State<HomeScreen> {
     foodProvider.fetchRestaurants();
     foodProvider.fetchWishlist();
     String searchQuery = '';
-    String selectedFilter = 'All';
     addToWishlist(int restaurantId) async {
       final foodProvider = Provider.of<FoodProvider>(context, listen: false);
       try {
@@ -244,428 +245,565 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Scaffold(
               backgroundColor: Colors.white,
               body: SafeArea(
-                child: ListView(
-                  children: [
-                    Container(
-                      height: 280,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(
-                              'https://mesme.in/mainBanner.jpg'),
-                          fit: BoxFit.cover,
-                          colorFilter: ColorFilter.mode(
-                            Colors.black.withOpacity(0.4),
-                            BlendMode.darken,
-                          ),
-                        ),
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MeLocation(
-                                          uid: userData?.id ?? '-',
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: Colors.orange.shade700,
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                        ),
-                                        child: const Icon(
-                                          Icons.location_on_outlined,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Your Location',
-                                            style: GoogleFonts.poppins(
-                                              textStyle: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            userData?.address != null
-                                                ? userData!.address
-                                                    .split(' ')
-                                                    .take(2)
-                                                    .join(' ')
-                                                : 'Enter location',
-                                            style: GoogleFonts.poppins(
-                                              textStyle: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                  style: ButtonStyle(
-                                    backgroundColor: WidgetStatePropertyAll(
-                                        Colors.orange.shade700),
-                                    shape:
-                                        WidgetStatePropertyAll(CircleBorder()),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                        context, '/FoodProfile');
-                                  },
-                                  icon: const Icon(Icons.person,
-                                      color: Colors.white),
-                                ),
-                              ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 280,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image:
+                                NetworkImage('https://mesme.in/mainBanner.jpg'),
+                            fit: BoxFit.cover,
+                            colorFilter: ColorFilter.mode(
+                              Colors.black.withOpacity(0.4),
+                              BlendMode.darken,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: TextField(
-                              key: _searchKey,
-                              controller: _searchController,
-                              style: const TextStyle(color: Colors.black),
-                              cursorColor: Colors.orange.shade700,
-                              onChanged: _search,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Colors.white,
-                                prefixIcon: const Icon(Icons.search,
-                                    color: Colors.orange),
-                                hintText: 'Are you Hungry!!!',
-                                hintStyle:
-                                    const TextStyle(color: Colors.black38),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(30),
+                            bottomRight: Radius.circular(30),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: caro2(foodProvider.bannerImages),
-                    ),
-                    const SizedBox(height: 12),
-                    RestaurantList(
-                      title: '${userData!.name}',
-                      location: userData.location,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: customHeading(
-                          'Top (${foodProvider.restaurants.length}) restaurants to explore'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 10, top: 8),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            customSwitch(
-                                Colors.orange.shade700, selectedFilter == 'All',
-                                (val) {
-                              setState(() => selectedFilter = 'All');
-                            }),
-                            customSwitch(Colors.green, selectedFilter == 'Veg',
-                                (val) {
-                              setState(() => selectedFilter = 'Veg');
-                            }),
-                            customSwitch(
-                                Colors.red[800]!, selectedFilter == 'Non-Veg',
-                                (val) {
-                              setState(() => selectedFilter = 'Non-Veg');
-                            }),
-                            customSwitch(
-                                Colors.orange, selectedFilter == 'rating',
-                                (val) {
-                              setState(() => selectedFilter = 'rating');
-                            }),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Consumer<FoodProvider>(
-                          builder: (context, provider, child) {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: foodProvider.restaurants.length,
-                          itemBuilder: (context, index) {
-                            var restaurant = foodProvider.restaurants[index];
-                            List<int> wishlistIds = foodProvider.restaurant
-                                .map((r) => r.id)
-                                .toList();
-
-                            Map<String, dynamic> result = isWithin6Km(
-                                userData.location, restaurant.coordinates);
-
-                            double distance = result['distance'] ?? 0.0;
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                GestureDetector(
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => FoodItemsApp(
-                                            allFoodItems: restaurant.foodItems
-                                                .map((foodItem) => {
-                                                      'name': foodItem.foodName,
-                                                      'price': foodItem.price,
-                                                      'image':
-                                                          foodItem.foodPhoto,
-                                                      'vegOrNonVeg':
-                                                          foodItem.vegOrNonVeg,
-                                                      'rating': foodItem.rating,
-                                                      'quantity':
-                                                          foodItem.Quantity,
-                                                      'unit': foodItem.Unit,
-                                                      'description': foodItem
-                                                          .foodDescription,
-                                                      'category':
-                                                          foodItem.category,
-                                                      'totalCount': foodItem
-                                                          .totalCount
-                                                          .toString()
-                                                    })
-                                                .toList(),
-                                            rname: restaurant.name,
-                                            rlocation: restaurant.location,
-                                            food: true,
-                                            isOnline:
-                                                restaurant.isOnline ? 1 : 0,
-                                            userCoordinate: userData.location,
-                                            rating: restaurant.rating,
-                                            restrauntCoordinate:
-                                                restaurant.coordinates,
-                                            restraurantImage:
-                                                'https://mesme.in/mainBanner.jpg',
-                                            time: restaurant.time,
-                                            description: restaurant.description,
-                                            area: restaurant.area,
+                                          builder: (context) => MeLocation(
+                                            uid: userData?.id ?? '-',
                                           ),
                                         ),
                                       );
                                     },
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 12),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          // Restaurant Image
-                                          Stack(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Image.network(
-                                                  "https://mesme.in/foodPhoto.jpg",
-                                                  height: 130,
-                                                  width: 130,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/placeholder.png',
-                                                      height: 130,
-                                                      width: 120,
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  },
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.orange.shade700,
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                          child: const Icon(
+                                            Icons.location_on_outlined,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Your Location',
+                                              style: GoogleFonts.poppins(
+                                                textStyle: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
                                                 ),
                                               ),
-                                              Positioned(
-                                                top: 8,
-                                                right: 4,
-                                                child: wishlistIds
-                                                        .contains(restaurant.id)
-                                                    ? Icon(
-                                                        Icons.favorite,
-                                                        color:
-                                                            Colors.red.shade800,
-                                                        size: 25,
-                                                      )
-                                                    : GestureDetector(
-                                                        onTap: () {
-                                                          addToWishlist(
-                                                              restaurant.id);
-                                                        },
-                                                        child: Icon(
-                                                          Icons
-                                                              .favorite_outline,
-                                                          color: Colors.white,
-                                                          size: 25,
-                                                        ),
-                                                      ),
+                                            ),
+                                            Text(
+                                              userData?.address != null
+                                                  ? userData!.address
+                                                      .split(' ')
+                                                      .take(2)
+                                                      .join(' ')
+                                                  : 'Enter location',
+                                              style: GoogleFonts.poppins(
+                                                textStyle: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
-                                            ],
-                                          ),
-                                          const SizedBox(width: 12),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStatePropertyAll(
+                                          Colors.orange.shade700),
+                                      shape: WidgetStatePropertyAll(
+                                          CircleBorder()),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                          context, '/FoodProfile');
+                                    },
+                                    icon: const Icon(Icons.person,
+                                        color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: TextField(
+                                key: _searchKey,
+                                controller: _searchController,
+                                style: const TextStyle(color: Colors.black),
+                                cursorColor: Colors.orange.shade700,
+                                onChanged: _search,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  prefixIcon: const Icon(Icons.search,
+                                      color: Colors.orange),
+                                  hintText: 'Are you Hungry!!!',
+                                  hintStyle:
+                                      const TextStyle(color: Colors.black38),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: caro2(foodProvider.bannerImages),
+                      ),
+                      const SizedBox(height: 12),
+                      RestaurantList(
+                        title: '${userData!.name}',
+                        location: userData.location,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: customHeading(
+                            'Top (${foodProvider.restaurants.length}) restaurants to explore'),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 10, top: 8),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              customSwitch(Colors.orange.shade700,
+                                  selectedFilter == 'All', (val) {
+                                setState(() => selectedFilter = 'All');
+                              }),
+                              customSwitch(
+                                  Colors.green, selectedFilter == 'Veg', (val) {
+                                setState(() => selectedFilter = 'Veg');
+                              }),
+                              customSwitch(
+                                  Colors.red[800]!, selectedFilter == 'Non-Veg',
+                                  (val) {
+                                setState(() => selectedFilter = 'Non-Veg');
+                              }),
+                              customSwitch(
+                                  Colors.orange, selectedFilter == 'rating',
+                                  (val) {
+                                setState(() => selectedFilter = 'rating');
+                              }),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        // padding: const EdgeInsets.all(8),
+                        child: Consumer<FoodProvider>(
+                            builder: (context, provider, child) {
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: foodProvider.restaurants.length,
+                            itemBuilder: (context, index) {
+                              var restaurant = foodProvider.restaurants[index];
+                              List<int> wishlistIds = foodProvider.restaurant
+                                  .map((r) => r.id)
+                                  .toList();
 
-                                          // Restaurant Info
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                // Restaurant Name
-                                                Row(
+                              Map<String, dynamic> result = isWithin6Km(
+                                  userData.location, restaurant.coordinates);
+
+                              double distance = result['distance'] ?? 0.0;
+
+                              // Apply filters based on selectedFilter
+                              if ((selectedFilter == 'Veg' &&
+                                      restaurant.style != 'veg') ||
+                                  (selectedFilter == 'Non-Veg' &&
+                                      restaurant.style == 'veg') ||
+                                  (selectedFilter == 'rating' &&
+                                      restaurant.rating < 4.0)) {
+                                return SizedBox.shrink(); // Skip this item
+                              }
+
+                              // Determine background color based on distance
+                              Color backgroundColor;
+                              if (index < foodProvider.restaurants.length - 1) {
+                                var nextRestaurant =
+                                    foodProvider.restaurants[index + 1];
+                                Map<String, dynamic> nextResult = isWithin6Km(
+                                    userData.location,
+                                    nextRestaurant.coordinates);
+                                double nextDistance =
+                                    nextResult['distance'] ?? 0.0;
+
+                                backgroundColor = (distance == nextDistance)
+                                    ? Colors
+                                        .grey.shade200 // Light grey background
+                                    : Colors.transparent; // No background
+                              } else {
+                                backgroundColor = Colors.transparent;
+                                // No background for the last item
+                              }
+
+                              return Container(
+                                padding: const EdgeInsets.only(
+                                    top: 10, left: 8, right: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  FoodItemsApp(
+                                                allFoodItems: restaurant
+                                                    .foodItems
+                                                    .map((foodItem) => {
+                                                          'name':
+                                                              foodItem.foodName,
+                                                          'price':
+                                                              foodItem.price,
+                                                          'image': foodItem
+                                                              .foodPhoto,
+                                                          'vegOrNonVeg':
+                                                              foodItem
+                                                                  .vegOrNonVeg,
+                                                          'rating':
+                                                              foodItem.rating,
+                                                          'quantity':
+                                                              foodItem.Quantity,
+                                                          'unit': foodItem.Unit,
+                                                          'description': foodItem
+                                                              .foodDescription,
+                                                          'category':
+                                                              foodItem.category,
+                                                          'totalCount': foodItem
+                                                              .totalCount
+                                                              .toString()
+                                                        })
+                                                    .toList(),
+                                                rname: restaurant.name,
+                                                rlocation: restaurant.location,
+                                                food: true,
+                                                isOnline:
+                                                    restaurant.isOnline ? 1 : 0,
+                                                userCoordinate:
+                                                    userData.location,
+                                                rating: restaurant.rating,
+                                                restrauntCoordinate:
+                                                    restaurant.coordinates,
+                                                restraurantImage:
+                                                    'https://mesme.in/mainBanner.jpg',
+                                                time: restaurant.time,
+                                                description:
+                                                    restaurant.description,
+                                                area: restaurant.area,
+                                                style: restaurant.style,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 12),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              // Restaurant Image
+                                              Stack(
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    child: Image.network(
+                                                      "https://mesme.in/foodPhoto.jpg",
+                                                      height: 150,
+                                                      width: 150,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/images/placeholder.png',
+                                                          height: 150,
+                                                          width: 150,
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Positioned(
+                                                    top: 8,
+                                                    right: 4,
+                                                    child:
+                                                        wishlistIds.contains(
+                                                                restaurant.id)
+                                                            ? GestureDetector(
+                                                                onTap:
+                                                                    () async {
+                                                                  try {
+                                                                    await foodProvider
+                                                                        .removeFromWishlist(
+                                                                            restaurant.id);
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      SnackBar(
+                                                                        content:
+                                                                            const Text('Item  Removed From  wishlist'),
+                                                                        backgroundColor: Colors
+                                                                            .green
+                                                                            .shade800,
+                                                                        duration:
+                                                                            const Duration(seconds: 2),
+                                                                        showCloseIcon:
+                                                                            true,
+                                                                        behavior:
+                                                                            SnackBarBehavior.floating,
+                                                                        closeIconColor:
+                                                                            Colors.white,
+                                                                      ),
+                                                                    );
+                                                                  } catch (e) {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      SnackBar(
+                                                                        content:
+                                                                            Text('Failed to remove item to wishlist'),
+                                                                        backgroundColor: Colors
+                                                                            .red
+                                                                            .shade800,
+                                                                        duration:
+                                                                            const Duration(seconds: 2),
+                                                                        showCloseIcon:
+                                                                            true,
+                                                                        behavior:
+                                                                            SnackBarBehavior.floating,
+                                                                        closeIconColor:
+                                                                            Colors.white,
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                  setState(
+                                                                      () {}); // Force UI update
+                                                                },
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .favorite,
+                                                                  color: Colors
+                                                                      .red
+                                                                      .shade800,
+                                                                  size: 25,
+                                                                ),
+                                                              )
+                                                            : GestureDetector(
+                                                                onTap:
+                                                                    () async {
+                                                                  try {
+                                                                    await foodProvider
+                                                                        .addToWishlist(
+                                                                            restaurant.id);
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      SnackBar(
+                                                                        content:
+                                                                            const Text('Item added to wishlist'),
+                                                                        backgroundColor: Colors
+                                                                            .green
+                                                                            .shade800,
+                                                                        duration:
+                                                                            const Duration(seconds: 2),
+                                                                        showCloseIcon:
+                                                                            true,
+                                                                        behavior:
+                                                                            SnackBarBehavior.floating,
+                                                                        closeIconColor:
+                                                                            Colors.white,
+                                                                      ),
+                                                                    );
+                                                                  } catch (e) {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      SnackBar(
+                                                                        content:
+                                                                            Text('Failed to add item to wishlist'),
+                                                                        backgroundColor: Colors
+                                                                            .red
+                                                                            .shade800,
+                                                                        duration:
+                                                                            const Duration(seconds: 2),
+                                                                        showCloseIcon:
+                                                                            true,
+                                                                        behavior:
+                                                                            SnackBarBehavior.floating,
+                                                                        closeIconColor:
+                                                                            Colors.white,
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                  setState(
+                                                                      () {}); // Force UI update
+                                                                },
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .favorite_outline,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 25,
+                                                                ),
+                                                              ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(width: 12),
+
+                                              // Restaurant Info
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
-                                                    Container(
-                                                      height: 20,
-                                                      width: 20,
-                                                      decoration: BoxDecoration(
-                                                          border: Border.all(
-                                                              color: restaurant
-                                                                          .style ==
-                                                                      'veg'
-                                                                  ? Colors.green
-                                                                      .shade900
-                                                                  : Colors.red
-                                                                      .shade900,
-                                                              width: 2),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(4)),
-                                                      child: Icon(
-                                                        Icons.circle,
-                                                        size: 10,
-                                                        color:
-                                                            restaurant.style ==
+                                                    // Restaurant Name
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          height: 20,
+                                                          width: 20,
+                                                          decoration: BoxDecoration(
+                                                              border: Border.all(
+                                                                  color: restaurant
+                                                                              .style ==
+                                                                          'veg'
+                                                                      ? Colors
+                                                                          .green
+                                                                          .shade900
+                                                                      : Colors
+                                                                          .red
+                                                                          .shade900,
+                                                                  width: 2),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4)),
+                                                          child: Icon(
+                                                            Icons.circle,
+                                                            size: 10,
+                                                            color: restaurant
+                                                                        .style ==
                                                                     'veg'
                                                                 ? Colors.green
                                                                     .shade900
                                                                 : Colors.red
                                                                     .shade900,
-                                                      ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        restaurant.rating >= 4.0
+                                                            ? Container(
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            8,
+                                                                        vertical:
+                                                                            4),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .orange, // Best Seller tag color
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              4),
+                                                                ),
+                                                                child: Text(
+                                                                  "Best Seller",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        12,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : SizedBox(),
+                                                      ],
                                                     ),
-                                                    SizedBox(
-                                                      width: 8,
-                                                    ),
-                                                    restaurant.rating >= 4.0
-                                                        ? Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        8,
-                                                                    vertical:
-                                                                        4),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: Colors
-                                                                  .orange, // Best Seller tag color
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          4),
-                                                            ),
-                                                            child: Text(
-                                                              "Best Seller",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 12,
-                                                              ),
-                                                            ),
-                                                          )
-                                                        : SizedBox(),
-                                                  ],
-                                                ),
 
-                                                Text(
-                                                  restaurant.name,
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-
-                                                const SizedBox(height: 2),
-
-                                                // Rating and Time
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.star,
-                                                        color: Colors.orange,
-                                                        size: 16),
                                                     Text(
-                                                      " ${restaurant.rating}(${restaurant.totalOrders}) • ${restaurant.time}",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
+                                                      restaurant.name,
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
                                                         fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Colors.black,
+                                                            FontWeight.bold,
                                                       ),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
-                                                  ],
-                                                ),
 
-                                                const SizedBox(height: 2),
+                                                    const SizedBox(height: 2),
 
-                                                // Description
-                                                Text(
-                                                  '${restaurant.description}',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.grey.shade600,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
+                                                    // Rating and Time
+                                                    Row(
+                                                      children: [
+                                                        Icon(Icons.star,
+                                                            color:
+                                                                Colors.orange,
+                                                            size: 16),
+                                                        Text(
+                                                          " ${restaurant.rating}(${restaurant.totalOrders}) • ${restaurant.time}",
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
 
-                                                const SizedBox(height: 2),
+                                                    const SizedBox(height: 2),
 
-                                                // Location
-                                                Row(
-                                                  children: [
+                                                    // Description
                                                     Text(
-                                                      restaurant.area,
+                                                      '${restaurant.description}',
                                                       style: TextStyle(
                                                         fontSize: 14,
                                                         color: Colors
@@ -675,35 +813,55 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                     ),
-                                                    Text(" • "),
-                                                    Expanded(
-                                                      child: Text(
-                                                        '${distance.toStringAsFixed(2)} Km ',
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          color: Colors
-                                                              .grey.shade600,
+
+                                                    const SizedBox(height: 2),
+
+                                                    // Location
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          restaurant.area,
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Colors
+                                                                .grey.shade600,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                         ),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
+                                                        Text(" • "),
+                                                        Expanded(
+                                                          child: Text(
+                                                            '${distance.toStringAsFixed(2)} Km ',
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              color: Colors.grey
+                                                                  .shade600,
+                                                            ),
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ],
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    )),
-                              ],
-                            );
-                          },
-                        );
-                      }),
-                    ),
-                  ],
+                                        )),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               floatingActionButton: ValueListenableBuilder<int>(

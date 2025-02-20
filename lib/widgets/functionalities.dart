@@ -13,16 +13,20 @@ class FoodFunction {
       String imageUrl,
       String restaurantName,
       String location,
+      String coordinates,
       String category, // Add category parameter
       BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> cartItems = prefs.getStringList('cartItems') ?? [];
-    Set<String> existingCategories = {}; // Set to track existing categories
+    Set<String> existingCategories = {};
+    Set<String> coordinates = {}; // Set to track existing categories
+    Set<String> existingCoordinates = {};
 
     // Check existing cart items for categories
     for (String itemJson in cartItems) {
       Map<String, dynamic> item = jsonDecode(itemJson);
       existingCategories.add(item['category']);
+      existingCoordinates.add(item['restaurantName']);
     }
 
     // Prevent adding items from different categories
@@ -32,6 +36,21 @@ class FoodFunction {
         const SnackBar(
           content: Text(
               'You cannot add items from different categories to the cart.'),
+          backgroundColor: Colors.red,
+          showCloseIcon: true,
+          behavior: SnackBarBehavior.floating,
+          closeIconColor: Colors.white,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+    if (existingCoordinates.isNotEmpty &&
+        !existingCoordinates.contains(coordinates)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'You cannot add items from different Restaurant to the cart.'),
           backgroundColor: Colors.red,
           showCloseIcon: true,
           behavior: SnackBarBehavior.floating,

@@ -23,6 +23,7 @@ class FoodItemsApp extends StatefulWidget {
   final area;
   final rating;
   final restraurantImage;
+  final style;
   FoodItemsApp(
       {required this.allFoodItems,
       this.rname,
@@ -37,7 +38,8 @@ class FoodItemsApp extends StatefulWidget {
       required this.food,
       this.time,
       this.description,
-      this.area});
+      this.area,
+      this.style});
 
   @override
   _FoodItemsAppState createState() => _FoodItemsAppState();
@@ -49,8 +51,6 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
   String selectedFilter = 'All';
   ScrollController _scrollController = ScrollController();
   bool _showAppBarSearch = false;
-
-  List<String> category = ['Recommeded', 'Popular', 'New', 'Old'];
 
   @override
   void initState() {
@@ -142,9 +142,7 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
         .toList();
     Map<String, List<Map<String, String>>> groupedFoodItems =
         groupBy(filteredFoodItems, (item) => item['category'] ?? 'Others');
-    return groupedFoodItems.isEmpty
-        ? buildShimmerLoader(false)
-        : Scaffold(
+    return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
               backgroundColor: Colors.white,
@@ -190,12 +188,15 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                         (val) {
                                       setState(() => selectedFilter = 'Veg');
                                     }),
-                                    customSwitch(Colors.red[800]!,
-                                        selectedFilter == 'Non-Veg', (val) {
-                                      setState(
-                                          () => selectedFilter = 'Non-Veg');
-                                    }),
-                                    customSwitch(Colors.orange,
+                                    // (widget.style == "non-veg" || widget.style == "both")
+                                    //     ? 
+                                        customSwitch(Colors.red[800]!,
+                                            selectedFilter == 'Non-Veg', (val) {
+                                            setState(() =>
+                                                selectedFilter = 'Non-Veg');
+                                          })
+                                        // : SizedBox(),
+                                    ,customSwitch(Colors.orange,
                                         selectedFilter == 'rating', (val) {
                                       setState(() => selectedFilter = 'rating');
                                     }),
@@ -207,122 +208,21 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                       : null
                   : null,
             ),
-            body: SingleChildScrollView(
+            body:  groupedFoodItems.isEmpty
+      ? Center(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Text(
+              "No items available for the selected filter",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        )
+      : SingleChildScrollView(
               controller: _scrollController,
               child: Column(
                 children: [
-                  // Container(
-                  //   margin: const EdgeInsets.only(
-                  //       top: 8, left: 10, right: 10, bottom: 10),
-                  //   decoration: BoxDecoration(
-                  //     color: Colors.white,
-                  //     borderRadius: BorderRadius.circular(10),
-                  //     boxShadow: [
-                  //       BoxShadow(
-                  //         color: Colors.grey.withOpacity(0.5),
-                  //         spreadRadius: 1,
-                  //         blurRadius: 4,
-                  //         offset: const Offset(0, 3),
-                  //       ),
-                  //     ],
-                  //   ),
-                  //   child: Padding(
-                  //     padding:
-                  //         const EdgeInsets.symmetric(horizontal: 11, vertical: 18),
-                  //     child: Column(
-                  //       mainAxisAlignment: MainAxisAlignment.start,
-                  //       crossAxisAlignment: CrossAxisAlignment.start,
-                  //       children: [
-                  //         Row(
-                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //           crossAxisAlignment: CrossAxisAlignment.center,
-                  //           children: [
-                  //             Text(
-                  //               widget.rname.toString().length > 25
-                  //                   ? '${widget.rname.toString().substring(0, 25)}...'
-                  //                   : widget.rname,
-                  //               style: TextStyle(
-                  //                   fontSize: 18, fontWeight: FontWeight.bold),
-                  //               overflow: TextOverflow.ellipsis,
-                  //             ),
-                  //             Container(
-                  //                 decoration: BoxDecoration(
-                  //                   color: Colors.green.shade900,
-                  //                   borderRadius: BorderRadius.circular(4),
-                  //                 ),
-                  //                 child: Padding(
-                  //                   padding: EdgeInsets.symmetric(
-                  //                       horizontal: 10, vertical: 5),
-                  //                   child: Row(
-                  //                     children: [
-                  //                       Icon(
-                  //                         Icons.star,
-                  //                         size: 18,
-                  //                         color: Colors.white,
-                  //                       ),
-                  //                       SizedBox(
-                  //                         width: 4,
-                  //                       ),
-                  //                       Text(
-                  //                         widget.rating.toString(),
-                  //                         style: TextStyle(
-                  //                             color: Colors.white,
-                  //                             fontWeight: FontWeight.bold),
-                  //                       ),
-                  //                     ],
-                  //                   ),
-                  //                 )),
-                  //           ],
-                  //         ),
-                  //         SizedBox(
-                  //           height: 4,
-                  //         ),
-                  //         Row(
-                  //           crossAxisAlignment: CrossAxisAlignment.center,
-                  //           children: [
-                  //             Text(
-                  //               widget.time,
-                  //               style: TextStyle(
-                  //                   fontSize: 13, fontWeight: FontWeight.w600),
-                  //             ),
-                  //             const SizedBox(
-                  //               width: 14,
-                  //               child:
-                  //                   Icon(Icons.circle, color: Colors.black, size: 6),
-                  //             ),
-                  //             Text(
-                  //               '${distance.toStringAsFixed(2)} Km ',
-                  //               style: TextStyle(
-                  //                   fontSize: 13, fontWeight: FontWeight.w600),
-                  //             ),
-                  //             const SizedBox(
-                  //               width: 14,
-                  //               child:
-                  //                   Icon(Icons.circle, color: Colors.black, size: 6),
-                  //             ),
-                  //             Text(
-                  //               widget.area,
-                  //               style: TextStyle(
-                  //                 fontSize: 13,
-                  //                 fontWeight: FontWeight.w600,
-                  //               ),
-                  //               overflow: TextOverflow.ellipsis,
-                  //             ),
-                  //           ],
-                  //         ),
-                  //         SizedBox(
-                  //           height: 4,
-                  //         ),
-                  //         Text(
-                  //           widget.description,
-                  //           style:
-                  //               TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                  //           textAlign: TextAlign.start,
-                  //         )
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Stack(
@@ -462,7 +362,6 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                       ],
                     ),
                   ),
-
                   if (!_showAppBarSearch) buildSearchBar(),
                   if (!_showAppBarSearch)
                     widget.food
@@ -486,12 +385,15 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                     selectedFilter = 'Veg';
                                   });
                                 }),
+                                (widget.style == "non-veg" || widget.style == "both")
+                                    ?
                                 customSwitch(Colors.red[800]!,
                                     selectedFilter == 'Non-Veg', (val) {
                                   setState(() {
                                     selectedFilter = 'Non-Veg';
                                   });
-                                }),
+                                })
+                                :SizedBox(),
                                 customSwitch(
                                     Colors.orange, selectedFilter == 'rating',
                                     (val) {
@@ -571,6 +473,8 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                     location: widget.rlocation,
                                                     restaurantName:
                                                         widget.rname,
+                                                    restrauntCoordinate: widget
+                                                        .restrauntCoordinate,
                                                     description:
                                                         item['description']!,
                                                     isVeg: item['vegOrNonVeg'],
@@ -728,8 +632,8 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                               BlendMode.darken),
                                                       child: Image.network(
                                                         "https://mesme.in/ControlHub/includes/uploads/${item['image']!}",
-                                                        width: 120,
-                                                        height: 120,
+                                                        width: 150,
+                                                        height: 150,
                                                         fit: BoxFit.cover,
                                                       ),
                                                     ),
@@ -787,6 +691,8 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                                 widget.rname,
                                                                 widget
                                                                     .rlocation,
+                                                                widget
+                                                                    .restrauntCoordinate,
                                                                 widget.food
                                                                     ? 'Food'
                                                                     : 'Grocery',

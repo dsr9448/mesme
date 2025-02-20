@@ -48,8 +48,8 @@ Widget buildShimmerLoader(bool isHome) {
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
                   child: Container(
-                    height: 120,
-                    width: 120,
+                    height: 150,
+                    width: 150,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),

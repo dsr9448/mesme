@@ -22,153 +22,154 @@ class _RestaurantListState extends State<RestaurantList> {
     final foodProvider = Provider.of<FoodProvider>(context);
     foodProvider.fetchWishlist();
 
-    
-      return Column(
-        children: [
-         
-          (foodProvider.restaurant.length != 0)?Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              customHeading("${widget.title}'s Favorite Restaurants"),
-              SizedBox(
-                height: 6,
-              ),
-              SizedBox(
-                height: 245,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: foodProvider.restaurant.length,
-                  itemBuilder: (context, index) {
-                    var restaurant = foodProvider.restaurant[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FoodItemsApp(
-                              allFoodItems: restaurant.foodItems
-                                  .map((foodItem) => {
-                                        'name': foodItem.foodName,
-                                        'price': foodItem.price,
-                                        'image': foodItem.foodPhoto,
-                                        'vegOrNonVeg': foodItem.vegOrNonVeg,
-                                        'rating': foodItem.rating,
-                                        'quantity': foodItem.Quantity,
-                                        'unit': foodItem.Unit,
-                                        'description': foodItem.foodDescription,
-                                        'category': foodItem.category,
-                                        'totalCount':
-                                            foodItem.totalCount.toString()
-                                      })
-                                  .toList(),
-                              rname: restaurant.name,
-                              rlocation: restaurant.location,
-                              food: true,
-                              isOnline: restaurant.isOnline ? 1 : 0,
-                              userCoordinate: widget.location,
+    return Column(
+      children: [
+        (foodProvider.restaurant.length != 0)
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    customHeading("${widget.title}'s Favorite Restaurants"),
+                    SizedBox(
+                      height: 6,
+                    ),
+                    SizedBox(
+                      height: 245,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: foodProvider.restaurant.length,
+                        itemBuilder: (context, index) {
+                          var restaurant = foodProvider.restaurant[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => FoodItemsApp(
+                                    allFoodItems: restaurant.foodItems
+                                        .map((foodItem) => {
+                                              'name': foodItem.foodName,
+                                              'price': foodItem.price,
+                                              'image': foodItem.foodPhoto,
+                                              'vegOrNonVeg':
+                                                  foodItem.vegOrNonVeg,
+                                              'rating': foodItem.rating,
+                                              'quantity': foodItem.Quantity,
+                                              'unit': foodItem.Unit,
+                                              'description':
+                                                  foodItem.foodDescription,
+                                              'category': foodItem.category,
+                                              'totalCount':
+                                                  foodItem.totalCount.toString()
+                                            })
+                                        .toList(),
+                                    rname: restaurant.name,
+                                    rlocation: restaurant.location,
+                                    food: true,
+                                    isOnline: restaurant.isOnline ? 1 : 0,
+                                    userCoordinate: widget.location,
+                                    rating: restaurant.rating,
+                                    restrauntCoordinate: restaurant.coordinates,
+                                    restraurantImage:
+                                        'https://mesme.in/mainBanner.jpg',
+                                    time: restaurant.time,
+                                    description: restaurant.description,
+                                    area: restaurant.area,
+                                    style: restaurant.style,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: RestaurantCard(
+                              id: restaurant.id,
+                              name: restaurant.name,
+                              imageUrl: "https://mesme.in/foodPhoto.jpg",
                               rating: restaurant.rating,
-                              restrauntCoordinate: restaurant.coordinates,
-                              restraurantImage:
-                                  'https://mesme.in/mainBanner.jpg',
                               time: restaurant.time,
                               description: restaurant.description,
-                              area: restaurant.area,
+                              isFav: true,
                             ),
-                          ),
-                        );
-                      },
-                      child: RestaurantCard(
-                        id: restaurant.id,
-                        name: restaurant.name,
-                        imageUrl:
-                            "https://mesme.in/foodPhoto.jpg",
-                        rating: restaurant.rating,
-                        time: restaurant.time,
-                        description: restaurant.description,
-                        isFav: true,
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ],
+                ))
+            : SizedBox(),
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                customHeading("Top Rated Restaurants"),
+                SizedBox(
+                  height: 6,
                 ),
-              ),
-            ],
-          )):SizedBox(),
-          Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              customHeading("Top Rated Restaurants"),
-              SizedBox(
-                height: 6,
-              ),
-              SizedBox(
-                height: 245,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: foodProvider.restaurantsAbove4.length,
-                  itemBuilder: (context, index) {
-                    var restaurant = foodProvider.restaurantsAbove4[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FoodItemsApp(
-                              allFoodItems: restaurant.foodItems
-                                  .map((foodItem) => {
-                                        'name': foodItem.foodName,
-                                        'price': foodItem.price,
-                                        'image': foodItem.foodPhoto,
-                                        'vegOrNonVeg': foodItem.vegOrNonVeg,
-                                        'rating': foodItem.rating,
-                                        'quantity': foodItem.Quantity,
-                                        'unit': foodItem.Unit,
-                                        'description': foodItem.foodDescription,
-                                        'category': foodItem.category,
-                                        'totalCount':
-                                            foodItem.totalCount.toString()
-                                      })
-                                  .toList(),
-                              rname: restaurant.name,
-                              rlocation: restaurant.location,
-                              food: true,
-                              isOnline: restaurant.isOnline ? 1 : 0,
-                              userCoordinate: widget.location,
-                              rating: restaurant.rating,
-                              restrauntCoordinate: restaurant.coordinates,
-                              restraurantImage:
-                                  'https://mesme.in/mainBanner.jpg',
-                              time: restaurant.time,
-                              description: restaurant.description,
-                              area: restaurant.area,
+                SizedBox(
+                  height: 245,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: foodProvider.restaurantsAbove4.length,
+                    itemBuilder: (context, index) {
+                      var restaurant = foodProvider.restaurantsAbove4[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FoodItemsApp(
+                                allFoodItems: restaurant.foodItems
+                                    .map((foodItem) => {
+                                          'name': foodItem.foodName,
+                                          'price': foodItem.price,
+                                          'image': foodItem.foodPhoto,
+                                          'vegOrNonVeg': foodItem.vegOrNonVeg,
+                                          'rating': foodItem.rating,
+                                          'quantity': foodItem.Quantity,
+                                          'unit': foodItem.Unit,
+                                          'description':
+                                              foodItem.foodDescription,
+                                          'category': foodItem.category,
+                                          'totalCount':
+                                              foodItem.totalCount.toString()
+                                        })
+                                    .toList(),
+                                rname: restaurant.name,
+                                rlocation: restaurant.location,
+                                food: true,
+                                isOnline: restaurant.isOnline ? 1 : 0,
+                                userCoordinate: widget.location,
+                                rating: restaurant.rating,
+                                restrauntCoordinate: restaurant.coordinates,
+                                restraurantImage:
+                                    'https://mesme.in/mainBanner.jpg',
+                                time: restaurant.time,
+                                description: restaurant.description,
+                                area: restaurant.area,
+                                style: restaurant.style,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      child: RestaurantCard(
-                        id: restaurant.id,
-                        name: restaurant.name,
-                        imageUrl:
-                            "https://mesme.in/foodPhoto.jpg",
-                        rating: restaurant.rating,
-                        time: restaurant.time,
-                        description: restaurant.description,
-                        isFav: false,
-                      ),
-                    );
-                  },
+                          );
+                        },
+                        child: RestaurantCard(
+                          id: restaurant.id,
+                          name: restaurant.name,
+                          imageUrl: "https://mesme.in/foodPhoto.jpg",
+                          rating: restaurant.rating,
+                          time: restaurant.time,
+                          description: restaurant.description,
+                          isFav: false,
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ))
-        ],
-      );
+              ],
+            ))
+      ],
+    );
   }
 }
-
-

@@ -243,6 +243,7 @@ class _SearchPageState extends State<SearchPage> {
                     name: foodItem['foodName'],
                     price: double.parse(foodItem['price']),
                     restaurantName: restaurantDetails['name'],
+                    restrauntCoordinate: restaurantDetails['coordinates'],
                     location: restaurantDetails['location'],
                     description: foodItem['foodDescription'],
                     quantity: foodItem['Quantity'],

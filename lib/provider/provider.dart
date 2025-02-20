@@ -190,8 +190,8 @@ class FoodProvider with ChangeNotifier {
 
   Future<void> fetchRestaurants() async {
     await fetchUserData();
-    if (_dataFetched) return;
-    if (restaurants.isNotEmpty) return;
+    // if (_dataFetched) return;
+    // if (restaurants.isNotEmpty) return;
 
     String? address = await fetchSavedCoordinates();
     final response =
@@ -259,7 +259,7 @@ class FoodProvider with ChangeNotifier {
       bannerImages = List<String>.from(jsonData['bannerImages']);
       await fetchWishlist();
 
-      _dataFetched = true;
+      // _dataFetched = true;
       notifyListeners();
     } else {
       throw Exception('Failed to load restaurants');
@@ -268,8 +268,8 @@ class FoodProvider with ChangeNotifier {
 
   Future<void> fetchWishlist() async {
     await fetchUserData();
-    if (_dataFetched) return;
-    if (restaurant.isNotEmpty) return;
+    // if (_dataFetched) return;
+    // if (restaurant.isNotEmpty) return;
 
     String? address = await fetchSavedCoordinates();
     final response = await http.get(Uri.parse(
@@ -311,7 +311,8 @@ class FoodProvider with ChangeNotifier {
       restaurant = restaurantWithDistances
           .map<Restaurant>((item) => item['restaurant'] as Restaurant)
           .toList();
-      _dataFetched = true;
+      // _dat
+      //aFetched = true;
       notifyListeners();
     } else {
       throw Exception('Failed to load restaurants');
@@ -321,39 +322,70 @@ class FoodProvider with ChangeNotifier {
   Future<void> addToWishlist(int foodId) async {
     final url = 'https://mesme.in/admin/api/Wishlist/create.php';
 
-    // Prepare the data
     final requestData = {
       'userid': FirebaseAuth.instance.currentUser!.uid,
       'foodid': foodId,
     };
 
     try {
-      // Make the POST request
       final response = await http.post(
         Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
 
-      // Check the response status
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        if (responseData.containsKey('message')) {
-          await fetchWishlist();
-          notifyListeners();
-        } else if (responseData.containsKey('error')) {
+        if (responseData.containsKey('message') ||
+            responseData.containsKey('error')) {
+          await fetchRestaurants();
           await fetchWishlist();
           notifyListeners();
         }
       } else {
         await fetchWishlist();
+        await fetchRestaurants();
         notifyListeners();
       }
     } catch (error) {
       print('Network error: $error');
     }
+
+    notifyListeners();
+  }
+
+  Future<void> removeFromWishlist(int foodId) async {
+    final url = 'https://mesme.in/admin/api/Wishlist/delete.php';
+
+    final requestData = {
+      'userid': FirebaseAuth.instance.currentUser!.uid,
+      'foodid': foodId,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData.containsKey('message') ||
+            responseData.containsKey('error')) {
+          await fetchRestaurants();
+          await fetchWishlist();
+          notifyListeners();
+        }
+      } else {
+        await fetchWishlist();
+        await fetchRestaurants();
+        notifyListeners();
+      }
+    } catch (error) {
+      print('Network error: $error');
+    }
+
     notifyListeners();
   }
 

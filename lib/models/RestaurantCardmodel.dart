@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mesme/provider/provider.dart';
 
-class RestaurantCard extends StatelessWidget {
+class RestaurantCard extends StatefulWidget {
   final int id;
   final String name;
   final String imageUrl;
@@ -20,6 +20,11 @@ class RestaurantCard extends StatelessWidget {
     required this.isFav,
   });
 
+  @override
+  State<RestaurantCard> createState() => _RestaurantCardState();
+}
+
+class _RestaurantCardState extends State<RestaurantCard> {
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -44,7 +49,7 @@ class RestaurantCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: Image.network(
-                  imageUrl,
+                  widget.imageUrl,
                   height: 150,
                   width: 200,
                   fit: BoxFit.cover,
@@ -56,7 +61,7 @@ class RestaurantCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name.length > 20 ? name.substring(0, 16) + "..." : name,
+                      widget.name.length > 20 ? widget.name.substring(0, 16) + "..." : widget.name,
                       style: TextStyle(
                         fontSize: 16,
                         overflow: TextOverflow.ellipsis,
@@ -67,15 +72,15 @@ class RestaurantCard extends StatelessWidget {
                       children: [
                         Icon(Icons.star, color: Colors.amber, size: 16),
                         SizedBox(width: 4),
-                        Text("$rating"),
+                        Text("${widget.rating}"),
                         SizedBox(width: 10),
                         Icon(Icons.access_time, size: 16, color: Colors.grey),
                         SizedBox(width: 4),
-                        Text(time),
+                        Text(widget.time),
                       ],
                     ),
                     Text(
-                      description,
+                      widget.description,
                       style: TextStyle(fontSize: 12, color: Colors.grey),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -85,14 +90,74 @@ class RestaurantCard extends StatelessWidget {
             ],
           ),
         ),
-        isFav
+        widget.isFav
             ? Positioned(
                 top: 8,
                 right: 20,
                 child: GestureDetector(
-                  onTap: () {
-                    FoodProvider().addToWishlist(id);
-                  },
+                 onTap: () async {
+                                                            try {
+                                                             
+                                                              
+                                                              await  FoodProvider()
+                                                                  .removeFromWishlist(
+                                                                      widget.id);
+                                                                          setState(() {
+                                                                            
+                                                                          });
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                SnackBar(
+                                                                  content: const Text(
+                                                                      'Item  Removed From  wishlist'),
+                                                                  backgroundColor:
+                                                                      Colors.green
+                                                                          .shade800,
+                                                                  duration:
+                                                                      const Duration(
+                                                                          seconds:
+                                                                              2),
+                                                                  showCloseIcon:
+                                                                      true,
+                                                                  behavior:
+                                                                      SnackBarBehavior
+                                                                          .floating,
+                                                                  closeIconColor:
+                                                                      Colors
+                                                                          .white,
+                                                                ),
+                                                              );
+                                                            } catch (e) {
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                SnackBar(
+                                                                  content: Text(
+                                                                      'Failed to remove item to wishlist'),
+                                                                  backgroundColor:
+                                                                      Colors.red
+                                                                          .shade800,
+                                                                  duration:
+                                                                      const Duration(
+                                                                          seconds:
+                                                                              2),
+                                                                  showCloseIcon:
+                                                                      true,
+                                                                  behavior:
+                                                                      SnackBarBehavior
+                                                                          .floating,
+                                                                  closeIconColor:
+                                                                      Colors
+                                                                          .white,
+                                                                ),
+                                                              );
+                                                            }
+                                                               setState(() {
+                                                                            
+                                                                          });
+                                                       // Force UI update
+                                                          },
                   child: Icon(
                     Icons.favorite,
                     color: Colors.red.shade700,

@@ -8,7 +8,8 @@ class ViewItem extends StatefulWidget {
   final String name;
   final double price;
   final String restaurantName;
-  final String location;
+  final String location;  
+  final String restrauntCoordinate;
   final String description;
   final bool food;
   final quantity;
@@ -25,6 +26,7 @@ class ViewItem extends StatefulWidget {
     required this.price,
     required this.restaurantName,
     required this.location,
+    required this.restrauntCoordinate,
     required this.description,
     required this.food,
     this.isVeg,
@@ -424,6 +426,7 @@ class _ViewItemState extends State<ViewItem> {
                                     widget.imageUrl,
                                     widget.restaurantName,
                                     widget.location,
+                                    widget.restrauntCoordinate,
                                     widget.food ? 'Food' : 'Grocery',
                                     context)
                                 .whenComplete(() {
@@ -475,6 +478,7 @@ class _ViewItemState extends State<ViewItem> {
                                           widget.imageUrl,
                                           widget.restaurantName,
                                           widget.location,
+                                          widget.restrauntCoordinate,
                                           widget.food ? 'Food' : 'Grocery',
                                           context)
                                       .whenComplete(() {
