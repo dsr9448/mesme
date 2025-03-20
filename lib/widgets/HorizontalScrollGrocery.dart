@@ -98,7 +98,7 @@
 //                           ),
 //                     child: CachedNetworkImage(
 //                       imageUrl:
-//                           'https://mesme.in/ControlHub/includes/uploads/${item.imageUrl}',
+//                           'https://mesme.inkaradigital.com/ControlHub/includes/uploads/${item.imageUrl}',
 //                       height: 80, // Adjust the height as needed
 //                       width: 80,
 //                       fit: BoxFit.cover,
@@ -147,7 +147,7 @@
 //             // ClipRRect(
 //             //   borderRadius: BorderRadius.circular(50),
 //             //   child: Image.network(
-//             //     'https://mesme.in/ControlHub/includes/uploads/${item.imageUrl}',
+//             //     'https://mesme.inkaradigital.com/ControlHub/includes/uploads/${item.imageUrl}',
 //             //     height: 100, // Adjust the height as needed
 //             //     width: 100,
 //             //     fit: BoxFit.cover,

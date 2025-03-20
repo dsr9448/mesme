@@ -42,7 +42,7 @@ class _FoodProfileState extends State<FoodProfile> {
       if (user == null) {
         throw Exception('User is not authenticated');
       }
-      var url = 'https://mesme.in/admin/api/users/get.php?id=${user.uid}';
+      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
       var response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         setState(() {
@@ -100,7 +100,7 @@ class _FoodProfileState extends State<FoodProfile> {
                       CircleAvatar(
                         radius: 50,
                         backgroundImage: NetworkImage(
-                          'https://mesme.in/admin/api/usersuploads/${userData?.profilePhoto ?? ''}',
+                          'https://mesme.inkaradigital.com/admin/api/usersuploads/${userData?.profilePhoto ?? ''}',
                         ),
                       ),
                     ],

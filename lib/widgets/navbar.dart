@@ -110,7 +110,7 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                                 : Colors.black45,
                           ),
                           Text(
-                            'Grocery',
+                            'Sweets',
                             style: GoogleFonts.poppins(
                               textStyle: TextStyle(
                                 fontWeight: FontWeight.w600,

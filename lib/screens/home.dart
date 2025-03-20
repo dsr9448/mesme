@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final response = await http.get(Uri.parse(
-          'https://mesme.in/admin/api/Food/search.php?search=$query'));
+          'https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      "https://mesme.in/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
+                      "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
@@ -253,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image:
-                                NetworkImage('https://mesme.in/mainBanner.jpg'),
+                                NetworkImage('https://mesme.inkaradigital.com/mainBanner.jpg'),
                             fit: BoxFit.cover,
                             colorFilter: ColorFilter.mode(
                               Colors.black.withOpacity(0.4),
@@ -520,7 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 restrauntCoordinate:
                                                     restaurant.coordinates,
                                                 restraurantImage:
-                                                    'https://mesme.in/mainBanner.jpg',
+                                                    'https://mesme.inkaradigital.com/mainBanner.jpg',
                                                 time: restaurant.time,
                                                 description:
                                                     restaurant.description,
@@ -545,14 +545,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         BorderRadius.circular(
                                                             10),
                                                     child: Image.network(
-                                                      "https://mesme.in/foodPhoto.jpg",
+                                                      "https://mesme.inkaradigital.com/foodPhoto.jpg",
                                                       height: 150,
                                                       width: 150,
                                                       fit: BoxFit.cover,
                                                       errorBuilder: (context,
                                                           error, stackTrace) {
-                                                        return Image.asset(
-                                                          'assets/images/placeholder.png',
+                                                        return Image.network(
+                                                          'https://placehold.co/600x600',
                                                           height: 150,
                                                           width: 150,
                                                           fit: BoxFit.cover,

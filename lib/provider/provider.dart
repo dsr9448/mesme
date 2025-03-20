@@ -69,7 +69,7 @@ class FoodProvider with ChangeNotifier {
 
       if (user != null) {
         await http.post(
-          Uri.parse('https://mesme.in/admin/api/users/create.php'),
+          Uri.parse('https://mesme.inkaradigital.com/admin/api/users/create.php'),
           body: {
             "id": user.uid,
             "name": name,
@@ -117,7 +117,7 @@ class FoodProvider with ChangeNotifier {
         notifyListeners();
         return null;
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       isAuthInProgress = false;
       notifyListeners(); // Notify UI to stop loading indicator
       // print('Login failed: $e');
@@ -146,7 +146,7 @@ class FoodProvider with ChangeNotifier {
       if (user != null) {
         // Store user information in your backend server
         var res = await http.post(
-          Uri.parse('https://mesme.in/admin/api/users/create.php'),
+          Uri.parse('https://mesme.inkaradigital.com/admin/api/users/create.php'),
           body: {
             "id": user.uid,
             "name": name,
@@ -195,7 +195,7 @@ class FoodProvider with ChangeNotifier {
 
     String? address = await fetchSavedCoordinates();
     final response =
-        await http.get(Uri.parse('https://mesme.in/admin/api/Food/get.php'));
+        await http.get(Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/get.php'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);
@@ -273,7 +273,7 @@ class FoodProvider with ChangeNotifier {
 
     String? address = await fetchSavedCoordinates();
     final response = await http.get(Uri.parse(
-        'https://mesme.in/admin/api/Wishlist/get.php?userid=${user!.uid}'));
+        'https://mesme.inkaradigital.com/admin/api/Wishlist/get.php?userid=${user!.uid}'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);
@@ -320,7 +320,7 @@ class FoodProvider with ChangeNotifier {
   }
 
   Future<void> addToWishlist(int foodId) async {
-    final url = 'https://mesme.in/admin/api/Wishlist/create.php';
+    final url = 'https://mesme.inkaradigital.com/admin/api/Wishlist/create.php';
 
     final requestData = {
       'userid': FirebaseAuth.instance.currentUser!.uid,
@@ -355,7 +355,7 @@ class FoodProvider with ChangeNotifier {
   }
 
   Future<void> removeFromWishlist(int foodId) async {
-    final url = 'https://mesme.in/admin/api/Wishlist/delete.php';
+    final url = 'https://mesme.inkaradigital.com/admin/api/Wishlist/delete.php';
 
     final requestData = {
       'userid': FirebaseAuth.instance.currentUser!.uid,
@@ -395,7 +395,7 @@ class FoodProvider with ChangeNotifier {
     await fetchUserData();
     String? address = await fetchSavedCoordinates();
     final response = await http
-        .get(Uri.parse('https://mesme.in/admin/api/Food/getGrocery.php'));
+        .get(Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/getGrocery.php'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -457,7 +457,7 @@ class FoodProvider with ChangeNotifier {
         throw Exception('User is not authenticated');
       }
 
-      var url = 'https://mesme.in/admin/api/users/get.php?id=${user!.uid}';
+      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user!.uid}';
       var response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -483,7 +483,7 @@ class FoodProvider with ChangeNotifier {
       if (user == null) {
         throw Exception('User is not authenticated');
       }
-      var url = 'https://mesme.in/admin/api/users/get.php?id=${user.uid}';
+      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
       var response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -507,7 +507,7 @@ class FoodProvider with ChangeNotifier {
       if (user == null) {
         throw Exception('User is not authenticated');
       }
-      var url = 'https://mesme.in/admin/api/users/get.php?id=${user.uid}';
+      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
       var response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -543,7 +543,7 @@ class FoodProvider with ChangeNotifier {
       }
 
       // Define the API URL for updating the token
-      var url = Uri.parse('https://mesme.in/admin/api/users/updateToken.php');
+      var url = Uri.parse('https://mesme.inkaradigital.com/admin/api/users/updateToken.php');
 
       // Send POST request to the API
       var response = await http.post(
@@ -568,7 +568,7 @@ class FoodProvider with ChangeNotifier {
 
   Future<void> fetchOrders() async {
     final response = await http.get(Uri.parse(
-        'https://mesme.in/admin/api/FoodOrders/get.php?userId=${user!.uid}'));
+        'https://mesme.inkaradigital.com/admin/api/FoodOrders/get.php?userId=${user!.uid}'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
@@ -726,7 +726,7 @@ class FoodProvider with ChangeNotifier {
     try {
       // Sending the request to the server
       final response = await http.post(
-        Uri.parse('https://mesme.in/admin/api/FoodPayments/update.php'),
+        Uri.parse('https://mesme.inkaradigital.com/admin/api/FoodPayments/update.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );

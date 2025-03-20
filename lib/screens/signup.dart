@@ -3,10 +3,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:mesme/models/usermodel.dart';
 import 'package:mesme/provider/provider.dart';
-import 'package:mesme/services/firebase_authservices.dart';
 import 'package:provider/provider.dart';
 
 class MeSignup extends StatefulWidget {

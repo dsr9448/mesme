@@ -73,7 +73,7 @@ class _RestaurantListState extends State<RestaurantList> {
                                     rating: restaurant.rating,
                                     restrauntCoordinate: restaurant.coordinates,
                                     restraurantImage:
-                                        'https://mesme.in/mainBanner.jpg',
+                                        'https://mesme.inkaradigital.com/mainBanner.jpg',
                                     time: restaurant.time,
                                     description: restaurant.description,
                                     area: restaurant.area,
@@ -85,7 +85,7 @@ class _RestaurantListState extends State<RestaurantList> {
                             child: RestaurantCard(
                               id: restaurant.id,
                               name: restaurant.name,
-                              imageUrl: "https://mesme.in/foodPhoto.jpg",
+                              imageUrl: "https://mesme.inkaradigital.com/foodPhoto.jpg",
                               rating: restaurant.rating,
                               time: restaurant.time,
                               description: restaurant.description,
@@ -145,7 +145,7 @@ class _RestaurantListState extends State<RestaurantList> {
                                 rating: restaurant.rating,
                                 restrauntCoordinate: restaurant.coordinates,
                                 restraurantImage:
-                                    'https://mesme.in/mainBanner.jpg',
+                                    'https://mesme.inkaradigital.com/mainBanner.jpg',
                                 time: restaurant.time,
                                 description: restaurant.description,
                                 area: restaurant.area,
@@ -157,7 +157,7 @@ class _RestaurantListState extends State<RestaurantList> {
                         child: RestaurantCard(
                           id: restaurant.id,
                           name: restaurant.name,
-                          imageUrl: "https://mesme.in/foodPhoto.jpg",
+                          imageUrl: "https://mesme.inkaradigital.com/foodPhoto.jpg",
                           rating: restaurant.rating,
                           time: restaurant.time,
                           description: restaurant.description,

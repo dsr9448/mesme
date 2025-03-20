@@ -36,7 +36,7 @@ class _SearchState extends State<Search> {
 
   Future<void> _search(String query) async {
     final response = await http.get(
-        Uri.parse('https://mesme.in/admin/api/Food/search.php?search=$query'));
+        Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -92,7 +92,7 @@ class _SearchState extends State<Search> {
                   Text(
                       userData?.address != null
                           ? userData!.address.split(' ').take(3).join(' ') +
-                              (userData!.address.split(' ').length > 2
+                              (userData.address.split(' ').length > 2
                                   ? '.'
                                   : '')
                           : 'Enter location',
@@ -141,7 +141,7 @@ class _SearchState extends State<Search> {
                 ),
                 filled: true,
                 border: OutlineInputBorder(borderSide: BorderSide.none),
-                hintText: 'Search for groceries',
+                hintText: 'Search for Sweets',
                 fillColor: Colors.orange,
                 hintStyle: TextStyle(color: Colors.white),
               ),
@@ -215,7 +215,7 @@ class _SearchState extends State<Search> {
 
     if (_searchResults['groceryItems'] != null &&
         _searchResults['groceryItems'].isNotEmpty) {
-      widgets.add(const Text('Grocery Items Or Fruits & Vegetables',
+      widgets.add(const Text('Sweet Items Or Fruits & Vegetables',
           style: TextStyle(fontWeight: FontWeight.bold)));
       for (var item in _searchResults['groceryItems']) {
         widgets.add(ListTile(
@@ -247,7 +247,7 @@ class _SearchState extends State<Search> {
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
-              "https://mesme.in/ControlHub/includes/uploads/${item['ImageUrl']}",
+              "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${item['ImageUrl']}",
               width: 65,
               height: 65,
               fit: BoxFit.cover,

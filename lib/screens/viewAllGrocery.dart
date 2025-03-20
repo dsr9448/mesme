@@ -19,6 +19,7 @@ class GroceryItemsApp extends StatefulWidget {
   final time;
   final description;
   final area;
+  final restraurantImage;
   final bool food;
 
   GroceryItemsApp(
@@ -33,6 +34,7 @@ class GroceryItemsApp extends StatefulWidget {
       required this.food,
       this.time,
       this.description,
+      this.restraurantImage,
       this.area});
 
   @override
@@ -183,18 +185,30 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                     padding: const EdgeInsets.all(8.0),
                     child: Stack(
                       children: [
-                        Container(
+                               Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                  8), // Ensure rounded corners
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                    widget.restraurantImage), // Network image
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                 Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 18, vertical: 28),
                           decoration: BoxDecoration(
-                            color: Colors.orange.shade700,
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.35),
+                                color: Colors.black.withOpacity(0.45),
                                 spreadRadius: 1,
                                 blurRadius: 4,
-                                // offset: const Offset(0, 3),
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
@@ -349,7 +363,8 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                                                     location: widget.rlocation,
                                                     restaurantName:
                                                         widget.rname,
-                                                    restrauntCoordinate: widget.restrauntCoordinate,
+                                                    restrauntCoordinate: widget
+                                                        .restrauntCoordinate,
                                                     description:
                                                         item['description']!,
                                                     isVeg: item['vegOrNonVeg'],
@@ -477,7 +492,7 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                                                               Colors.black54,
                                                               BlendMode.darken),
                                                       child: Image.network(
-                                                        "https://mesme.in/ControlHub/includes/uploads/${item['image']!}",
+                                                        "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${item['image']!}",
                                                         width: 150,
                                                         height: 150,
                                                         fit: BoxFit.cover,
@@ -513,7 +528,8 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                                                         ),
                                                       ),
                                                     ),
-                                                  Positioned(
+                                                 widget.isOnline == 1
+                                                      ?    Positioned(
                                                     bottom: -10,
                                                     left: 15,
                                                     right: 15,
@@ -537,7 +553,8 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                                                                 widget.rname,
                                                                 widget
                                                                     .rlocation,
-                                                                    widget.restrauntCoordinate,
+                                                                widget
+                                                                    .restrauntCoordinate,
                                                                 widget.food
                                                                     ? 'Food'
                                                                     : 'Grocery',
@@ -571,7 +588,7 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
+                                                  ):SizedBox(),
                                                 ],
                                               ),
                                             ],

@@ -35,7 +35,7 @@ class _MePhotoState extends State<MePhoto> {
 
         // Send image to server via HTTP POST request
         final response = await http.post(
-          Uri.parse('https://mesme.in/admin/api/users/upload.php'),
+          Uri.parse('https://mesme.inkaradigital.com/admin/api/users/upload.php'),
           body: {
             'image': base64Image,
             'userId': widget.userId,

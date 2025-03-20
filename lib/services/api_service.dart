@@ -15,7 +15,7 @@ class ApiService with ChangeNotifier {
 
   Future<void> createOrder(String userId, String status, String deliveryAddress,
       double totalPrice, List<Map<String, dynamic>> items) async {
-    final url = 'https://mesme.in/admin/api/FoodOrders/create.php';
+    final url = 'https://mesme.inkaradigital.com/admin/api/FoodOrders/create.php';
 
     // Prepare the data
     final requestData = {
@@ -70,7 +70,7 @@ class ApiService with ChangeNotifier {
     try {
       // Sending the request to the server
       final response = await http.post(
-        Uri.parse('https://mesme.in/admin/api/FoodOrders/update.php'),
+        Uri.parse('https://mesme.inkaradigital.com/admin/api/FoodOrders/update.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -108,7 +108,7 @@ class ApiService with ChangeNotifier {
     try {
       // Sending the request to the server
       final response = await http.post(
-        Uri.parse('https://mesme.in/admin/api/FoodOrders/rating.php'),
+        Uri.parse('https://mesme.inkaradigital.com/admin/api/FoodOrders/rating.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -147,7 +147,7 @@ class ApiService with ChangeNotifier {
     try {
       // Sending the request to the server
       final response = await http.post(
-        Uri.parse('https://mesme.in/admin/api/FoodPayments/update.php'),
+        Uri.parse('https://mesme.inkaradigital.com/admin/api/FoodPayments/update.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -176,7 +176,7 @@ class ApiService with ChangeNotifier {
   }
 
   Future<void> fetchData() async {
-    final url = 'https://mesme.in/admin/api/Food/get.php';
+    final url = 'https://mesme.inkaradigital.com/admin/api/Food/get.php';
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {

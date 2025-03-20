@@ -26,7 +26,7 @@ class _MeEditprofileState extends State<MeEditprofile> {
 
   Future<void> updateProfiledata() async {
     if (_phonenoController.text.length == 10) {
-      String url = 'https://mesme.in/admin/api/users/update.php';
+      String url = 'https://mesme.inkaradigital.com/admin/api/users/update.php';
       var res = await http.post(Uri.parse(url), body: {
         "id": userData!.id,
         "name": _nameoController.text,
@@ -155,7 +155,7 @@ class _MeEditprofileState extends State<MeEditprofile> {
       if (user == null) {
         throw Exception('User is not authenticated');
       }
-      var url = 'https://mesme.in/admin/api/users/get.php?id=${user.uid}';
+      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
       var response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
@@ -227,7 +227,7 @@ class _MeEditprofileState extends State<MeEditprofile> {
                                 image: DecorationImage(
                                   fit: BoxFit.cover,
                                   image: NetworkImage(
-                                    'https://mesme.in/admin/api/usersuploads/${userData?.profilePhoto ?? ''}',
+                                    'https://mesme.inkaradigital.com/admin/api/usersuploads/${userData?.profilePhoto ?? ''}',
                                   ),
                                 )),
                           ),

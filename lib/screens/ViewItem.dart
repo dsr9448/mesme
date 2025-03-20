@@ -8,7 +8,7 @@ class ViewItem extends StatefulWidget {
   final String name;
   final double price;
   final String restaurantName;
-  final String location;  
+  final String location;
   final String restrauntCoordinate;
   final String description;
   final bool food;
@@ -59,7 +59,7 @@ class _ViewItemState extends State<ViewItem> {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
@@ -67,7 +67,7 @@ class _ViewItemState extends State<ViewItem> {
             children: [
               CachedNetworkImage(
                 imageUrl:
-                    'https://mesme.in/ControlHub/includes/uploads/${widget.imageUrl}',
+                    'https://mesme.inkaradigital.com/ControlHub/includes/uploads/${widget.imageUrl}',
                 fit: BoxFit.cover,
                 placeholder: (context, url) => const SizedBox(
                   height: 100,
@@ -330,7 +330,7 @@ class _ViewItemState extends State<ViewItem> {
                     const SizedBox(height: 4),
                     Text(
                       widget.description,
-                      textAlign: TextAlign.justify,
+                        textAlign: TextAlign.justify,
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           color: Colors.black,
@@ -420,18 +420,15 @@ class _ViewItemState extends State<ViewItem> {
                       ? ElevatedButton(
                           onPressed: () {
                             FoodFunction.addToCart(
-                                    widget.name,
-                                    widget.price,
-                                    quantity,
-                                    widget.imageUrl,
-                                    widget.restaurantName,
-                                    widget.location,
-                                    widget.restrauntCoordinate,
-                                    widget.food ? 'Food' : 'Grocery',
-                                    context)
-                                .whenComplete(() {
-                              Navigator.pop(context);
-                            });
+                                widget.name,
+                                widget.price,
+                                quantity,
+                                widget.imageUrl,
+                                widget.restaurantName,
+                                widget.location,
+                                widget.restrauntCoordinate,
+                                widget.food ? 'Food' : 'Grocery',
+                                context);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange.shade700,

@@ -12,6 +12,7 @@ class FirebaseAuthServices {
     } catch (e) {
       print("some error occured");
     }
+    return null;
   }
 
   Future<User?> loginWithEmailandPassword(String email, String password) async {
@@ -20,5 +21,6 @@ class FirebaseAuthServices {
           email: email, password: password);
       return credential.user;
     } catch (e) {}
+    return null;
   }
 }

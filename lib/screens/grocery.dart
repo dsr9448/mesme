@@ -114,7 +114,7 @@ class GroceryScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: customHeading(
-                        'Top (${foodProvider.groceries.length}) Groceries to explore'),
+                        'Top (${foodProvider.groceries.length}) Sweets to explore'),
                   ),
                   const SizedBox(height: 12),
                   for (var grocery in foodProvider.groceries)
@@ -134,7 +134,7 @@ class GroceryScreen extends StatelessWidget {
                                         'quantity': foodItem.quantity,
                                         'unit': foodItem.unit,
                                         'rating': '',
-                                      
+                                        'category': foodItem.category,
                                         'totalCount': '',
                                       })
                                   .toList(),
@@ -145,6 +145,8 @@ class GroceryScreen extends StatelessWidget {
                               userCoordinate: userData.location,
                               restrauntCoordinate: grocery.coordinates,
                               description: grocery.description,
+                              restraurantImage:
+                                  'https://mesme.inkaradigital.com/mainBanner.jpg',
                               area: grocery.area,
                               time: grocery.time,
                             ),
@@ -160,7 +162,7 @@ class GroceryScreen extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: Image.network(
-                                "https://mesme.in/foodPhoto.jpg",
+                                "https://mesme.inkaradigital.com/foodPhoto.jpg",
                                 height: 150,
                                 width: 150,
                                 fit: BoxFit.cover,
@@ -229,8 +231,8 @@ class GroceryScreen extends StatelessWidget {
                                   Row(
                                     children: [
                                       Icon(Icons.location_on,
-                                        size: 16, color: Colors.grey),
-                                        SizedBox(width: 2),
+                                          size: 16, color: Colors.grey),
+                                      SizedBox(width: 2),
                                       Text(
                                         grocery.area,
                                         style: TextStyle(

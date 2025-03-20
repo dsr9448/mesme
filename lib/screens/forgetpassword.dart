@@ -18,7 +18,7 @@ class _MeForgotState extends State<MeForgot> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (_auths.currentUser != null) {
         Navigator.pushNamedAndRemoveUntil(
           context,
@@ -110,7 +110,7 @@ class _MeForgotState extends State<MeForgot> {
                                               backgroundColor: Colors.black,
                                             ))
                                           });
-                                } on FirebaseAuth catch (e) {
+                                } on FirebaseAuth {
                                   Navigator.pushNamed(context, '/welcome');
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(const SnackBar(

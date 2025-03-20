@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
@@ -11,27 +11,27 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
 
 class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
-  final andriodChannel = const AndroidNotificationChannel(
-      'high_importance_channel', 'High Importance Notifications',
-      description: 'This channel is used for important notification',
-      importance: Importance.defaultImportance);
-  final _localNotification = FlutterLocalNotificationsPlugin();
+    // final andriodChannel = const AndroidNotificationChannel(
+    //     'high_importance_channel', 'High Importance Notifications',
+    //     description: 'This channel is used for important notification',
+    //     importance: Importance.defaultImportance);
+    // final _localNotification = FlutterLocalNotificationsPlugin();
   void handleMessage(RemoteMessage? message) {
     if (message == null) return;
 
 
-  }
+  } 
 
-  Future<void> initLocalNotifications() async {
-    const android = AndroidInitializationSettings('@drawable/ic_launcher');
-    const settings = InitializationSettings(android: android);
+  // Future<void> initLocalNotifications() async {
+  //   const android = AndroidInitializationSettings('@drawable/ic_launcher');
+  //   const settings = InitializationSettings(android: android);
 
-    await _localNotification.initialize(settings);
+  //   await _localNotification.initialize(settings);
 
-    final platform = _localNotification.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
-    await platform?.createNotificationChannel(andriodChannel);
-  }
+  //   final platform = _localNotification.resolvePlatformSpecificImplementation<
+  //       AndroidFlutterLocalNotificationsPlugin>();
+  //   await platform?.createNotificationChannel(andriodChannel);
+  // }
 
   Future initPushNotification() async {
     await FirebaseMessaging.instance
@@ -46,18 +46,18 @@ class FirebaseApi {
     FirebaseMessaging.onMessage.listen((message) {
       final notification = message.notification;
       if (notification == null) return;
-      _localNotification.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-              andriodChannel.id, andriodChannel.name,
-              channelDescription: andriodChannel.description,
-              icon: '@drawable/ic_launcher'),
-        ),
-        payload: jsonEncode(message.toMap()),
-      );
+      // _localNotification.show(
+      //   notification.hashCode,
+      //   notification.title,
+      //   notification.body,
+      //   NotificationDetails(
+      //     android: AndroidNotificationDetails(
+      //         andriodChannel.id, andriodChannel.name,
+      //         channelDescription: andriodChannel.description,
+      //         icon: '@drawable/ic_launcher'),
+      //   ),
+      //   payload: jsonEncode(message.toMap()),
+      // );
     });
   }
 
@@ -67,6 +67,6 @@ class FirebaseApi {
     print('token :$fCMtoken');
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
     initPushNotification();
-    initLocalNotifications();
+    // initLocalNotifications();
   }
 }

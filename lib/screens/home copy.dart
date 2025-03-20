@@ -57,7 +57,7 @@
 
 //     try {
 //       final response = await http.get(Uri.parse(
-//           'https://mesme.in/admin/api/Food/search.php?search=$query'));
+//           'https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
 
 //       if (response.statusCode == 200) {
 //         setState(() {
@@ -163,7 +163,7 @@
 //                   leading: ClipRRect(
 //                     borderRadius: BorderRadius.circular(8),
 //                     child: Image.network(
-//                       "https://mesme.in/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
+//                       "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
 //                       width: 50,
 //                       height: 50,
 //                       fit: BoxFit.cover,
@@ -213,7 +213,7 @@
 //                 decoration: BoxDecoration(
 //                   image: DecorationImage(
 //                     image: NetworkImage(
-//                         'https://mesme.in/mainBanner.jpg'),
+//                         'https://mesme.inkaradigital.com/mainBanner.jpg'),
 //                     fit: BoxFit.cover,
 //                     colorFilter: ColorFilter.mode(
 //                       Colors.black.withOpacity(0.4),

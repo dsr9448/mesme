@@ -3,7 +3,6 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:mesme/models/ordermodel.dart';
 import 'package:mesme/provider/provider.dart';
 import 'package:mesme/services/api_service.dart';
-import 'package:mesme/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';

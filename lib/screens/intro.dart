@@ -2,9 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:mesme/screens/welcome.dart';
 import 'package:mesme/widgets/onboard.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class MeIntro extends StatefulWidget {
   const MeIntro({super.key});

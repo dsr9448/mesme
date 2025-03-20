@@ -315,7 +315,7 @@ class _FoodCartState extends State<FoodCart> {
         ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Image.network(
-            "https://mesme.in/ControlHub/includes/uploads/${item['imageUrl']}",
+            "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${item['imageUrl']}",
             width: 100,
             height: 100,
             fit: BoxFit.cover,

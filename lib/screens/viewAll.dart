@@ -6,7 +6,6 @@ import 'package:mesme/widgets/functionalities.dart';
 import 'package:mesme/widgets/calculateLocation.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
-import 'package:mesme/widgets/preloder.dart';
 
 class FoodItemsApp extends StatefulWidget {
   final List<Map<String, String>> allFoodItems;
@@ -66,7 +65,6 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
 
   void _onScroll() {
     if (_scrollController.offset > 180) {
-      // Adjust this value based on when you want the search to appear
       if (!_showAppBarSearch) {
         setState(() {
           _showAppBarSearch = true;
@@ -136,90 +134,91 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
         .where((item) =>
             item['name']!.toLowerCase().contains(searchQuery.toLowerCase()) &&
             (selectedFilter == 'rating'
-                ? double.parse(item['rating'] ?? '0') >= 4.4
+                ? (double.parse(item['rating'] ?? '0') >= 4.0 ||
+                    double.parse(item['rating'] ?? '0') == 4)
                 : selectedFilter == 'All' ||
                     item['vegOrNonVeg'] == selectedFilter))
         .toList();
     Map<String, List<Map<String, String>>> groupedFoodItems =
         groupBy(filteredFoodItems, (item) => item['category'] ?? 'Others');
     return Scaffold(
-            backgroundColor: Colors.white,
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              forceMaterialTransparency: true,
-              automaticallyImplyLeading: false,
-              leading: IconButton(
-                style: const ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(Colors.orange)),
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              title: _showAppBarSearch ? buildSearchBar() : null,
-              bottom: _showAppBarSearch
-                  ? widget.food
-                      ? PreferredSize(
-                          preferredSize: Size.fromHeight(58),
-                          child: Container(
-                            margin: EdgeInsets.only(bottom: 4),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(
-                                      color: Colors.grey.shade300, width: 1)),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.only(bottom: 10, top: 10),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    customSwitch(Colors.orange.shade700,
-                                        selectedFilter == 'All', (val) {
-                                      setState(() => selectedFilter = 'All');
-                                    }),
-                                    customSwitch(
-                                        Colors.green, selectedFilter == 'Veg',
-                                        (val) {
-                                      setState(() => selectedFilter = 'Veg');
-                                    }),
-                                    // (widget.style == "non-veg" || widget.style == "both")
-                                    //     ? 
-                                        customSwitch(Colors.red[800]!,
-                                            selectedFilter == 'Non-Veg', (val) {
-                                            setState(() =>
-                                                selectedFilter = 'Non-Veg');
-                                          })
-                                        // : SizedBox(),
-                                    ,customSwitch(Colors.orange,
-                                        selectedFilter == 'rating', (val) {
-                                      setState(() => selectedFilter = 'rating');
-                                    }),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ))
-                      : null
-                  : null,
-            ),
-            body:  groupedFoodItems.isEmpty
-      ? Center(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Text(
-              "No items available for the selected filter",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        forceMaterialTransparency: true,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          style: const ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(Colors.orange)),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
           ),
-        )
-      : SingleChildScrollView(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: _showAppBarSearch ? buildSearchBar() : null,
+        bottom: _showAppBarSearch
+            ? widget.food
+                ? PreferredSize(
+                    preferredSize: Size.fromHeight(58),
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 4),
+                      decoration: BoxDecoration(
+                        border: Border(
+                            bottom: BorderSide(
+                                color: Colors.grey.shade300, width: 1)),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 10, top: 10),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              customSwitch(Colors.orange.shade700,
+                                  selectedFilter == 'All', (val) {
+                                setState(() => selectedFilter = 'All');
+                              }),
+                              customSwitch(
+                                  Colors.green, selectedFilter == 'Veg', (val) {
+                                setState(() => selectedFilter = 'Veg');
+                              }),
+                              // (widget.style == "non-veg" || widget.style == "both")
+                              //     ?
+                              customSwitch(
+                                  Colors.red[800]!, selectedFilter == 'Non-Veg',
+                                  (val) {
+                                setState(() => selectedFilter = 'Non-Veg');
+                              })
+                              // : SizedBox(),
+                              ,
+                              customSwitch(
+                                  Colors.orange, selectedFilter == 'rating',
+                                  (val) {
+                                setState(() => selectedFilter = 'rating');
+                              }),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ))
+                : null
+            : null,
+      ),
+      body: groupedFoodItems.isEmpty
+          ? Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  "No items available for the selected filter",
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+          : SingleChildScrollView(
               controller: _scrollController,
               child: Column(
                 children: [
@@ -385,15 +384,15 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                     selectedFilter = 'Veg';
                                   });
                                 }),
-                                (widget.style == "non-veg" || widget.style == "both")
-                                    ?
-                                customSwitch(Colors.red[800]!,
-                                    selectedFilter == 'Non-Veg', (val) {
-                                  setState(() {
-                                    selectedFilter = 'Non-Veg';
-                                  });
-                                })
-                                :SizedBox(),
+                                (widget.style == "non-veg" ||
+                                        widget.style == "both")
+                                    ? customSwitch(Colors.red[800]!,
+                                        selectedFilter == 'Non-Veg', (val) {
+                                        setState(() {
+                                          selectedFilter = 'Non-Veg';
+                                        });
+                                      })
+                                    : SizedBox(),
                                 customSwitch(
                                     Colors.orange, selectedFilter == 'rating',
                                     (val) {
@@ -631,7 +630,7 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                               Colors.black54,
                                                               BlendMode.darken),
                                                       child: Image.network(
-                                                        "https://mesme.in/ControlHub/includes/uploads/${item['image']!}",
+                                                        "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${item['image']!}",
                                                         width: 150,
                                                         height: 150,
                                                         fit: BoxFit.cover,
@@ -667,66 +666,76 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                         ),
                                                       ),
                                                     ),
-                                                  Positioned(
-                                                    bottom: -10,
-                                                    left: 15,
-                                                    right: 15,
-                                                    child: TextButton(
-                                                      style: ButtonStyle(
-                                                        backgroundColor:
-                                                            WidgetStatePropertyAll(
-                                                          canAdd
-                                                              ? Colors.orange
-                                                              : Colors.grey,
-                                                        ),
-                                                      ),
-                                                      onPressed: canAdd
-                                                          ? () => FoodFunction
-                                                                  .addToCart(
-                                                                item['name']!,
-                                                                double.parse(item[
-                                                                    'price']!),
-                                                                1,
-                                                                item['image']!,
-                                                                widget.rname,
-                                                                widget
-                                                                    .rlocation,
-                                                                widget
-                                                                    .restrauntCoordinate,
-                                                                widget.food
-                                                                    ? 'Food'
-                                                                    : 'Grocery',
-                                                                context,
-                                                              )
-                                                          : () =>
-                                                              QuickAlert.show(
-                                                                context:
-                                                                    context,
-                                                                type:
-                                                                    QuickAlertType
-                                                                        .info,
-                                                                title:
-                                                                    'Service not Available',
-                                                                text:
-                                                                    'Service is not available in this location.',
-                                                                confirmBtnText:
-                                                                    'Ok',
-                                                                confirmBtnColor:
-                                                                    Colors
+                                                  widget.isOnline == 1
+                                                      ? Positioned(
+                                                          bottom: -10,
+                                                          left: 15,
+                                                          right: 15,
+                                                          child: TextButton(
+                                                            style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  WidgetStatePropertyAll(
+                                                                canAdd
+                                                                    ? Colors
                                                                         .orange
-                                                                        .shade700,
+                                                                    : Colors
+                                                                        .grey,
                                                               ),
-                                                      child: const Text(
-                                                        "Add",
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
+                                                            ),
+                                                            onPressed: canAdd
+                                                                ? () =>
+                                                                    FoodFunction
+                                                                        .addToCart(
+                                                                      item[
+                                                                          'name']!,
+                                                                      double.parse(
+                                                                          item[
+                                                                              'price']!),
+                                                                      1,
+                                                                      item[
+                                                                          'image']!,
+                                                                      widget
+                                                                          .rname,
+                                                                      widget
+                                                                          .rlocation,
+                                                                      widget
+                                                                          .restrauntCoordinate,
+                                                                      widget.food
+                                                                          ? 'Food'
+                                                                          : 'Grocery',
+                                                                      context,
+                                                                    )
+                                                                : () =>
+                                                                    QuickAlert
+                                                                        .show(
+                                                                      context:
+                                                                          context,
+                                                                      type: QuickAlertType
+                                                                          .info,
+                                                                      title:
+                                                                          'Service not Available',
+                                                                      text:
+                                                                          'Service is not available in this location.',
+                                                                      confirmBtnText:
+                                                                          'Ok',
+                                                                      confirmBtnColor: Colors
+                                                                          .orange
+                                                                          .shade700,
+                                                                    ),
+                                                            child: const Text(
+                                                              "Add",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : SizedBox(),
                                                 ],
                                               ),
                                             ],
@@ -746,49 +755,49 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                 ],
               ),
             ),
-            floatingActionButton: ValueListenableBuilder<int>(
-              valueListenable: FoodFunction.cartItemCountNotifier,
-              builder: (context, itemCount, child) {
-                return FloatingActionButton(
-                  backgroundColor: Colors.orange.shade700,
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/FoodCart');
-                  },
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      const Icon(Icons.shopping_cart, color: Colors.white),
-                      if (itemCount > 0)
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            constraints: const BoxConstraints(
-                              maxWidth: 24,
-                              maxHeight: 24,
-                            ),
-                            child: Center(
-                              child: Text(
-                                '$itemCount',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ),
+      floatingActionButton: ValueListenableBuilder<int>(
+        valueListenable: FoodFunction.cartItemCountNotifier,
+        builder: (context, itemCount, child) {
+          return FloatingActionButton(
+            backgroundColor: Colors.orange.shade700,
+            onPressed: () {
+              Navigator.pushNamed(context, '/FoodCart');
+            },
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                const Icon(Icons.shopping_cart, color: Colors.white),
+                if (itemCount > 0)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        maxWidth: 24,
+                        maxHeight: 24,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$itemCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
                           ),
                         ),
-                    ],
+                      ),
+                    ),
                   ),
-                );
-              },
+              ],
             ),
           );
+        },
+      ),
+    );
   }
 }

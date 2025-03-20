@@ -36,7 +36,7 @@ class _SearchPageState extends State<SearchPage> {
 
   Future<void> _search(String query) async {
     final response = await http.get(
-        Uri.parse('https://mesme.in/admin/api/Food/search.php?search=$query'));
+        Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -92,7 +92,7 @@ class _SearchPageState extends State<SearchPage> {
                   Text(
                       userData?.address != null
                           ? userData!.address.split(' ').take(3).join(' ') +
-                              (userData!.address.split(' ').length > 2
+                              (userData.address.split(' ').length > 2
                                   ? '.'
                                   : '')
                           : 'Enter location',
@@ -264,7 +264,7 @@ class _SearchPageState extends State<SearchPage> {
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                "https://mesme.in/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
+                "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
                 width: 65,
                 height: 65,
                 fit: BoxFit.cover,
