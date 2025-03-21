@@ -30,18 +30,18 @@ if (keystorePropertiesFile.exists()) {
 
 
 android {
-    namespace = "com.example.mesme"
+    namespace = "com.mesme.food"
     compileSdkVersion 35
     ndkVersion "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "in.mesmefood.mesme"
+        applicationId = "com.mesme.food"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdk = 23
