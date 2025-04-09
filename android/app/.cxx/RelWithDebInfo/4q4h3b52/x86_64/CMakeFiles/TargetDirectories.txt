@@ -1,0 +1,2 @@
+F:/Inkara/app/mesme/android/app/.cxx/RelWithDebInfo/4q4h3b52/x86_64/CMakeFiles/edit_cache.dir
+F:/Inkara/app/mesme/android/app/.cxx/RelWithDebInfo/4q4h3b52/x86_64/CMakeFiles/rebuild_cache.dir

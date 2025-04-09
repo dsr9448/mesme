@@ -32,20 +32,19 @@ class FoodProvider with ChangeNotifier {
   String? _currentOrderId;
   BuildContext? _tempContext;
   final FirebaseAuthServices auth = FirebaseAuthServices();
+  Map<String, Future<dynamic>> _pendingRequests = {};
+  DateTime? _lastUserDataFetch;
+  DateTime? _lastRestaurantFetch;
+  DateTime? _lastOrderFetch;
+
   FoodProvider() {
-    fetchUserData();
-    fetchSavedCoordinates();
-    fetchSavedAddress();
-    fetchRestaurants();
-    fetchGrocery();
-    fetchOrders();
-    fetchWishlist();
-    _startPeriodicFetch();
+    _initializeData();
     _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isAuthInProgress = false;
   bool _passwordVisible = false;
@@ -55,6 +54,36 @@ class FoodProvider with ChangeNotifier {
   void togglePasswordVisibility() {
     _passwordVisible = !_passwordVisible;
     notifyListeners();
+  }
+
+  Future<void> _initializeData() async {
+    await Future.wait([
+      fetchUserData(),
+      fetchSavedCoordinates(),
+      fetchSavedAddress(),
+      fetchRestaurants(),
+      fetchOrders(),
+      fetchWishlist(),
+    ]);
+  }
+
+  Future<dynamic> _deduplicateRequest(
+      String key, Future<dynamic> Function() request) async {
+    if (_pendingRequests.containsKey(key)) {
+      return _pendingRequests[key];
+    }
+
+    final future = request();
+    _pendingRequests[key] = future;
+
+    try {
+      final result = await future;
+      _pendingRequests.remove(key);
+      return result;
+    } catch (e) {
+      _pendingRequests.remove(key);
+      rethrow;
+    }
   }
 
   Future<void> signUp(
@@ -69,7 +98,8 @@ class FoodProvider with ChangeNotifier {
 
       if (user != null) {
         await http.post(
-          Uri.parse('https://mesme.inkaradigital.com/admin/api/users/create.php'),
+          Uri.parse(
+              'https://mesme.inkaradigital.com/admin/api/users/create.php'),
           body: {
             "id": user.uid,
             "name": name,
@@ -106,7 +136,7 @@ class FoodProvider with ChangeNotifier {
         await fetchSavedAddress();
         await fetchRestaurants();
         await fetchWishlist();
-        await fetchGrocery();
+        // await fetchGrocery();
         await fetchOrders();
 
         isAuthInProgress = false;
@@ -146,7 +176,8 @@ class FoodProvider with ChangeNotifier {
       if (user != null) {
         // Store user information in your backend server
         var res = await http.post(
-          Uri.parse('https://mesme.inkaradigital.com/admin/api/users/create.php'),
+          Uri.parse(
+              'https://mesme.inkaradigital.com/admin/api/users/create.php'),
           body: {
             "id": user.uid,
             "name": name,
@@ -189,112 +220,101 @@ class FoodProvider with ChangeNotifier {
   }
 
   Future<void> fetchRestaurants() async {
-    await fetchUserData();
-    // if (_dataFetched) return;
-    // if (restaurants.isNotEmpty) return;
-
-    String? address = await fetchSavedCoordinates();
-    final response =
-        await http.get(Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/get.php'));
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> jsonData = json.decode(response.body);
-
-      // Parse restaurant data
-      List<Restaurant> fetchedRestaurants = (jsonData['restaurants'] as List)
-          .map((json) => Restaurant.fromJson(json))
-          .toList();
-
-      // Filter only restaurants with rating > 4
-      List<Restaurant> fetchedRestaurantsAbove4 = fetchedRestaurants
-          .where((restaurant) => (restaurant.rating ?? 0) > 4)
-          .toList();
-
-      String userCoordinate = userData!.location ?? address ?? '0,0';
-
-      // Function to calculate distances
-      List<Map<String, dynamic>> calculateDistances(
-          List<Restaurant> restaurantList) {
-        return restaurantList.map((restaurant) {
-          String restaurantCoordinate = restaurant.coordinates;
-          double rating = restaurant.rating ?? 0.0;
-
-          // Calculate the distance
-          Map<String, dynamic> result =
-              isWithin6Km(userCoordinate, restaurantCoordinate);
-          double distance = result['distance'];
-
-          return {
-            'restaurant': restaurant,
-            'distance': distance,
-            'rating': rating,
-          };
-        }).toList();
-      }
-
-      // Calculate distances
-      List<Map<String, dynamic>> restaurantWithDistances =
-          calculateDistances(fetchedRestaurants);
-      List<Map<String, dynamic>> restaurantAbove4WithDistances =
-          calculateDistances(fetchedRestaurantsAbove4);
-
-      // Sort `restaurants` by distance (ASC - closest first)
-      restaurantWithDistances
-          .sort((a, b) => a['distance'].compareTo(b['distance']));
-
-      // Sort `restaurantsAbove4` by rating (DESC - highest rated first)
-      restaurantAbove4WithDistances
-          .sort((a, b) => b['rating'].compareTo(a['rating']));
-
-      // Extract sorted restaurants
-      restaurants = restaurantWithDistances
-          .map<Restaurant>((item) => item['restaurant'] as Restaurant)
-          .toList();
-
-      restaurantsAbove4 = restaurantAbove4WithDistances
-          .map<Restaurant>((item) => item['restaurant'] as Restaurant)
-          .toList();
-
-      // Banner images
-      bannerImages = List<String>.from(jsonData['bannerImages']);
-      await fetchWishlist();
-
-      // _dataFetched = true;
-      notifyListeners();
-    } else {
-      throw Exception('Failed to load restaurants');
+    if (_lastRestaurantFetch != null &&
+        DateTime.now().difference(_lastRestaurantFetch!) <
+            Duration(minutes: 1)) {
+      return;
     }
+
+    return _deduplicateRequest('fetchRestaurants', () async {
+      String? address = await fetchSavedCoordinates();
+      final response = await http.get(
+          Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/get.php'));
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = json.decode(response.body);
+        List<Restaurant> fetchedRestaurants = (jsonData['restaurants'] as List)
+            .map((json) => Restaurant.fromJson(json))
+            .toList();
+
+        List<Restaurant> fetchedRestaurantsAbove4 = fetchedRestaurants
+            .where((restaurant) => double.parse(restaurant.rating ?? "0.0") > 4)
+            .toList();
+
+        String userCoordinate = userData!.location ?? address ?? '0,0';
+
+        List<Map<String, dynamic>> calculateDistances(
+            List<Restaurant> restaurantList) {
+          return restaurantList.map((restaurant) {
+            String restaurantCoordinate = restaurant.coordinates;
+            double rating = double.parse(restaurant.rating ?? "0.0");
+            Map<String, dynamic> result =
+                isWithin6Km(userCoordinate, restaurantCoordinate);
+            double distance = result['distance'];
+            return {
+              'restaurant': restaurant,
+              'distance': distance,
+              'rating': rating,
+            };
+          }).toList();
+        }
+
+        List<Map<String, dynamic>> restaurantWithDistances =
+            calculateDistances(fetchedRestaurants);
+        List<Map<String, dynamic>> restaurantAbove4WithDistances =
+            calculateDistances(fetchedRestaurantsAbove4);
+
+        restaurantWithDistances
+            .sort((a, b) => a['distance'].compareTo(b['distance']));
+        restaurantAbove4WithDistances
+            .sort((a, b) => b['rating'].compareTo(a['rating']));
+
+        restaurants = restaurantWithDistances
+            .map<Restaurant>((item) => item['restaurant'] as Restaurant)
+            .toList();
+
+        restaurantsAbove4 = restaurantAbove4WithDistances
+            .map<Restaurant>((item) => item['restaurant'] as Restaurant)
+            .toList();
+
+        bannerImages = List<String>.from(jsonData['bannerImages']);
+        _lastRestaurantFetch = DateTime.now();
+        notifyListeners();
+      } else {
+        throw Exception('Failed to load restaurants');
+      }
+    });
   }
 
   Future<void> fetchWishlist() async {
-    await fetchUserData();
-    // if (_dataFetched) return;
-    // if (restaurant.isNotEmpty) return;
-
     String? address = await fetchSavedCoordinates();
     final response = await http.get(Uri.parse(
         'https://mesme.inkaradigital.com/admin/api/Wishlist/get.php?userid=${user!.uid}'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);
-      List<Restaurant> fetchedRestaurants = (jsonData['restaurants'] as List)
-          .map((json) => Restaurant.fromJson(json))
-          .toList();
+      List<dynamic> restaurantList = jsonData['restaurants'] ?? [];
+
+      if (restaurantList is! List) {
+        throw Exception('Invalid data format for restaurants');
+      }
+
+      List<Restaurant> fetchedRestaurants =
+          restaurantList.map((json) => Restaurant.fromJson(json)).toList();
 
       String userCoordinate = userData!.location ?? address ?? '0,0';
 
       // List to hold restaurants with distances
       List<Map<String, dynamic>> restaurantWithDistances = [];
 
-      // Calculate distances for each restaurant1
+      // Calculate distances for each restaurant
       for (var restaurant in fetchedRestaurants) {
-        String restaurantCoordinate = restaurant
-            .coordinates; // Assuming restaurant coordinates are a string
+        String restaurantCoordinate = restaurant.coordinates;
 
         // Use the isWithin6Km function to calculate the distance
         Map<String, dynamic> result =
             isWithin6Km(userCoordinate, restaurantCoordinate);
-        double distance = result['distance']; // Get the calculated distance
+        double distance = result['distance'];
 
         // Store the restaurant and its distance
         restaurantWithDistances.add({
@@ -311,8 +331,7 @@ class FoodProvider with ChangeNotifier {
       restaurant = restaurantWithDistances
           .map<Restaurant>((item) => item['restaurant'] as Restaurant)
           .toList();
-      // _dat
-      //aFetched = true;
+
       notifyListeners();
     } else {
       throw Exception('Failed to load restaurants');
@@ -390,12 +409,11 @@ class FoodProvider with ChangeNotifier {
   }
 
   Future<void> fetchGrocery() async {
-    // if (_dataFetched) return;
     if (groceries.isNotEmpty) return;
     await fetchUserData();
     String? address = await fetchSavedCoordinates();
-    final response = await http
-        .get(Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/getGrocery.php'));
+    final response = await http.get(Uri.parse(
+        'https://mesme.inkaradigital.com/admin/api/Food/getGrocery.php'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -403,21 +421,16 @@ class FoodProvider with ChangeNotifier {
       final List<Map<String, dynamic>> groceryWithDistances = [];
       final Map<int, List<GroceryItem>> loadedCategoriesMap = {};
 
-      // User location (assumed to be in 'lat,long' format)
-      String userCoordinate = userData!.location ?? address ?? '0,0';
+      String userCoordinate = userData?.location ?? address ?? '0,0';
 
-      // Parse categories and calculate distance
       for (var categoryJson in data['categories']) {
         final category = Grocery.fromJson(categoryJson);
-        String groceryCoordinate = category
-            .coordinates; // Assuming coordinates exist for each category
+        String groceryCoordinate = category.coordinates;
 
-        // Calculate distance using isWithin6Km
         Map<String, dynamic> result =
             isWithin6Km(userCoordinate, groceryCoordinate);
-        double distance = result['distance']; // Get the calculated distance
+        double distance = result['distance'];
 
-        // Add the grocery category along with its distance
         groceryWithDistances.add({
           'grocery': category,
           'distance': distance,
@@ -425,55 +438,54 @@ class FoodProvider with ChangeNotifier {
 
         loadedCategoriesMap[category.id] = [];
 
-        // Parse items for each category
         for (var itemJson in categoryJson['items']) {
           final item = GroceryItem.fromJson(itemJson);
           loadedCategoriesMap[category.id]?.add(item);
         }
       }
 
-      // Sort grocery categories by distance (ascending order)
       groceryWithDistances
           .sort((a, b) => a['distance'].compareTo(b['distance']));
 
-      // Extract sorted grocery categories
       groceries = groceryWithDistances
           .map<Grocery>((item) => item['grocery'] as Grocery)
           .toList();
 
-      // Assign the loaded categories map
       groceryCategoriesMap = loadedCategoriesMap;
       _dataFetched = true;
       notifyListeners();
-    } else {
-      throw Exception('Failed to load groceries');
     }
   }
 
   Future<void> fetchUserData() async {
-    try {
-      user = _auth.currentUser;
-      if (user == null) {
-        throw Exception('User is not authenticated');
-      }
-
-      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user!.uid}';
-      var response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        userData = UserModel.fromMap(data);
-        fetchSavedAddress();
-        notifyListeners();
-      } else {
-        throw Exception('Failed to load user data: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Error fetching user data: $e');
-    } finally {
-      isLoading = false;
-      notifyListeners();
+    if (_lastUserDataFetch != null &&
+        DateTime.now().difference(_lastUserDataFetch!) < Duration(minutes: 1)) {
+      return;
     }
+
+    return _deduplicateRequest('fetchUserData', () async {
+      try {
+        user = _auth.currentUser;
+        if (user == null) {
+          throw Exception('User is not authenticated');
+        }
+
+        var url =
+            'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user!.uid}';
+        var response = await http.get(Uri.parse(url));
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          userData = UserModel.fromMap(data);
+          _lastUserDataFetch = DateTime.now();
+          notifyListeners();
+        } else {
+          throw Exception('Failed to load user data: ${response.statusCode}');
+        }
+      } catch (e) {
+        throw Exception('Error fetching user data: $e');
+      }
+    });
   }
 
   Future<String?> fetchSavedAddress() async {
@@ -483,7 +495,8 @@ class FoodProvider with ChangeNotifier {
       if (user == null) {
         throw Exception('User is not authenticated');
       }
-      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
+      var url =
+          'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
       var response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -507,7 +520,8 @@ class FoodProvider with ChangeNotifier {
       if (user == null) {
         throw Exception('User is not authenticated');
       }
-      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
+      var url =
+          'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
       var response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -543,7 +557,8 @@ class FoodProvider with ChangeNotifier {
       }
 
       // Define the API URL for updating the token
-      var url = Uri.parse('https://mesme.inkaradigital.com/admin/api/users/updateToken.php');
+      var url = Uri.parse(
+          'https://mesme.inkaradigital.com/admin/api/users/updateToken.php');
 
       // Send POST request to the API
       var response = await http.post(
@@ -622,15 +637,6 @@ class FoodProvider with ChangeNotifier {
     }
   }
 
-  // void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-  //   if (_currentOrderId != null) {
-  //     await updatePayment(_currentOrderId!, "Paid");
-  //     // Use the stored orderId
-  //   } else {
-  //     print('Error: orderId is null');
-  //   }
-  //   notifyListeners();
-  // }
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     if (_currentOrderId != null) {
       await updatePayment(_currentOrderId!, "Paid").whenComplete(() {
@@ -710,9 +716,9 @@ class FoodProvider with ChangeNotifier {
   }
 
   void _startPeriodicFetch() {
-    _timer = Timer.periodic(Duration(seconds: 5), (timer) async {
-      await fetchOrders();
-    });
+    // _timer = Timer.periodic(Duration(seconds: 5), (timer) async {
+    //   await fetchOrders();
+    // });
   }
 
   Future<void> updatePayment(String orderId, String status) async {
@@ -726,7 +732,8 @@ class FoodProvider with ChangeNotifier {
     try {
       // Sending the request to the server
       final response = await http.post(
-        Uri.parse('https://mesme.inkaradigital.com/admin/api/FoodPayments/update.php'),
+        Uri.parse(
+            'https://mesme.inkaradigital.com/admin/api/FoodPayments/update.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -759,5 +766,45 @@ class FoodProvider with ChangeNotifier {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  Future<Map<String, dynamic>> createOrder(
+    String userId,
+    String rid,
+    String status,
+    String deliveryAddress,
+    double totalPrice,
+    List<Map<String, dynamic>> items,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://mesme.inkaradigital.com/admin/api/FoodOrders/create.php'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Connection': 'keep-alive',
+        },
+        body: jsonEncode({
+          'userId': userId,
+          'partnerId': rid,
+          'status': status,
+          'deliveryAddress': deliveryAddress,
+          'totalPrice': totalPrice.toString(),
+          'items': items,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        await fetchOrders(); // Refresh orders list after creating new order
+        notifyListeners();
+        return responseData;
+      } else {
+        throw Exception('Failed to create order: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error creating order: $e');
+    }
   }
 }

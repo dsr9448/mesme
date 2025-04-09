@@ -163,7 +163,7 @@
 //                   leading: ClipRRect(
 //                     borderRadius: BorderRadius.circular(8),
 //                     child: Image.network(
-//                       "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
+//                       "https://mesme.inkaradigital.com/admin/menu/${foodItem['foodPhoto']}",
 //                       width: 50,
 //                       height: 50,
 //                       fit: BoxFit.cover,

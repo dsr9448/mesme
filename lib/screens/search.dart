@@ -35,8 +35,8 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _search(String query) async {
-    final response = await http.get(
-        Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
+    final response = await http.get(Uri.parse(
+        'https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -128,14 +128,12 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             const SizedBox(height: 10),
             TextField(
-              style: const TextStyle(color: Colors.white,decoration: TextDecoration.none),
-              
+              style: const TextStyle(
+                  color: Colors.white, decoration: TextDecoration.none),
               cursorColor: Colors.orange.shade700,
               onChanged: (search) => _search(search),
-            
               decoration: const InputDecoration(
                 focusColor: Colors.white,
-                             
                 isDense: true,
                 prefixIcon: Icon(
                   Icons.search,
@@ -145,7 +143,6 @@ class _SearchPageState extends State<SearchPage> {
                 border: OutlineInputBorder(borderSide: BorderSide.none),
                 hintText: 'Are you Hungry!!!',
                 fillColor: Colors.orange,
-                
                 hintStyle: TextStyle(color: Colors.white),
               ),
             ),
@@ -240,6 +237,7 @@ class _SearchPageState extends State<SearchPage> {
                 MaterialPageRoute(
                   builder: (context) => ViewItem(
                     imageUrl: foodItem['foodPhoto'],
+                    stock: foodItem['stock'],
                     name: foodItem['foodName'],
                     price: double.parse(foodItem['price']),
                     restaurantName: restaurantDetails['name'],
@@ -264,7 +262,7 @@ class _SearchPageState extends State<SearchPage> {
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
+                "https://mesme.inkaradigital.com/admin/menu/${foodItem['foodPhoto']}",
                 width: 65,
                 height: 65,
                 fit: BoxFit.cover,
@@ -281,5 +279,4 @@ class _SearchPageState extends State<SearchPage> {
 
     return widgets;
   }
-
 }

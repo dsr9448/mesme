@@ -35,8 +35,8 @@ class _SearchState extends State<Search> {
   }
 
   Future<void> _search(String query) async {
-    final response = await http.get(
-        Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
+    final response = await http.get(Uri.parse(
+        'https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -225,6 +225,7 @@ class _SearchState extends State<Search> {
                 MaterialPageRoute(
                     builder: (context) => ViewItem(
                           imageUrl: item['ImageUrl'],
+                          stock: item['stock'],
                           name: item['ItemName'] ?? '',
                           price: double.parse(item['Price']),
                           restaurantName: item['ShopName'] ?? '',
@@ -247,7 +248,7 @@ class _SearchState extends State<Search> {
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
-              "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${item['ImageUrl']}",
+              "https://mesme.inkaradigital.com/admin/menu/${item['ImageUrl']}",
               width: 65,
               height: 65,
               fit: BoxFit.cover,

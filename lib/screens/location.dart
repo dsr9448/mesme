@@ -39,7 +39,7 @@ class _MeLocationState extends State<MeLocation> {
 
   @override
   Widget build(BuildContext context) {
-     final foodProvider = Provider.of<FoodProvider>(context);
+    final foodProvider = Provider.of<FoodProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -196,11 +196,12 @@ class _MeLocationState extends State<MeLocation> {
     address += ', ' + (placemark.country ?? '');
     address += ', ' + (placemark.postalCode ?? '');
     _locationController.text = address;
-    }
+  }
 
   Future<void> fetchSavedAddress() async {
     try {
-      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${widget.uid}';
+      var url =
+          'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${widget.uid}';
       var response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         Map<String, dynamic> userData = jsonDecode(response.body);
@@ -218,7 +219,8 @@ class _MeLocationState extends State<MeLocation> {
 
   void updateLocation(double latitude, double longitude) async {
     try {
-      var updateUrl = 'https://mesme.inkaradigital.com/admin/api/location/location.php';
+      var updateUrl =
+          'https://mesme.inkaradigital.com/admin/api/location/location.php';
       var body = {
         'id': widget.uid,
         'address': _locationController.text,
@@ -232,12 +234,12 @@ class _MeLocationState extends State<MeLocation> {
       );
       if (response.statusCode == 200) {
         Provider.of<FoodProvider>(context, listen: false).fetchUserData();
-        Provider.of<FoodProvider>(context, listen: false).fetchSavedCoordinates();
+        Provider.of<FoodProvider>(context, listen: false)
+            .fetchSavedCoordinates();
         Provider.of<FoodProvider>(context, listen: false).fetchSavedAddress();
         Provider.of<FoodProvider>(context, listen: false).fetchRestaurants();
         Provider.of<FoodProvider>(context, listen: false).fetchGrocery();
-        
-        
+
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

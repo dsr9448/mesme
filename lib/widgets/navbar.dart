@@ -95,8 +95,7 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                     child: MaterialButton(
                       onPressed: () {
                         setState(() {
-                          currentScreen = const GroceryScreen();
-                          currentTab = 1;
+                          _showComingSoonDialog(context);
                         });
                       },
                       child: Column(
@@ -110,7 +109,7 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                                 : Colors.black45,
                           ),
                           Text(
-                            'Sweets',
+                            'Grocery',
                             style: GoogleFonts.poppins(
                               textStyle: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -176,9 +175,9 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.iron, color: Colors.white),
+                            const Icon(Icons.headphones, color: Colors.white),
                             Text(
-                              'Iron',
+                              'Feedback',
                               style: GoogleFonts.poppins(
                                 textStyle: TextStyle(
                                   fontWeight: FontWeight.w600,

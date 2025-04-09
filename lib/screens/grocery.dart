@@ -162,7 +162,7 @@ class GroceryScreen extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: Image.network(
-                                "https://mesme.inkaradigital.com/foodPhoto.jpg",
+                                "https://mesme.inkaradigital.com/admin/foodPhoto.jpg",
                                 height: 150,
                                 width: 150,
                                 fit: BoxFit.cover,

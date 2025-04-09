@@ -60,21 +60,26 @@ class _RestaurantListState extends State<RestaurantList> {
                                               'unit': foodItem.Unit,
                                               'description':
                                                   foodItem.foodDescription,
+                                              'stock':
+                                                  foodItem.stock.toString(),
                                               'category': foodItem.category,
                                               'totalCount':
                                                   foodItem.totalCount.toString()
                                             })
                                         .toList(),
                                     rname: restaurant.name,
+                                    rid: restaurant.id.toString(),
                                     rlocation: restaurant.location,
                                     food: true,
                                     isOnline: restaurant.isOnline ? 1 : 0,
                                     userCoordinate: widget.location,
                                     rating: restaurant.rating,
                                     restrauntCoordinate: restaurant.coordinates,
-                                    restraurantImage:
-                                        'https://mesme.inkaradigital.com/mainBanner.jpg',
-                                    time: restaurant.time,
+                                    restraurantImage: restaurant
+                                            .rphoto.isNotEmpty
+                                        ? 'https://mesme.inkaradigital.com/admin/restrauntimage/${restaurant.rphoto}'
+                                        : 'https://mesme.inkaradigital.com/mainBanner.jpg',
+                                    time: restaurant.rtime,
                                     description: restaurant.description,
                                     area: restaurant.area,
                                     style: restaurant.style,
@@ -85,8 +90,9 @@ class _RestaurantListState extends State<RestaurantList> {
                             child: RestaurantCard(
                               id: restaurant.id,
                               name: restaurant.name,
-                              imageUrl: "https://mesme.inkaradigital.com/foodPhoto.jpg",
-                              rating: restaurant.rating,
+                              imageUrl:
+                                  "https://mesme.inkaradigital.com/admin/menu/${restaurant.foodItems[0].foodPhoto}",
+                              rating: double.parse(restaurant.rating ?? "0.0"),
                               time: restaurant.time,
                               description: restaurant.description,
                               isFav: true,
@@ -133,6 +139,7 @@ class _RestaurantListState extends State<RestaurantList> {
                                           'description':
                                               foodItem.foodDescription,
                                           'category': foodItem.category,
+                                          'stock': foodItem.stock.toString(),
                                           'totalCount':
                                               foodItem.totalCount.toString()
                                         })
@@ -140,13 +147,15 @@ class _RestaurantListState extends State<RestaurantList> {
                                 rname: restaurant.name,
                                 rlocation: restaurant.location,
                                 food: true,
+                                rid: restaurant.id.toString(),
                                 isOnline: restaurant.isOnline ? 1 : 0,
                                 userCoordinate: widget.location,
                                 rating: restaurant.rating,
                                 restrauntCoordinate: restaurant.coordinates,
-                                restraurantImage:
-                                    'https://mesme.inkaradigital.com/mainBanner.jpg',
-                                time: restaurant.time,
+                                restraurantImage: restaurant.rphoto.isNotEmpty
+                                    ? 'https://mesme.inkaradigital.com/admin/restrauntimage/${restaurant.rphoto}'
+                                    : 'https://mesme.inkaradigital.com/mainBanner.jpg',
+                                time: restaurant.rtime,
                                 description: restaurant.description,
                                 area: restaurant.area,
                                 style: restaurant.style,
@@ -157,8 +166,9 @@ class _RestaurantListState extends State<RestaurantList> {
                         child: RestaurantCard(
                           id: restaurant.id,
                           name: restaurant.name,
-                          imageUrl: "https://mesme.inkaradigital.com/foodPhoto.jpg",
-                          rating: restaurant.rating,
+                          imageUrl:
+                              "https://mesme.inkaradigital.com/admin/menu/${restaurant.foodItems[0].foodPhoto}",
+                          rating: double.parse(restaurant.rating ?? "0.0"),
                           time: restaurant.time,
                           description: restaurant.description,
                           isFav: false,

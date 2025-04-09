@@ -185,7 +185,7 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                     padding: const EdgeInsets.all(8.0),
                     child: Stack(
                       children: [
-                               Positioned.fill(
+                        Positioned.fill(
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(
@@ -198,7 +198,7 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                             ),
                           ),
                         ),
-                 Container(
+                        Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 18, vertical: 28),
                           decoration: BoxDecoration(
@@ -372,6 +372,7 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                                                     food: widget.food,
                                                     quantity: item['quantity'],
                                                     unit: item['unit'],
+                                                    stock: item['stock'],
                                                     canAdd: canAdd,
                                                     distance: distance,
                                                   )));
@@ -492,7 +493,7 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                                                               Colors.black54,
                                                               BlendMode.darken),
                                                       child: Image.network(
-                                                        "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${item['image']!}",
+                                                        "https://mesme.inkaradigital.com/admin/menu/${item['image']!}",
                                                         width: 150,
                                                         height: 150,
                                                         fit: BoxFit.cover,
@@ -528,67 +529,79 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                                                         ),
                                                       ),
                                                     ),
-                                                 widget.isOnline == 1
-                                                      ?    Positioned(
-                                                    bottom: -10,
-                                                    left: 15,
-                                                    right: 15,
-                                                    child: TextButton(
-                                                      style: ButtonStyle(
-                                                        backgroundColor:
-                                                            WidgetStatePropertyAll(
-                                                          canAdd
-                                                              ? Colors.orange
-                                                              : Colors.grey,
-                                                        ),
-                                                      ),
-                                                      onPressed: canAdd
-                                                          ? () => FoodFunction
-                                                                  .addToCart(
-                                                                item['name']!,
-                                                                double.parse(item[
-                                                                    'price']!),
-                                                                1,
-                                                                item['image']!,
-                                                                widget.rname,
-                                                                widget
-                                                                    .rlocation,
-                                                                widget
-                                                                    .restrauntCoordinate,
-                                                                widget.food
-                                                                    ? 'Food'
-                                                                    : 'Grocery',
-                                                                context,
-                                                              )
-                                                          : () =>
-                                                              QuickAlert.show(
-                                                                context:
-                                                                    context,
-                                                                type:
-                                                                    QuickAlertType
-                                                                        .info,
-                                                                title:
-                                                                    'Service not Available',
-                                                                text:
-                                                                    'Service is not available in this location.',
-                                                                confirmBtnText:
-                                                                    'Ok',
-                                                                confirmBtnColor:
-                                                                    Colors
+                                                  widget.isOnline == 1
+                                                      ? Positioned(
+                                                          bottom: -10,
+                                                          left: 15,
+                                                          right: 15,
+                                                          child: TextButton(
+                                                            style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  WidgetStatePropertyAll(
+                                                                canAdd
+                                                                    ? Colors
                                                                         .orange
-                                                                        .shade700,
+                                                                    : Colors
+                                                                        .grey,
                                                               ),
-                                                      child: const Text(
-                                                        "Add",
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ):SizedBox(),
+                                                            ),
+                                                            onPressed: canAdd
+                                                                ? () =>
+                                                                    FoodFunction
+                                                                        .addToCart(
+                                                                      item[
+                                                                          'name']!,
+                                                                      double.parse(
+                                                                          item[
+                                                                              'price']!),
+                                                                      1,
+                                                                      item[
+                                                                          'image']!,
+                                                                      widget
+                                                                          .rname,
+                                                                      widget
+                                                                          .rlocation,
+                                                                      widget
+                                                                          .restrauntCoordinate,
+                                                                      widget.food
+                                                                          ? 'Food'
+                                                                          : 'Grocery',
+                                                                      "",
+                                                                      "",
+                                                                      "",
+                                                                      context,
+                                                                    )
+                                                                : () =>
+                                                                    QuickAlert
+                                                                        .show(
+                                                                      context:
+                                                                          context,
+                                                                      type: QuickAlertType
+                                                                          .info,
+                                                                      title:
+                                                                          'Service not Available',
+                                                                      text:
+                                                                          'Service is not available in this location.',
+                                                                      confirmBtnText:
+                                                                          'Ok',
+                                                                      confirmBtnColor: Colors
+                                                                          .orange
+                                                                          .shade700,
+                                                                    ),
+                                                            child: const Text(
+                                                              "Add",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : SizedBox(),
                                                 ],
                                               ),
                                             ],

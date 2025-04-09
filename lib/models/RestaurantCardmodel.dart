@@ -61,7 +61,9 @@ class _RestaurantCardState extends State<RestaurantCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.name.length > 20 ? widget.name.substring(0, 16) + "..." : widget.name,
+                      widget.name.length > 20
+                          ? widget.name.substring(0, 16) + "..."
+                          : widget.name,
                       style: TextStyle(
                         fontSize: 16,
                         overflow: TextOverflow.ellipsis,
@@ -95,69 +97,35 @@ class _RestaurantCardState extends State<RestaurantCard> {
                 top: 8,
                 right: 20,
                 child: GestureDetector(
-                 onTap: () async {
-                                                            try {
-                                                             
-                                                              
-                                                              await  FoodProvider()
-                                                                  .removeFromWishlist(
-                                                                      widget.id);
-                                                                          setState(() {
-                                                                            
-                                                                          });
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                SnackBar(
-                                                                  content: const Text(
-                                                                      'Item  Removed From  wishlist'),
-                                                                  backgroundColor:
-                                                                      Colors.green
-                                                                          .shade800,
-                                                                  duration:
-                                                                      const Duration(
-                                                                          seconds:
-                                                                              2),
-                                                                  showCloseIcon:
-                                                                      true,
-                                                                  behavior:
-                                                                      SnackBarBehavior
-                                                                          .floating,
-                                                                  closeIconColor:
-                                                                      Colors
-                                                                          .white,
-                                                                ),
-                                                              );
-                                                            } catch (e) {
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                SnackBar(
-                                                                  content: Text(
-                                                                      'Failed to remove item to wishlist'),
-                                                                  backgroundColor:
-                                                                      Colors.red
-                                                                          .shade800,
-                                                                  duration:
-                                                                      const Duration(
-                                                                          seconds:
-                                                                              2),
-                                                                  showCloseIcon:
-                                                                      true,
-                                                                  behavior:
-                                                                      SnackBarBehavior
-                                                                          .floating,
-                                                                  closeIconColor:
-                                                                      Colors
-                                                                          .white,
-                                                                ),
-                                                              );
-                                                            }
-                                                               setState(() {
-                                                                            
-                                                                          });
-                                                       // Force UI update
-                                                          },
+                  onTap: () async {
+                    try {
+                      await FoodProvider().removeFromWishlist(widget.id);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Item  Removed From  wishlist'),
+                          backgroundColor: Colors.green.shade800,
+                          duration: const Duration(seconds: 2),
+                          showCloseIcon: true,
+                          behavior: SnackBarBehavior.floating,
+                          closeIconColor: Colors.white,
+                        ),
+                      );
+                      setState(() {});
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to remove item to wishlist'),
+                          backgroundColor: Colors.red.shade800,
+                          duration: const Duration(seconds: 2),
+                          showCloseIcon: true,
+                          behavior: SnackBarBehavior.floating,
+                          closeIconColor: Colors.white,
+                        ),
+                      );
+                    }
+                    setState(() {});
+                    // Force UI update
+                  },
                   child: Icon(
                     Icons.favorite,
                     color: Colors.red.shade700,

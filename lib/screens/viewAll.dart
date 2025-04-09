@@ -9,6 +9,7 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class FoodItemsApp extends StatefulWidget {
   final List<Map<String, String>> allFoodItems;
+  final rid;
   final rname;
   final rlocation;
   final isOnline;
@@ -25,6 +26,7 @@ class FoodItemsApp extends StatefulWidget {
   final style;
   FoodItemsApp(
       {required this.allFoodItems,
+      this.rid,
       this.rname,
       this.rlocation,
       this.isOnline,
@@ -461,7 +463,8 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                   .map<Widget>((item) {
                                 return GestureDetector(
                                   onTap: () {
-                                    if (widget.isOnline == 1) {
+                                    if (item['stock'].toString() == "1" &&
+                                        widget.isOnline == 1) {
                                       Navigator.of(context)
                                           .push(MaterialPageRoute(
                                               builder: (context) => ViewItem(
@@ -470,6 +473,8 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                     price: double.parse(
                                                         item['price']!),
                                                     location: widget.rlocation,
+                                                    rid: widget.rid,
+                                                    menuType: item['category']!,
                                                     restaurantName:
                                                         widget.rname,
                                                     restrauntCoordinate: widget
@@ -479,24 +484,34 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                     isVeg: item['vegOrNonVeg'],
                                                     rating: item['rating'],
                                                     food: widget.food,
+                                                    stock: item['stock'],
                                                     quantity: item['quantity'],
                                                     unit: item['unit'],
                                                     canAdd: canAdd,
                                                     distance: distance,
                                                   )));
                                     } else {
-                                      QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.info,
-                                        title: widget.food
-                                            ? 'Restaurant Offline'
-                                            : 'Store Offline',
-                                        text: widget.food
-                                            ? 'Restaurant is offline at the moment.'
-                                            : 'Store is offline at the moment.',
-                                        confirmBtnText: 'Ok',
-                                        confirmBtnColor: Colors.orange.shade700,
-                                      );
+                                      widget.isOnline != 1
+                                          ? QuickAlert.show(
+                                              context: context,
+                                              type: QuickAlertType.info,
+                                              title: 'Restaurant Offline',
+                                              text:
+                                                  'Restaurant is offline at the moment.',
+                                              confirmBtnText: 'Ok',
+                                              confirmBtnColor:
+                                                  Colors.orange.shade700,
+                                            )
+                                          : QuickAlert.show(
+                                              context: context,
+                                              type: QuickAlertType.info,
+                                              title: 'Out of Stock',
+                                              text:
+                                                  'Store is out of stock at the moment.',
+                                              confirmBtnText: 'Ok',
+                                              confirmBtnColor:
+                                                  Colors.orange.shade700,
+                                            );
                                     }
                                   },
                                   child: Container(
@@ -616,28 +631,34 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                         BorderRadius.circular(
                                                             15),
                                                     child: ColorFiltered(
-                                                      colorFilter: widget
-                                                                  .isOnline ==
-                                                              1
+                                                      colorFilter: (widget
+                                                                      .isOnline !=
+                                                                  1 ||
+                                                              item['stock']
+                                                                      .toString() !=
+                                                                  "1")
                                                           ? const ColorFilter
+                                                              .mode(
+                                                              Colors.black54,
+                                                              BlendMode.darken)
+                                                          : const ColorFilter
                                                               .mode(
                                                               Colors
                                                                   .transparent,
                                                               BlendMode
-                                                                  .multiply)
-                                                          : const ColorFilter
-                                                              .mode(
-                                                              Colors.black54,
-                                                              BlendMode.darken),
+                                                                  .multiply),
                                                       child: Image.network(
-                                                        "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${item['image']!}",
-                                                        width: 150,
-                                                        height: 150,
+                                                        "https://mesme.inkaradigital.com/admin/menu/${item['image']!}",
+                                                        width: 110,
+                                                        height: 110,
                                                         fit: BoxFit.cover,
                                                       ),
                                                     ),
                                                   ),
-                                                  if (widget.isOnline != 1)
+                                                  if (widget.isOnline != 1 ||
+                                                      item['stock']
+                                                              .toString() !=
+                                                          "1")
                                                     Positioned(
                                                       top: 8,
                                                       left: 5,
@@ -655,8 +676,10 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                               BorderRadius
                                                                   .circular(4),
                                                         ),
-                                                        child: const Text(
-                                                          'Offline',
+                                                        child: Text(
+                                                          widget.isOnline != 1
+                                                              ? 'Offline'
+                                                              : 'Out of Stock',
                                                           style: TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 12,
@@ -666,7 +689,10 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                         ),
                                                       ),
                                                     ),
-                                                  widget.isOnline == 1
+                                                  (widget.isOnline == 1 &&
+                                                          item['stock']
+                                                                  .toString() ==
+                                                              '1')
                                                       ? Positioned(
                                                           bottom: -10,
                                                           left: 15,
@@ -700,9 +726,13 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                                           .rlocation,
                                                                       widget
                                                                           .restrauntCoordinate,
-                                                                      widget.food
-                                                                          ? 'Food'
-                                                                          : 'Grocery',
+                                                                      distance
+                                                                          .toString(),
+                                                                      widget
+                                                                          .rid,
+                                                                      'food',
+                                                                      item[
+                                                                          'category']!,
                                                                       context,
                                                                     )
                                                                 : () =>

@@ -18,7 +18,9 @@ class ViewItem extends StatefulWidget {
   final rating;
   final canAdd;
   final distance;
-
+  final rid;
+  final menuType;
+  final stock;
   const ViewItem({
     super.key,
     required this.imageUrl,
@@ -35,6 +37,9 @@ class ViewItem extends StatefulWidget {
     required this.unit,
     this.canAdd,
     this.distance,
+    this.rid,
+    this.menuType,
+    required this.stock,
   });
 
   @override
@@ -67,7 +72,7 @@ class _ViewItemState extends State<ViewItem> {
             children: [
               CachedNetworkImage(
                 imageUrl:
-                    'https://mesme.inkaradigital.com/ControlHub/includes/uploads/${widget.imageUrl}',
+                    'https://mesme.inkaradigital.com/admin/menu/${widget.imageUrl}',
                 fit: BoxFit.cover,
                 placeholder: (context, url) => const SizedBox(
                   height: 100,
@@ -330,7 +335,7 @@ class _ViewItemState extends State<ViewItem> {
                     const SizedBox(height: 4),
                     Text(
                       widget.description,
-                        textAlign: TextAlign.justify,
+                      textAlign: TextAlign.justify,
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           color: Colors.black,
@@ -358,7 +363,7 @@ class _ViewItemState extends State<ViewItem> {
             ),
           ),
           Positioned(
-            bottom: 0,
+            bottom: 10,
             left: 0,
             right: 0,
             child: Container(
@@ -416,7 +421,7 @@ class _ViewItemState extends State<ViewItem> {
                   ),
                   const Spacer(),
                   // Add to Cart Button
-                  widget.canAdd == true
+                  widget.canAdd == true && widget.stock != '0'
                       ? ElevatedButton(
                           onPressed: () {
                             FoodFunction.addToCart(
@@ -427,6 +432,9 @@ class _ViewItemState extends State<ViewItem> {
                                 widget.restaurantName,
                                 widget.location,
                                 widget.restrauntCoordinate,
+                                widget.distance.toString(),
+                                widget.rid,
+                                widget.menuType,
                                 widget.food ? 'Food' : 'Grocery',
                                 context);
                           },
@@ -446,59 +454,18 @@ class _ViewItemState extends State<ViewItem> {
                             ),
                           ),
                         )
-                      : widget.canAdd == false
-                          ? ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red.shade800,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 12),
-                              ),
-                              child: Text(
-                                'Service Not Available',
-                                style: GoogleFonts.poppins(
-                                  textStyle: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                      : widget.canAdd == false || widget.stock == '0'
+                          ? Text(
+                              'Service Not Available',
+                              style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             )
-                          : Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  FoodFunction.addToCart(
-                                          widget.name,
-                                          widget.price,
-                                          quantity,
-                                          widget.imageUrl,
-                                          widget.restaurantName,
-                                          widget.location,
-                                          widget.restrauntCoordinate,
-                                          widget.food ? 'Food' : 'Grocery',
-                                          context)
-                                      .whenComplete(() {
-                                    Navigator.pop(context);
-                                  });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange.shade700,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 12),
-                                ),
-                                child: Text(
-                                  'Add to Cart ₹ ${(widget.price * quantity).toString()}',
-                                  style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
+                          : Text('item out of stock'),
                 ],
               ),
             ),

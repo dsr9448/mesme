@@ -155,7 +155,8 @@ class _MeEditprofileState extends State<MeEditprofile> {
       if (user == null) {
         throw Exception('User is not authenticated');
       }
-      var url = 'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
+      var url =
+          'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
       var response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         return jsonDecode(response.body);

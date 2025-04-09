@@ -13,6 +13,7 @@ import 'package:mesme/widgets/calculateLocation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,11 +24,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _restaurantSearchController =
+      TextEditingController();
   Map<String, dynamic> _searchResults = {};
   OverlayEntry? _overlayEntry;
-
   final GlobalKey _searchKey = GlobalKey();
   String selectedFilter = 'All';
+  String restaurantSearchQuery = '';
+  Timer? _searchDebounceTimer;
+  static const Duration _searchDebounceDuration = Duration(milliseconds: 500);
 
   @override
   void initState() {
@@ -38,8 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _restaurantSearchController.dispose();
     _hideOverlay();
     _searchController.dispose();
+    _searchDebounceTimer?.cancel();
     super.dispose();
   }
 
@@ -57,19 +64,27 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    try {
-      final response = await http.get(Uri.parse(
-          'https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
+    // Cancel any existing timer
+    _searchDebounceTimer?.cancel();
 
-      if (response.statusCode == 200) {
-        setState(() {
-          _searchResults = json.decode(response.body);
-        });
-        _showOverlay();
+    // Start a new timer
+    _searchDebounceTimer = Timer(_searchDebounceDuration, () async {
+      try {
+        final response = await http.get(Uri.parse(
+            'https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
+
+        if (response.statusCode == 200) {
+          if (mounted) {
+            setState(() {
+              _searchResults = json.decode(response.body);
+            });
+            _showOverlay();
+          }
+        }
+      } catch (e) {
+        print('Search error: $e');
       }
-    } catch (e) {
-      print('Search error: $e');
-    }
+    });
   }
 
   void _showOverlay() {
@@ -132,11 +147,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           imageUrl: foodItem['foodPhoto'],
                           name: foodItem['foodName'],
                           price: double.parse(foodItem['price'].toString()),
-                          restaurantName: restaurantDetails['name'],
                           location: restaurantDetails['location'],
+                          rid: restaurantDetails['rid'],
+                          menuType: foodItem['category'],
+                          restaurantName: restaurantDetails['name'],
                           description: foodItem['foodDescription'],
                           quantity: foodItem['Quantity'],
                           unit: foodItem['Unit'],
+                          stock: foodItem['stock'],
                           rating: foodItem['rating'],
                           isVeg: foodItem['vegOrNonVeg'],
                           restrauntCoordinate: restaurantDetails['coordinates'],
@@ -166,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      "https://mesme.inkaradigital.com/ControlHub/includes/uploads/${foodItem['foodPhoto']}",
+                      "https://mesme.inkaradigital.com/admin/menu/${foodItem['foodPhoto']}",
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
@@ -192,10 +210,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _fetchData(FoodProvider foodProvider) async {
-    await foodProvider.fetchSavedCoordinates();
-    await foodProvider.fetchUserData();
-    await foodProvider.fetchSavedAddress();
-    await foodProvider.fetchOrders();
+    try {
+      await Future.wait([
+        foodProvider.fetchUserData(),
+        foodProvider.fetchRestaurants(),
+      ]);
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
   }
 
   Widget build(BuildContext context) {
@@ -252,8 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 280,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image:
-                                NetworkImage('https://mesme.inkaradigital.com/mainBanner.jpg'),
+                            image: NetworkImage(
+                                'https://mesme.inkaradigital.com/mainBanner.jpg'),
                             fit: BoxFit.cover,
                             colorFilter: ColorFilter.mode(
                               Colors.black.withOpacity(0.4),
@@ -378,47 +400,85 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: caro2(foodProvider.bannerImages),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 8),
+                      //   child: caro2(foodProvider.bannerImages),
+                      // ),
                       const SizedBox(height: 12),
                       RestaurantList(
                         title: '${userData!.name}',
                         location: userData.location,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: customHeading(
-                            'Top (${foodProvider.restaurants.length}) restaurants to explore'),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 10),
+                      //   child: customHeading(
+                      //       'Top (${foodProvider.restaurants.length}) restaurants to explore'),
+                      // ),
                       Padding(
                         padding: EdgeInsets.only(bottom: 10, top: 8),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              customSwitch(Colors.orange.shade700,
-                                  selectedFilter == 'All', (val) {
-                                setState(() => selectedFilter = 'All');
-                              }),
-                              customSwitch(
-                                  Colors.green, selectedFilter == 'Veg', (val) {
-                                setState(() => selectedFilter = 'Veg');
-                              }),
-                              customSwitch(
-                                  Colors.red[800]!, selectedFilter == 'Non-Veg',
-                                  (val) {
-                                setState(() => selectedFilter = 'Non-Veg');
-                              }),
-                              customSwitch(
-                                  Colors.orange, selectedFilter == 'rating',
-                                  (val) {
-                                setState(() => selectedFilter = 'rating');
-                              }),
-                            ],
-                          ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 8),
+                              child: TextField(
+                                controller: _restaurantSearchController,
+                                decoration: InputDecoration(
+                                  hintText: 'Search restaurants...',
+                                  prefixIcon: Icon(Icons.search,
+                                      color: Colors.orange.shade700),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                        color: Colors.orange.shade700),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                        color: Colors.orange.shade700),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                        color: Colors.orange.shade700,
+                                        width: 2),
+                                  ),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    restaurantSearchQuery = value.toLowerCase();
+                                  });
+                                },
+                              ),
+                            ),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  customSwitch(Colors.orange.shade700,
+                                      selectedFilter == 'All', (val) {
+                                    setState(() => selectedFilter = 'All');
+                                  }),
+                                  customSwitch(
+                                      Colors.green, selectedFilter == 'Veg',
+                                      (val) {
+                                    setState(() => selectedFilter = 'Veg');
+                                  }),
+                                  customSwitch(Colors.red[800]!,
+                                      selectedFilter == 'Non-Veg', (val) {
+                                    setState(() => selectedFilter = 'Non-Veg');
+                                  }),
+                                  customSwitch(
+                                      Colors.orange, selectedFilter == 'rating',
+                                      (val) {
+                                    setState(() => selectedFilter = 'rating');
+                                  }),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Container(
@@ -428,9 +488,35 @@ class _HomeScreenState extends State<HomeScreen> {
                           return ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            itemCount: foodProvider.restaurants.length,
+                            itemCount:
+                                foodProvider.restaurants.where((restaurant) {
+                              if (restaurantSearchQuery.isEmpty) return true;
+                              return restaurant.name
+                                      .toLowerCase()
+                                      .contains(restaurantSearchQuery) ||
+                                  restaurant.area
+                                      .toLowerCase()
+                                      .contains(restaurantSearchQuery) ||
+                                  restaurant.description
+                                      .toLowerCase()
+                                      .contains(restaurantSearchQuery);
+                            }).length,
                             itemBuilder: (context, index) {
-                              var restaurant = foodProvider.restaurants[index];
+                              var filteredRestaurants =
+                                  foodProvider.restaurants.where((restaurant) {
+                                if (restaurantSearchQuery.isEmpty) return true;
+                                return restaurant.name
+                                        .toLowerCase()
+                                        .contains(restaurantSearchQuery) ||
+                                    restaurant.area
+                                        .toLowerCase()
+                                        .contains(restaurantSearchQuery) ||
+                                    restaurant.description
+                                        .toLowerCase()
+                                        .contains(restaurantSearchQuery);
+                              }).toList();
+
+                              var restaurant = filteredRestaurants[index];
                               List<int> wishlistIds = foodProvider.restaurant
                                   .map((r) => r.id)
                                   .toList();
@@ -440,13 +526,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
                               double distance = result['distance'] ?? 0.0;
 
+                              // Skip restaurants beyond 8km
+                              if (distance > 8.0) {
+                                return SizedBox.shrink();
+                              }
+
                               // Apply filters based on selectedFilter
                               if ((selectedFilter == 'Veg' &&
                                       restaurant.style != 'veg') ||
                                   (selectedFilter == 'Non-Veg' &&
                                       restaurant.style == 'veg') ||
                                   (selectedFilter == 'rating' &&
-                                      restaurant.rating < 4.0)) {
+                                      double.parse(restaurant.rating ?? "0.0") <
+                                          4.0)) {
                                 return SizedBox.shrink(); // Skip this item
                               }
 
@@ -500,6 +592,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           'quantity':
                                                               foodItem.Quantity,
                                                           'unit': foodItem.Unit,
+                                                          'stock': foodItem
+                                                              .stock
+                                                              .toString(),
                                                           'description': foodItem
                                                               .foodDescription,
                                                           'category':
@@ -512,6 +607,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 rname: restaurant.name,
                                                 rlocation: restaurant.location,
                                                 food: true,
+                                                rid: restaurant.rid,
                                                 isOnline:
                                                     restaurant.isOnline ? 1 : 0,
                                                 userCoordinate:
@@ -519,9 +615,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 rating: restaurant.rating,
                                                 restrauntCoordinate:
                                                     restaurant.coordinates,
-                                                restraurantImage:
-                                                    'https://mesme.inkaradigital.com/mainBanner.jpg',
-                                                time: restaurant.time,
+                                                restraurantImage: restaurant
+                                                        .rphoto.isNotEmpty
+                                                    ? 'https://mesme.inkaradigital.com/admin/restrauntimage/${restaurant.rphoto}'
+                                                    : 'https://mesme.inkaradigital.com/mainBanner.jpg',
+                                                time: restaurant.rtime,
                                                 description:
                                                     restaurant.description,
                                                 area: restaurant.area,
@@ -544,22 +642,72 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10),
-                                                    child: Image.network(
-                                                      "https://mesme.inkaradigital.com/foodPhoto.jpg",
-                                                      height: 150,
-                                                      width: 150,
-                                                      fit: BoxFit.cover,
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                        return Image.network(
-                                                          'https://placehold.co/600x600',
-                                                          height: 150,
-                                                          width: 150,
-                                                          fit: BoxFit.cover,
-                                                        );
-                                                      },
+                                                    child: ColorFiltered(
+                                                      colorFilter: (!restaurant
+                                                              .isOnline)
+                                                          ? const ColorFilter
+                                                              .mode(
+                                                              Colors.black54,
+                                                              BlendMode.darken)
+                                                          : const ColorFilter
+                                                              .mode(
+                                                              Colors
+                                                                  .transparent,
+                                                              BlendMode
+                                                                  .multiply),
+                                                      child: Image.network(
+                                                        "https://mesme.inkaradigital.com/admin/menu/${restaurant.foodItems[0].foodPhoto}",
+                                                        height: 150,
+                                                        width: 150,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                          return Image.network(
+                                                            "https://mesme.inkaradigital.com/admin/foodPhoto.jpg",
+                                                            height: 150,
+                                                            width: 150,
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
+                                                      ),
                                                     ),
                                                   ),
+                                                  (!restaurant.isOnline)
+                                                      ? Positioned(
+                                                          top: 8,
+                                                          left: 5,
+                                                          child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        12,
+                                                                    vertical:
+                                                                        2),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors
+                                                                  .orange
+                                                                  .shade700,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4),
+                                                            ),
+                                                            child: Text(
+                                                              'Offline',
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : SizedBox(),
                                                   Positioned(
                                                     top: 8,
                                                     right: 4,
@@ -679,7 +827,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   Icons
                                                                       .favorite_outline,
                                                                   color: Colors
-                                                                      .white,
+                                                                      .orange
+                                                                      .shade800,
                                                                   size: 25,
                                                                 ),
                                                               ),
@@ -697,41 +846,77 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     // Restaurant Name
                                                     Row(
                                                       children: [
-                                                        Container(
-                                                          height: 20,
-                                                          width: 20,
-                                                          decoration: BoxDecoration(
-                                                              border: Border.all(
-                                                                  color: restaurant
-                                                                              .style ==
-                                                                          'veg'
-                                                                      ? Colors
-                                                                          .green
-                                                                          .shade900
-                                                                      : Colors
-                                                                          .red
-                                                                          .shade900,
-                                                                  width: 2),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          4)),
-                                                          child: Icon(
-                                                            Icons.circle,
-                                                            size: 10,
-                                                            color: restaurant
-                                                                        .style ==
-                                                                    'veg'
-                                                                ? Colors.green
-                                                                    .shade900
-                                                                : Colors.red
-                                                                    .shade900,
-                                                          ),
+                                                        Row(
+                                                          children: [
+                                                            Container(
+                                                              height: 20,
+                                                              width: 20,
+                                                              decoration: BoxDecoration(
+                                                                  border: Border.all(
+                                                                      color: restaurant.style == 'veg' ||
+                                                                              restaurant.style ==
+                                                                                  'both'
+                                                                          ? Colors
+                                                                              .green
+                                                                              .shade900
+                                                                          : Colors
+                                                                              .red
+                                                                              .shade900,
+                                                                      width: 2),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              4)),
+                                                              child: Icon(
+                                                                Icons.circle,
+                                                                size: 10,
+                                                                color: restaurant.style ==
+                                                                            'veg' ||
+                                                                        restaurant.style ==
+                                                                            'both'
+                                                                    ? Colors
+                                                                        .green
+                                                                        .shade900
+                                                                    : Colors.red
+                                                                        .shade900,
+                                                              ),
+                                                            ),
+                                                            if (restaurant
+                                                                    .style ==
+                                                                'both') ...[
+                                                              SizedBox(
+                                                                  width: 4),
+                                                              Container(
+                                                                height: 20,
+                                                                width: 20,
+                                                                decoration: BoxDecoration(
+                                                                    border: Border.all(
+                                                                        color: Colors
+                                                                            .red
+                                                                            .shade900,
+                                                                        width:
+                                                                            2),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            4)),
+                                                                child: Icon(
+                                                                  Icons.circle,
+                                                                  size: 10,
+                                                                  color: Colors
+                                                                      .red
+                                                                      .shade900,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ],
                                                         ),
                                                         SizedBox(
                                                           width: 8,
                                                         ),
-                                                        restaurant.rating >= 4.0
+                                                        double.parse(restaurant
+                                                                        .rating ??
+                                                                    "0.0") >=
+                                                                4.0
                                                             ? Container(
                                                                 padding: EdgeInsets
                                                                     .symmetric(
@@ -769,7 +954,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     Text(
                                                       restaurant.name,
                                                       style: const TextStyle(
-                                                        fontSize: 16,
+                                                        fontSize: 18,
                                                         fontWeight:
                                                             FontWeight.bold,
                                                       ),

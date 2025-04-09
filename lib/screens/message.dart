@@ -35,10 +35,9 @@ class _MeMessageState extends State<MeMessage> {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         setState(() {
-          _messages = data
-              .map((messageJson) => Message.fromJson(messageJson))
-              .toList();
-                });
+          _messages =
+              data.map((messageJson) => Message.fromJson(messageJson)).toList();
+        });
       } else {
         throw Exception('Failed to load messages');
       }
@@ -50,7 +49,8 @@ class _MeMessageState extends State<MeMessage> {
   Future<void> sendMessage(String message) async {
     try {
       final response = await http.post(
-        Uri.parse('https://mesme.inkaradigital.com/admin/api/messages/create.php'),
+        Uri.parse(
+            'https://mesme.inkaradigital.com/admin/api/messages/create.php'),
         body: {
           'userId': _user!.uid,
           'message': message,
@@ -72,7 +72,7 @@ class _MeMessageState extends State<MeMessage> {
   void _addMessage(String message) {
     setState(() {
       _messages.insert(
-        0,  // Insert at the top
+        0, // Insert at the top
         Message(
           userId: _user!.uid,
           message: message,
