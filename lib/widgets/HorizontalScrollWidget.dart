@@ -99,7 +99,7 @@
 //                           ),
 //                     child: CachedNetworkImage(
 //                       imageUrl:
-//                           "https://mesme.inkaradigital.com/admin/menu/${item.foodPhoto}",
+//                           "https://admin.maximus.works/admin/menu/${item.foodPhoto}",
 //                       height: 80, // Adjust the height as needed
 //                       width: 80,
 //                       fit: BoxFit.cover,

@@ -917,12 +917,12 @@ class _FoodCartState extends State<FoodCart> {
                                 // Close loading dialog
                                 Navigator.of(context).pop();
 
-                                if (result['success']) {
+                                if (result['success'] == true) {
                                   // Show success dialog
                                   QuickAlert.show(
                                     context: context,
                                     type: QuickAlertType.success,
-                                    text: 'Order placed successfully',
+                                    text: 'Order #${result['orderId']} placed successfully',
                                     title: 'Thank you for your order!',
                                     confirmBtnColor: Colors.orange.shade700,
                                     onConfirmBtnTap: () async {
@@ -939,8 +939,7 @@ class _FoodCartState extends State<FoodCart> {
                                   QuickAlert.show(
                                     context: context,
                                     type: QuickAlertType.error,
-                                    text: result['error'] ??
-                                        'Failed to place order',
+                                    text: result['message'] ?? 'Failed to place order',
                                     title: 'Order Failed',
                                     confirmBtnColor: Colors.red,
                                     onConfirmBtnTap: () {
@@ -956,8 +955,7 @@ class _FoodCartState extends State<FoodCart> {
                                 QuickAlert.show(
                                   context: context,
                                   type: QuickAlertType.error,
-                                  text:
-                                      'An unexpected error occurred. Please try again.',
+                                  text: 'An unexpected error occurred. Please try again.',
                                   title: 'Error',
                                   confirmBtnColor: Colors.red,
                                   onConfirmBtnTap: () {

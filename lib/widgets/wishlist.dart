@@ -77,8 +77,8 @@ class _RestaurantListState extends State<RestaurantList> {
                                     restrauntCoordinate: restaurant.coordinates,
                                     restraurantImage: restaurant
                                             .rphoto.isNotEmpty
-                                        ? 'https://mesme.inkaradigital.com/admin/restrauntimage/${restaurant.rphoto}'
-                                        : 'https://mesme.inkaradigital.com/mainBanner.jpg',
+                                        ? 'https://admin.maximus.works/admin/restrauntimage/${restaurant.rphoto}'
+                                        : 'https://admin.maximus.works/mainBanner.jpg',
                                     time: restaurant.rtime,
                                     description: restaurant.description,
                                     area: restaurant.area,
@@ -91,7 +91,7 @@ class _RestaurantListState extends State<RestaurantList> {
                               id: restaurant.id,
                               name: restaurant.name,
                               imageUrl:
-                                  "https://mesme.inkaradigital.com/admin/menu/${restaurant.foodItems[0].foodPhoto}",
+                                  "https://admin.maximus.works/admin/menu/${restaurant.foodItems[0].foodPhoto}",
                               rating: double.parse(restaurant.rating ?? "0.0"),
                               time: restaurant.time,
                               description: restaurant.description,
@@ -153,8 +153,8 @@ class _RestaurantListState extends State<RestaurantList> {
                                 rating: restaurant.rating,
                                 restrauntCoordinate: restaurant.coordinates,
                                 restraurantImage: restaurant.rphoto.isNotEmpty
-                                    ? 'https://mesme.inkaradigital.com/admin/restrauntimage/${restaurant.rphoto}'
-                                    : 'https://mesme.inkaradigital.com/mainBanner.jpg',
+                                    ? 'https://admin.maximus.works/admin/restrauntimage/${restaurant.rphoto}'
+                                    : 'https://admin.maximus.works/mainBanner.jpg',
                                 time: restaurant.rtime,
                                 description: restaurant.description,
                                 area: restaurant.area,
@@ -167,7 +167,7 @@ class _RestaurantListState extends State<RestaurantList> {
                           id: restaurant.id,
                           name: restaurant.name,
                           imageUrl:
-                              "https://mesme.inkaradigital.com/admin/menu/${restaurant.foodItems[0].foodPhoto}",
+                              "https://admin.maximus.works/admin/menu/${restaurant.foodItems[0].foodPhoto}",
                           rating: double.parse(restaurant.rating ?? "0.0"),
                           time: restaurant.time,
                           description: restaurant.description,

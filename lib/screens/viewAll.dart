@@ -648,7 +648,7 @@ class _FoodItemsAppState extends State<FoodItemsApp> {
                                                               BlendMode
                                                                   .multiply),
                                                       child: Image.network(
-                                                        "https://mesme.inkaradigital.com/admin/menu/${item['image']!}",
+                                                        "https://admin.maximus.works/admin/menu/${item['image']!}",
                                                         width: 110,
                                                         height: 110,
                                                         fit: BoxFit.cover,

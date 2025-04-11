@@ -493,7 +493,7 @@ class _GroceryItemsAppState extends State<GroceryItemsApp> {
                                                               Colors.black54,
                                                               BlendMode.darken),
                                                       child: Image.network(
-                                                        "https://mesme.inkaradigital.com/admin/menu/${item['image']!}",
+                                                        "https://admin.maximus.works/admin/menu/${item['image']!}",
                                                         width: 150,
                                                         height: 150,
                                                         fit: BoxFit.cover,

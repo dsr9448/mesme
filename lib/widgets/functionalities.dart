@@ -209,7 +209,7 @@ Widget caro2(List<String> bannerImages) {
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: Image.network(
-                          'https://mesme.inkaradigital.com/admin/menu/${i}',
+                          'https://admin.maximus.works/admin/menu/${i}',
                           fit: BoxFit.cover,
                           width: double.infinity,
                         )));

@@ -146,7 +146,7 @@ class GroceryScreen extends StatelessWidget {
                               restrauntCoordinate: grocery.coordinates,
                               description: grocery.description,
                               restraurantImage:
-                                  'https://mesme.inkaradigital.com/mainBanner.jpg',
+                                  'https://admin.maximus.works/mainBanner.jpg',
                               area: grocery.area,
                               time: grocery.time,
                             ),
@@ -162,7 +162,7 @@ class GroceryScreen extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: Image.network(
-                                "https://mesme.inkaradigital.com/admin/foodPhoto.jpg",
+                                "https://admin.maximus.works/admin/foodPhoto.jpg",
                                 height: 150,
                                 width: 150,
                                 fit: BoxFit.cover,

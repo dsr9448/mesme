@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mesme/provider/provider.dart';
-import 'package:mesme/screens/grocery.dart';
 import 'package:mesme/screens/home.dart';
 import 'package:mesme/screens/orders.dart';
+import 'package:mesme/screens/customersupport.dart';
 import 'package:provider/provider.dart';
 
 class FoodBottomNavBar extends StatefulWidget {
@@ -162,7 +162,11 @@ class _FoodBottomNavBarState extends State<FoodBottomNavBar> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        _showComingSoonDialog(context);
+                        setState(() {
+                          currentScreen =
+                              const MeCustomer(); // Change this to the appropriate screen for Orders
+                          currentTab = 2;
+                        });
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(

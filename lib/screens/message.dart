@@ -29,7 +29,7 @@ class _MeMessageState extends State<MeMessage> {
     try {
       final response = await http.get(
         Uri.parse(
-            'https://mesme.inkaradigital.com/admin/api/messages/get.php?userId=${_user!.uid}'),
+            'https://admin.maximus.works/admin/api/messages/get.php?userId=${_user!.uid}'),
       );
 
       if (response.statusCode == 200) {
@@ -50,7 +50,7 @@ class _MeMessageState extends State<MeMessage> {
     try {
       final response = await http.post(
         Uri.parse(
-            'https://mesme.inkaradigital.com/admin/api/messages/create.php'),
+            'https://admin.maximus.works/admin/api/messages/create.php'),
         body: {
           'userId': _user!.uid,
           'message': message,

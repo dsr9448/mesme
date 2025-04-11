@@ -201,7 +201,7 @@ class _MeLocationState extends State<MeLocation> {
   Future<void> fetchSavedAddress() async {
     try {
       var url =
-          'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${widget.uid}';
+          'https://admin.maximus.works/admin/api/users/get.php?id=${widget.uid}';
       var response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         Map<String, dynamic> userData = jsonDecode(response.body);
@@ -220,7 +220,7 @@ class _MeLocationState extends State<MeLocation> {
   void updateLocation(double latitude, double longitude) async {
     try {
       var updateUrl =
-          'https://mesme.inkaradigital.com/admin/api/location/location.php';
+          'https://admin.maximus.works/admin/api/location/location.php';
       var body = {
         'id': widget.uid,
         'address': _locationController.text,

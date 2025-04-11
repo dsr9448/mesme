@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _searchDebounceTimer = Timer(_searchDebounceDuration, () async {
       try {
         final response = await http.get(Uri.parse(
-            'https://mesme.inkaradigital.com/admin/api/Food/search.php?search=$query'));
+            'https://admin.maximus.works/admin/api/Food/search.php?search=$query'));
 
         if (response.statusCode == 200) {
           if (mounted) {
@@ -184,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      "https://mesme.inkaradigital.com/admin/menu/${foodItem['foodPhoto']}",
+                      "https://admin.maximus.works/admin/menu/${foodItem['foodPhoto']}",
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
@@ -275,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: NetworkImage(
-                                'https://mesme.inkaradigital.com/mainBanner.jpg'),
+                                'https://admin.maximus.works/mainBanner.jpg'),
                             fit: BoxFit.cover,
                             colorFilter: ColorFilter.mode(
                               Colors.black.withOpacity(0.4),
@@ -617,8 +617,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     restaurant.coordinates,
                                                 restraurantImage: restaurant
                                                         .rphoto.isNotEmpty
-                                                    ? 'https://mesme.inkaradigital.com/admin/restrauntimage/${restaurant.rphoto}'
-                                                    : 'https://mesme.inkaradigital.com/mainBanner.jpg',
+                                                    ? 'https://admin.maximus.works/admin/restrauntimage/${restaurant.rphoto}'
+                                                    : 'https://admin.maximus.works/mainBanner.jpg',
                                                 time: restaurant.rtime,
                                                 description:
                                                     restaurant.description,
@@ -656,14 +656,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               BlendMode
                                                                   .multiply),
                                                       child: Image.network(
-                                                        "https://mesme.inkaradigital.com/admin/menu/${restaurant.foodItems[0].foodPhoto}",
+                                                        "https://admin.maximus.works/admin/menu/${restaurant.foodItems[0].foodPhoto}",
                                                         height: 150,
                                                         width: 150,
                                                         fit: BoxFit.cover,
                                                         errorBuilder: (context,
                                                             error, stackTrace) {
                                                           return Image.network(
-                                                            "https://mesme.inkaradigital.com/admin/foodPhoto.jpg",
+                                                            "https://admin.maximus.works/admin/foodPhoto.jpg",
                                                             height: 150,
                                                             width: 150,
                                                             fit: BoxFit.cover,

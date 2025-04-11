@@ -99,7 +99,7 @@ class FoodProvider with ChangeNotifier {
       if (user != null) {
         await http.post(
           Uri.parse(
-              'https://mesme.inkaradigital.com/admin/api/users/create.php'),
+              'https://admin.maximus.works/admin/api/users/create.php'),
           body: {
             "id": user.uid,
             "name": name,
@@ -177,7 +177,7 @@ class FoodProvider with ChangeNotifier {
         // Store user information in your backend server
         var res = await http.post(
           Uri.parse(
-              'https://mesme.inkaradigital.com/admin/api/users/create.php'),
+              'https://admin.maximus.works/admin/api/users/create.php'),
           body: {
             "id": user.uid,
             "name": name,
@@ -229,7 +229,7 @@ class FoodProvider with ChangeNotifier {
     return _deduplicateRequest('fetchRestaurants', () async {
       String? address = await fetchSavedCoordinates();
       final response = await http.get(
-          Uri.parse('https://mesme.inkaradigital.com/admin/api/Food/get.php'));
+          Uri.parse('https://admin.maximus.works/admin/api/Food/get.php'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = json.decode(response.body);
@@ -289,7 +289,7 @@ class FoodProvider with ChangeNotifier {
   Future<void> fetchWishlist() async {
     String? address = await fetchSavedCoordinates();
     final response = await http.get(Uri.parse(
-        'https://mesme.inkaradigital.com/admin/api/Wishlist/get.php?userid=${user!.uid}'));
+        'https://admin.maximus.works/admin/api/Wishlist/get.php?userid=${user!.uid}'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);
@@ -339,7 +339,7 @@ class FoodProvider with ChangeNotifier {
   }
 
   Future<void> addToWishlist(int foodId) async {
-    final url = 'https://mesme.inkaradigital.com/admin/api/Wishlist/create.php';
+    final url = 'https://admin.maximus.works/admin/api/Wishlist/create.php';
 
     final requestData = {
       'userid': FirebaseAuth.instance.currentUser!.uid,
@@ -374,7 +374,7 @@ class FoodProvider with ChangeNotifier {
   }
 
   Future<void> removeFromWishlist(int foodId) async {
-    final url = 'https://mesme.inkaradigital.com/admin/api/Wishlist/delete.php';
+    final url = 'https://admin.maximus.works/admin/api/Wishlist/delete.php';
 
     final requestData = {
       'userid': FirebaseAuth.instance.currentUser!.uid,
@@ -413,7 +413,7 @@ class FoodProvider with ChangeNotifier {
     await fetchUserData();
     String? address = await fetchSavedCoordinates();
     final response = await http.get(Uri.parse(
-        'https://mesme.inkaradigital.com/admin/api/Food/getGrocery.php'));
+        'https://admin.maximus.works/admin/api/Food/getGrocery.php'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -471,7 +471,7 @@ class FoodProvider with ChangeNotifier {
         }
 
         var url =
-            'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user!.uid}';
+            'https://admin.maximus.works/admin/api/users/get.php?id=${user!.uid}';
         var response = await http.get(Uri.parse(url));
 
         if (response.statusCode == 200) {
@@ -496,7 +496,7 @@ class FoodProvider with ChangeNotifier {
         throw Exception('User is not authenticated');
       }
       var url =
-          'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
+          'https://admin.maximus.works/admin/api/users/get.php?id=${user.uid}';
       var response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -521,7 +521,7 @@ class FoodProvider with ChangeNotifier {
         throw Exception('User is not authenticated');
       }
       var url =
-          'https://mesme.inkaradigital.com/admin/api/users/get.php?id=${user.uid}';
+          'https://admin.maximus.works/admin/api/users/get.php?id=${user.uid}';
       var response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
@@ -558,7 +558,7 @@ class FoodProvider with ChangeNotifier {
 
       // Define the API URL for updating the token
       var url = Uri.parse(
-          'https://mesme.inkaradigital.com/admin/api/users/updateToken.php');
+          'https://admin.maximus.works/admin/api/users/updateToken.php');
 
       // Send POST request to the API
       var response = await http.post(
@@ -583,7 +583,7 @@ class FoodProvider with ChangeNotifier {
 
   Future<void> fetchOrders() async {
     final response = await http.get(Uri.parse(
-        'https://mesme.inkaradigital.com/admin/api/FoodOrders/get.php?userId=${user!.uid}'));
+        'https://admin.maximus.works/admin/api/FoodOrders/get.php?userId=${user!.uid}'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
@@ -733,7 +733,7 @@ class FoodProvider with ChangeNotifier {
       // Sending the request to the server
       final response = await http.post(
         Uri.parse(
-            'https://mesme.inkaradigital.com/admin/api/FoodPayments/update.php'),
+            'https://admin.maximus.works/admin/api/FoodPayments/update.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -779,7 +779,7 @@ class FoodProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse(
-            'https://mesme.inkaradigital.com/admin/api/FoodOrders/create.php'),
+            'https://admin.maximus.works/admin/api/FoodOrders/create.php'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -797,7 +797,7 @@ class FoodProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        await fetchOrders(); // Refresh orders list after creating new order
+        await fetchOrders();
         notifyListeners();
         return responseData;
       } else {

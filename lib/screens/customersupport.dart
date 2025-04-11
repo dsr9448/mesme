@@ -23,17 +23,17 @@ class MeCustomer extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        leading: IconButton(
-          style: const ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll(Colors.orange)),
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        // leading: IconButton(
+        //   style: const ButtonStyle(
+        //       backgroundColor: WidgetStatePropertyAll(Colors.orange)),
+        //   icon: const Icon(
+        //     Icons.arrow_back_ios,
+        //     color: Colors.white,
+        //   ),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        // ),
         centerTitle: true,
         title: Text(
           'Customer Support',
@@ -42,6 +42,19 @@ class MeCustomer extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/FoodProfile');
+            },
+            icon: const Icon(
+              Icons.person,
+              color: Colors.white,
+            ),
+            style: const ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Colors.orange)),
+          ),
+        ],
       ),
       body: Container(
         padding: const EdgeInsets.all(12),

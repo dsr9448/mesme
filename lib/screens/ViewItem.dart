@@ -72,7 +72,7 @@ class _ViewItemState extends State<ViewItem> {
             children: [
               CachedNetworkImage(
                 imageUrl:
-                    'https://mesme.inkaradigital.com/admin/menu/${widget.imageUrl}',
+                    'https://admin.maximus.works/admin/menu/${widget.imageUrl}',
                 fit: BoxFit.cover,
                 placeholder: (context, url) => const SizedBox(
                   height: 100,

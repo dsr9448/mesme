@@ -59,7 +59,7 @@ class ApiService with ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      final url = 'https://mesme.inkaradigital.com/admin/api/Food/get.php';
+      final url = 'https://admin.maximus.works/admin/api/Food/get.php';
       try {
         final response = await http.get(
           Uri.parse(url),
@@ -143,7 +143,7 @@ class ApiService with ChangeNotifier {
         final response = await http
             .post(
               Uri.parse(
-                  'https://mesme.inkaradigital.com/admin/api/FoodOrders/create.php'),
+                  'https://admin.maximus.works/admin/api/FoodOrders/create.php'),
               headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -227,7 +227,7 @@ class ApiService with ChangeNotifier {
       // Sending the request to the server
       final response = await http.post(
         Uri.parse(
-            'https://mesme.inkaradigital.com/admin/api/FoodOrders/update.php'),
+            'https://admin.maximus.works/admin/api/FoodOrders/update.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -266,7 +266,7 @@ class ApiService with ChangeNotifier {
       // Sending the request to the server
       final response = await http.post(
         Uri.parse(
-            'https://mesme.inkaradigital.com/admin/api/FoodOrders/rating.php'),
+            'https://admin.maximus.works/admin/api/FoodOrders/rating.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
@@ -304,7 +304,7 @@ class ApiService with ChangeNotifier {
       // Sending the request to the server
       final response = await http.post(
         Uri.parse(
-            'https://mesme.inkaradigital.com/admin/api/FoodPayments/update.php'),
+            'https://admin.maximus.works/admin/api/FoodPayments/update.php'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),
       );
